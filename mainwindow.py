@@ -7,8 +7,16 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+#import imgviewer
+
+
+
 
 class Ui_MainWindow(object):
+    
+    captureState = False
+    colorState = False
+    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(875, 378)
@@ -40,6 +48,7 @@ class Ui_MainWindow(object):
         self.loadButton = QtWidgets.QPushButton(MainWindow)
         self.loadButton.setGeometry(QtCore.QRect(740, 100, 101, 31))
         self.loadButton.setObjectName("loadButton")
+        self.loadButton.clicked.connect(self.loadButtonAction)
         
         self.saveButton = QtWidgets.QPushButton(MainWindow)
         self.saveButton.setGeometry(QtCore.QRect(740, 140, 101, 31))
@@ -95,9 +104,20 @@ class Ui_MainWindow(object):
         
         
     def captureButtonAction(self):
-        print("what")
+        if self.captureState == False:
+            self.captureButton.setText("Stop Capture")
+            self.captureButton.setChecked(True)
+            print("Started")
+            self.captureState = True
+        else: 
+            self.captureButton.setText("Start Capture")
+            self.captureButton.setChecked(False)
+            print("Stopped")
+            self.captureState = False
+        
     
     def colorButtonAction(self):
+        self.colorButton.setChecked(False)
         print("Color")
         
     def loadButtonAction(self):   
@@ -130,7 +150,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Proyecto de Visión Artificial"))
-        self.captureButton.setText(_translate("MainWindow", "Stop Capture"))
+        self.captureButton.setText(_translate("MainWindow", "Start Capture"))
         self.colorButton.setText(_translate("MainWindow", "Color Image"))
         self.loadButton.setText(_translate("MainWindow", "Load from File"))
         self.saveButton.setText(_translate("MainWindow", "Save to File"))
@@ -142,3 +162,11 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Zoom"))
         self.label_4.setText(_translate("MainWindow", "Angle"))
 
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog = QtWidgets.QDialog()
+    ui = Ui_MainWindow()
+    ui.setupUi(Dialog)
+    Dialog.show()
+    sys.exit(app.exec_())
