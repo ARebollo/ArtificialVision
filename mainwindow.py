@@ -19,8 +19,11 @@ import numpy as np
 
 class Ui_MainWindow(object):
     capture = VideoCapture()
+    
     captureState = False
     colorState = False #False =  color, true = gray
+
+    #path to the image, and storage of the origin and transformed image
     imgPath = ""
     imgLeft = QImage()
     imgRight = QImage()
@@ -28,18 +31,22 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(875, 378)
+        
+        #Left image frame. Image prior to transformation
         self.imageFrameS = QtWidgets.QFrame(MainWindow)
         self.imageFrameS.setGeometry(QtCore.QRect(20, 20, 320, 240))
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
         
+        #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
         self.imageFrameD.setGeometry(QtCore.QRect(390, 20, 320, 240))
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
         
+        #Capture button.
         self.captureButton = QtWidgets.QPushButton(MainWindow)
         self.captureButton.setGeometry(QtCore.QRect(740, 20, 101, 31))
         self.captureButton.setCheckable(True)
@@ -47,6 +54,7 @@ class Ui_MainWindow(object):
         self.captureButton.setObjectName("captureButton")
         self.captureButton.clicked.connect(self.captureButtonAction)
         
+        #Gray/Color button.
         self.colorButton = QtWidgets.QPushButton(MainWindow)
         self.colorButton.setGeometry(QtCore.QRect(740, 60, 101, 31))
         self.colorButton.setCheckable(True)
@@ -54,31 +62,37 @@ class Ui_MainWindow(object):
         self.colorButton.setObjectName("colorButton")
         self.colorButton.clicked.connect(self.colorButtonAction)
         
+        #Load from file button.
         self.loadButton = QtWidgets.QPushButton(MainWindow)
         self.loadButton.setGeometry(QtCore.QRect(740, 100, 101, 31))
         self.loadButton.setObjectName("loadButton")
         self.loadButton.clicked.connect(self.loadButtonAction)
         
+        #Save to file button.
         self.saveButton = QtWidgets.QPushButton(MainWindow)
         self.saveButton.setGeometry(QtCore.QRect(740, 140, 101, 31))
         self.saveButton.setObjectName("saveButton")
         self.saveButton.clicked.connect(self.saveButtonAction)
         
+        #Copy selection button.
         self.copyButton = QtWidgets.QPushButton(MainWindow)
         self.copyButton.setGeometry(QtCore.QRect(740, 180, 101, 31))
         self.copyButton.setObjectName("copyButton")
         self.copyButton.clicked.connect(self.copyButtonAction)
         
+        #Resize image button.
         self.resizeButton = QtWidgets.QPushButton(MainWindow)
         self.resizeButton.setGeometry(QtCore.QRect(740, 220, 101, 31))
         self.resizeButton.setObjectName("resizeButton")
         self.resizeButton.clicked.connect(self.resizeButtonAction)
         
+        #Enlarge image button
         self.enlargeButton = QtWidgets.QPushButton(MainWindow)
         self.enlargeButton.setGeometry(QtCore.QRect(740, 260, 101, 31))
         self.enlargeButton.setObjectName("enlargeButton")
         self.enlargeButton.clicked.connect(self.enlargeButtonAction)
         
+        #Angle dial
         self.angleDial = QtWidgets.QDial(MainWindow)
         self.angleDial.setGeometry(QtCore.QRect(40, 260, 81, 91))
         self.angleDial.setObjectName("angleDial")
@@ -88,6 +102,7 @@ class Ui_MainWindow(object):
         self.angleDial.setWrapping(True)
         self.angleDial.valueChanged.connect(self.dialAction)
         
+        #Horizontal translation slider
         self.horizontalSlider = QtWidgets.QSlider(MainWindow)
         self.horizontalSlider.setGeometry(QtCore.QRect(150, 280, 160, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
@@ -97,6 +112,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(0)
         self.horizontalSlider.valueChanged.connect(self.horizontalSliderAction)
         
+        #Vertical translation slider
         self.verticalSlider = QtWidgets.QSlider(MainWindow)
         self.verticalSlider.setGeometry(QtCore.QRect(340, 280, 160, 22))
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
@@ -106,6 +122,7 @@ class Ui_MainWindow(object):
         self.verticalSlider.setValue(0)
         self.verticalSlider.valueChanged.connect(self.verticalSliderAction)
         
+        #Zoom slider
         self.zoomSlider = QtWidgets.QSlider(MainWindow)
         self.zoomSlider.setGeometry(QtCore.QRect(530, 280, 160, 22))
         self.zoomSlider.setOrientation(QtCore.Qt.Horizontal)
@@ -115,6 +132,7 @@ class Ui_MainWindow(object):
         self.zoomSlider.setValue(0)
         self.zoomSlider.valueChanged.connect(self.zoomSliderAction)
         
+        #Labels, in the order [Angle, Horizontal, Vertical, Zoom]
         self.label = QtWidgets.QLabel(MainWindow)
         self.label.setGeometry(QtCore.QRect(180, 310, 121, 16))
         self.label.setObjectName("label")
