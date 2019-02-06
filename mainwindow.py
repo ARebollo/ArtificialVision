@@ -82,17 +82,28 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setGeometry(QtCore.QRect(150, 280, 160, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.setMinimum(-100)
+        self.horizontalSlider.setMaximum(100)
+        self.horizontalSlider.setValue(0)
         self.horizontalSlider.valueChanged.connect(self.horizontalSliderAction)
         
         self.verticalSlider = QtWidgets.QSlider(MainWindow)
         self.verticalSlider.setGeometry(QtCore.QRect(340, 280, 160, 22))
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider.setObjectName("verticalSlider")
+        self.verticalSlider.setMinimum(-80)
+        self.verticalSlider.setMaximum(80)
+        self.verticalSlider.setValue(0)
+        self.verticalSlider.valueChanged.connect(self.verticalSliderAction)
         
         self.zoomSlider = QtWidgets.QSlider(MainWindow)
         self.zoomSlider.setGeometry(QtCore.QRect(530, 280, 160, 22))
         self.zoomSlider.setOrientation(QtCore.Qt.Horizontal)
         self.zoomSlider.setObjectName("zoomSlider")
+        self.zoomSlider.setMinimum(-50)
+        self.zoomSlider.setMaximum(50)
+        self.zoomSlider.setValue(0)
+        self.zoomSlider.valueChanged.connect(self.zoomSliderAction)
         
         self.label = QtWidgets.QLabel(MainWindow)
         self.label.setGeometry(QtCore.QRect(180, 310, 121, 16))
@@ -152,13 +163,13 @@ class Ui_MainWindow(object):
         print("Enlarge")
         
     def dialAction(self):
-        print(self.angleDial.value)
+        print(self.angleDial.value())
         
     def horizontalSliderAction(self):
-        print("Horizontal")
+        print(self.horizontalSlider.value())
     
     def verticalSliderAction(self):
-        print("Vertical")
+        print(self.verticalSlider.value())
         
     def zoomSliderAction(self):
         print("Zoom")
