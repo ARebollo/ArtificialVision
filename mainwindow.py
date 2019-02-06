@@ -7,6 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog
+import numpy as np
 #import imgviewer
 
 
@@ -15,7 +17,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     
     captureState = False
-    colorState = False
+    colorState = False #False =  color, true = gray
+    imgPath = ""
     
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -34,7 +37,7 @@ class Ui_MainWindow(object):
         self.captureButton = QtWidgets.QPushButton(MainWindow)
         self.captureButton.setGeometry(QtCore.QRect(740, 20, 101, 31))
         self.captureButton.setCheckable(True)
-        self.captureButton.setChecked(True)
+        self.captureButton.setChecked(False)
         self.captureButton.setObjectName("captureButton")
         self.captureButton.clicked.connect(self.captureButtonAction)
         
@@ -53,18 +56,22 @@ class Ui_MainWindow(object):
         self.saveButton = QtWidgets.QPushButton(MainWindow)
         self.saveButton.setGeometry(QtCore.QRect(740, 140, 101, 31))
         self.saveButton.setObjectName("saveButton")
+        self.saveButton.clicked.connect(self.saveButtonAction)
         
         self.copyButton = QtWidgets.QPushButton(MainWindow)
         self.copyButton.setGeometry(QtCore.QRect(740, 180, 101, 31))
         self.copyButton.setObjectName("copyButton")
+        self.copyButton.clicked.connect(self.copyButtonAction)
         
         self.resizeButton = QtWidgets.QPushButton(MainWindow)
         self.resizeButton.setGeometry(QtCore.QRect(740, 220, 101, 31))
         self.resizeButton.setObjectName("resizeButton")
+        self.resizeButton.clicked.connect(self.resizeButtonAction)
         
         self.enlargeButton = QtWidgets.QPushButton(MainWindow)
         self.enlargeButton.setGeometry(QtCore.QRect(740, 260, 101, 31))
         self.enlargeButton.setObjectName("enlargeButton")
+        self.enlargeButton.clicked.connect(self.enlargeButtonAction)
         
         self.angleDial = QtWidgets.QDial(MainWindow)
         self.angleDial.setGeometry(QtCore.QRect(40, 260, 81, 91))
@@ -75,6 +82,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setGeometry(QtCore.QRect(150, 280, 160, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.valueChanged.connect(self.horizontalSliderAction)
         
         self.verticalSlider = QtWidgets.QSlider(MainWindow)
         self.verticalSlider.setGeometry(QtCore.QRect(340, 280, 160, 22))
@@ -117,8 +125,16 @@ class Ui_MainWindow(object):
         
     
     def colorButtonAction(self):
-        self.colorButton.setChecked(False)
-        print("Color")
+        if self.colorState == False:
+            self.colorButton.setText("Gray Image")
+            self.colorButton.setChecked(True)
+            print("Swapping to Gray")
+            self.colorState = True
+        else: 
+            self.colorButton.setText("Color Image")
+            self.colorButton.setChecked(False)
+            print("Swapping to color")
+            self.colorState = False
         
     def loadButtonAction(self):   
         print("Load")
