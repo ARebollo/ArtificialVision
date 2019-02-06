@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5 import QImage
+import opencv2 as cv
+from opencv2 import VideoCapture
 import numpy as np
 #import imgviewer
 
@@ -15,10 +18,12 @@ import numpy as np
 
 
 class Ui_MainWindow(object):
-    
+    capture = VideoCapture()
     captureState = False
     colorState = False #False =  color, true = gray
     imgPath = ""
+    imgLeft = QImage()
+    imgRight = QImage()
     
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -28,6 +33,7 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
+        
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
         self.imageFrameD.setGeometry(QtCore.QRect(390, 20, 320, 240))
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -153,6 +159,11 @@ class Ui_MainWindow(object):
         
     def loadButtonAction(self):   
         print("Load")
+        self.imgPath, _ = QFileDialog.getOpenFileName()
+        img = QImage.load(self.imgPath)
+        self.imgLeft = cv.resize(img, cv.Size(320,240))
+        #imgViewer.setImage(image)
+        print(self.imgPath)
         
     def saveButtonAction(self):    
         print("Save")
