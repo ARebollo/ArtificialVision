@@ -7,10 +7,11 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5 import QImage
-import opencv2 as cv
-from opencv2 import VideoCapture
+from PyQt5.QtWidgets import QFileDialog, QLabel
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import QRect
+import cv2
+from cv2 import VideoCapture
 import numpy as np
 #import imgviewer
 
@@ -39,12 +40,20 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
         
+        self.label_S = QLabel(self.imageFrameS);
+        self.label_S.setObjectName("label_S");
+        self.label_S.setGeometry(QRect(0, 0, 320, 240));
+        
         #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
         self.imageFrameD.setGeometry(QtCore.QRect(390, 20, 320, 240))
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
+        
+        self.label_D = QLabel(self.imageFrameD);
+        self.label_D.setObjectName("label_D");
+        self.label_D.setGeometry(QRect(0, 0, 320, 240));
         
         #Capture button.
         self.captureButton = QtWidgets.QPushButton(MainWindow)
@@ -178,8 +187,13 @@ class Ui_MainWindow(object):
     def loadButtonAction(self):   
         print("Load")
         self.imgPath, _ = QFileDialog.getOpenFileName()
-        img = QImage.load(self.imgPath)
-        self.imgLeft = cv.resize(img, cv.Size(320,240))
+        self.cvImageO = cv2.imread(self.imgPath)
+        self.cvImageO = cv2.resize(self.cvImageO, (320,240))
+        cv2.cvtColor(self.cvImageO, cv2.COLOR_BGR2RGB, self.cvImageO)
+        width, height, byteValue = self.cvImageO.shape
+        self.imgLeft = QImage(self.cvImageO, width, height, byteValue, QImage.Format_RGB888)
+
+        self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
         #imgViewer.setImage(image)
         print(self.imgPath)
         
