@@ -51,7 +51,15 @@ class ImgViewer:
     #void windowSelected(QPointF center, int sizeX, int sizeY);
     #void pressEvent();
 
+	#imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
+		
+		resize (width,height);
+		win.setRect(0,0,width,height);
+
+		if (img)
+			qimg = imgVisor;
+		
         invertedVerticalAxis=false
         W_AXIS = false
         W_PERIMETER = false
