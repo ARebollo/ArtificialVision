@@ -207,7 +207,7 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         width, height, byteValue = self.colorImage.shape
-        self.imgLeft = QImage(self.colorImage, width, height, byteValue, QImage.Format_RGB888)
+        self.imgLeft = QImage(self.colorImage.data, width, height, QImage.Format_RGB888)
 
         self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
         #imgViewer.setImage(image)
