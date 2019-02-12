@@ -205,9 +205,12 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.resize(self.grayImage, (320,240))
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
-        width, height, byteValue = self.colorImage.shape
-        self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
-                     QImage.Format_RGB888)
+        if self.colorState == False:
+            self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
+                         QImage.Format_RGB888)
+        else:
+            self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
+                         QImage.Format_Grayscale8)
         #self.imgLeft = QImage(self.colorImage, width, height, QImage.Format_RGB888)
 
         self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
