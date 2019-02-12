@@ -13,7 +13,7 @@ from PyQt5.QtCore import QRect
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-import imgviewer
+import ImgViewer
 
 
 
@@ -41,7 +41,7 @@ class Ui_MainWindow(object):
         self.colorImage = cv2.Mat()
         self.grayImage = cv2.Mat()
         self.imgLeft = QImage()
-        self.imgVisorS = imgviewer(320,240, self.imgLeft, self.imageFrameS)
+        self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         
         
         self.label_S = QLabel(self.imageFrameS);
@@ -57,7 +57,7 @@ class Ui_MainWindow(object):
         self.colorImageDest = cv2.Mat()
         self.grayImageDest = cv2.Mat()
         self.imgRight = QImage()
-        self.imgVisorD = imgviewer(320,240, self.imgRight, self.imageFrameD)
+        self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
         self.label_D = QLabel(self.imageFrameD);
         self.label_D.setObjectName("label_D");
@@ -195,10 +195,17 @@ class Ui_MainWindow(object):
     def loadButtonAction(self):   
         print("Load")
         self.imgPath, _ = QFileDialog.getOpenFileName()
-        self.colorImage = cv2.imread(self.imgPath)
-        self.colorImage = cv2.resize(self.cvImageO, (320,240))
         
-        cv2.cvtColor(self.cvImageO, cv2.COLOR_BGR2RGB, self.colorImage)
+        
+        self.colorImage = cv2.imread(self.imgPath)
+        self.colorImage = cv2.resize(self.colorImage, (320,240))
+        self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
+        
+        
+        self.grayImage = cv2.imread(self.imgPath)
+        self.grayImage = cv2.resize(self.grayImage, (320,240))
+        self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
+        
         width, height, byteValue = self.colorImage.shape
         self.imgLeft = QImage(self.colorImage, width, height, byteValue, QImage.Format_RGB888)
 
