@@ -26,12 +26,12 @@ class Ui_MainWindow(object):
 
     #path to the image, and storage of the origin and transformed image
     imgPath = ""
-    imgLeft = QImage()
-    imgRight = QImage()
     
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(875, 378)
+        
+        self.imgPath = ""
         
         #Left image frame. Image prior to transformation
         self.imageFrameS = QtWidgets.QFrame(MainWindow)
@@ -39,6 +39,9 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
+        self.colorImage = cv2.Mat()
+        self.grayImage = cv2.Mat()
+        self.imgLeft = QImage()
         self.imgVisorS = imgviewer(320,240, self.imgLeft, self.imageFrameS)
         
         
@@ -52,6 +55,10 @@ class Ui_MainWindow(object):
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
+        self.colorImageDest = cv2.Mat()
+        self.grayImageDest = cv2.Mat()
+        self.imgRight = QImage()
+        self.imgVisorD = imgviewer(320,240, self.imgRight, self.imageFrameD)
         
         self.label_D = QLabel(self.imageFrameD);
         self.label_D.setObjectName("label_D");
