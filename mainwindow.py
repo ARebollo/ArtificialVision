@@ -13,10 +13,9 @@ from PyQt5.QtCore import QRect
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-import ImgViewer
+#import ImgViewer
 
-
-
+    
 
 class Ui_MainWindow(object):
     
@@ -38,10 +37,10 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
-        self.colorImage = cv2.Mat()
-        self.grayImage = cv2.Mat()
+        self.colorImage = np.zeros(1)
+        self.grayImage = np.zeros(1)
         self.imgLeft = QImage()
-        self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
+        #self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         
         
         self.label_S = QLabel(self.imageFrameS);
@@ -54,10 +53,10 @@ class Ui_MainWindow(object):
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
-        self.colorImageDest = cv2.Mat()
-        self.grayImageDest = cv2.Mat()
+        self.colorImageDest = np.zeros(1)
+        self.grayImageDest = np.zeros(1)
         self.imgRight = QImage()
-        self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
+        #self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
         self.label_D = QLabel(self.imageFrameD);
         self.label_D.setObjectName("label_D");
@@ -207,7 +206,9 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         width, height, byteValue = self.colorImage.shape
-        self.imgLeft = QImage(self.colorImage.data, width, height, QImage.Format_RGB888)
+        self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
+                     QImage.Format_RGB888)
+        #self.imgLeft = QImage(self.colorImage, width, height, QImage.Format_RGB888)
 
         self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
         #imgViewer.setImage(image)
