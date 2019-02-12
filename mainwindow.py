@@ -19,19 +19,18 @@ import imgviewer
 
 
 class Ui_MainWindow(object):
-    capture = VideoCapture()
     
-    captureState = False
-    colorState = False #False =  color, true = gray
 
     #path to the image, and storage of the origin and transformed image
-    imgPath = ""
-    
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(875, 378)
         
         self.imgPath = ""
+        self.capture = VideoCapture()
+        self.captureState = False
+        self.colorState = False  #False =  color, true = gray
         
         #Left image frame. Image prior to transformation
         self.imageFrameS = QtWidgets.QFrame(MainWindow)
@@ -196,11 +195,12 @@ class Ui_MainWindow(object):
     def loadButtonAction(self):   
         print("Load")
         self.imgPath, _ = QFileDialog.getOpenFileName()
-        self.cvImageO = cv2.imread(self.imgPath)
-        self.cvImageO = cv2.resize(self.cvImageO, (320,240))
-        cv2.cvtColor(self.cvImageO, cv2.COLOR_BGR2RGB, self.cvImageO)
-        width, height, byteValue = self.cvImageO.shape
-        self.imgLeft = QImage(self.cvImageO, width, height, byteValue, QImage.Format_RGB888)
+        self.colorImage = cv2.imread(self.imgPath)
+        self.colorImage = cv2.resize(self.cvImageO, (320,240))
+        
+        cv2.cvtColor(self.cvImageO, cv2.COLOR_BGR2RGB, self.colorImage)
+        width, height, byteValue = self.colorImage.shape
+        self.imgLeft = QImage(self.colorImage, width, height, byteValue, QImage.Format_RGB888)
 
         self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
         #imgViewer.setImage(image)
