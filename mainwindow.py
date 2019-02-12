@@ -13,7 +13,7 @@ from PyQt5.QtCore import QRect
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-#import imgviewer
+import imgviewer
 
 
 
@@ -39,6 +39,8 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
+        self.imgVisorS = imgviewer(320,240, self.imgLeft, self.imageFrameS)
+        
         
         self.label_S = QLabel(self.imageFrameS);
         self.label_S.setObjectName("label_S");

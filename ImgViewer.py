@@ -12,9 +12,9 @@ class ImgViewer:
 
 #Q_OBJECT
     
-    	imageScale = 0.0
+    imageScale = 0.0
 	invertedVerticalAxis = false
-    	width = 0
+    width = 0
     height = 0
 	win = QRectF()
 	effWin = QRectF()
@@ -51,7 +51,7 @@ class ImgViewer:
     #void windowSelected(QPointF center, int sizeX, int sizeY);
     #void pressEvent();
 
-    def __init__():
+    def __init__(self, width, heigth, imgVisor, imgFrame):
         invertedVerticalAxis=false
         W_AXIS = false
         W_PERIMETER = false
@@ -61,7 +61,7 @@ class ImgViewer:
             imageScale = width/qimg.width()
 	
         	else
-            	qimg = new QImage(width,height,QImage::Format_Indexed8)
+            	qimg = new QImage(width,height,QImage.Format_Indexed8)
 		    qimg.fill(240)
 	
         	#Gray color table
@@ -78,10 +78,10 @@ class ImgViewer:
 		if (f.sampleBuffers())
 			f.setSampleBuffers( true )
 			setFormat( f )
-			std::cout << "Sample Buffers On in QGLWidget" << std::endl
+			print("Sample Buffers On in QGLWidget")
 	
 		else
-			std::cout << "Sample Buffers Off in QGLWidget" << std::endl
+			print("Sample Buffers Off in QGLWidget")
 
         onSelection = false
 		show()
