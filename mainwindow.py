@@ -217,7 +217,15 @@ class Ui_MainWindow(object):
         #imgViewer.setImage(image)
         print(self.imgPath)
         
-    def saveButtonAction(self):    
+    def saveButtonAction(self):
+        if self.colorState ==  False:
+            saveImage = self.colorImage
+            saveImage = cv2.cvtColor(saveImage, cv2.COLOR_RGB2BGR)
+        else:
+            saveImage = self.grayImage    
+
+        filename = QFileDialog.getSaveFileName()
+        cv2.imWrite(filename, saveImage)
         print("Save")
     
     def copyButtonAction(self):
