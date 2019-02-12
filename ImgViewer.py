@@ -13,7 +13,7 @@ class ImgViewer:
 #Q_OBJECT
     
     imageScale = 0.0
-	invertedVerticalAxis = false
+	invertedVerticalAxis = False
     width = 0
     height = 0
 	win = QRectF()
@@ -30,16 +30,16 @@ class ImgViewer:
 	ctable = QVector<QRgb>() 
 	inicio = QPoint()
     actual = QPoint()
-	translating = false
+	translating = False
 	backPos = QPointF()
-	DRAW_AXIS = false
-    DRAW_PERIMETER = false
+	DRAW_AXIS = False
+    DRAW_PERIMETER = False
 
 	linGrad = QLinearGradient()
     
     iniCoorSelected = QPointF()
     endCoorSelected = QPointF()
-    onSelection = false  
+    onSelection = False  
 	
     TRect = namedtuple('TRect', 'rect color id ang fill width')
 	TEllipse = namedtuple('TEllipse', 'rect center rx ry color id fill ang')
@@ -60,9 +60,9 @@ class ImgViewer:
 		if (img)
 			qimg = imgVisor;
 		
-        invertedVerticalAxis=false
-        W_AXIS = false
-        W_PERIMETER = false
+        invertedVerticalAxis = False
+        W_AXIS = False
+        W_PERIMETER = False
         imageScale = 1.0
 	
         	if (qimg != NULL)
@@ -79,7 +79,7 @@ class ImgViewer:
         		ctable[i] = qRgb(i,i,i)
 	
         qimg->setColorTable(ctable)
-	    translating = false
+	    translating = False
 	    effWin = win
 		QGLFormat f = format()
 	
@@ -91,7 +91,7 @@ class ImgViewer:
 		else
 			print("Sample Buffers Off in QGLWidget")
 
-        onSelection = false
+        onSelection = False
 		show()
         
     def mousePressEvent(mouseEvent):
@@ -101,7 +101,7 @@ class ImgViewer:
             endCoorSelected.setX(mouseEvent.x())
             endCoorSelected.setY(mouseEvent.y())
 
-            onSelection = true
+            onSelection = True
             emit pressEvent()
 
 	
@@ -112,7 +112,7 @@ class ImgViewer:
     def mouseReleaseEvent(mouseEvent):
         if (mouseEvent.button() == Qt.LeftButton)
             emit windowSelected((iniCoorSelected+endCoorSelected)/2, abs(endCoorSelected.x()-iniCoorSelected.x()),abs(endCoorSelected.y()-iniCoorSelected.y()))
-        onSelection = false
+        onSelection = False
 
 '''
 void setImage(QImage *img);
