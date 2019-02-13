@@ -186,16 +186,16 @@ class Ui_MainWindow(object):
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
             if self.colorState == False:
-                ret, colorImage = self.capture.read()
+                ret, self.colorImage = self.capture.read()
                 self.colorImage = cv2.resize(self.colorImage, (320,240))
-                #self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
+                self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
                 self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)    
                 
             else:
-                ret, grayImage = self.capture.read()
+                ret, self.grayImage = self.capture.read()
                 self.grayImage = cv2.resize(self.grayImage, (320,240))
-                #self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
+                self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
                 self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
                 
