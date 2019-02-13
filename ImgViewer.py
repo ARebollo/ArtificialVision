@@ -6,113 +6,125 @@ Created on Wed Feb  6 12:10:15 2019
 @author: dakolas
 """
 
-import QtGui, QGLWidget
+import collections as c
+import numpy as np
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class ImgViewer: 
 
 #Q_OBJECT
     
+    TRect = c.namedtuple('TRect', 'rect color id ang fill width')
+    TEllipse = c.namedtuple('TEllipse', 'rect center rx ry color id fill ang')
+    TLine = c.namedTuple('TLine', 'line color width')
+    TGrad = c.namedTuple('TGrad', 'line color color1 width')
+    TText = c.namedTuple('TText', 'pos size color text width')
+
     imageScale = 0.0
-	invertedVerticalAxis = False
+    invertedVerticalAxis = False
+    
     width = 0
     height = 0
-	win = QRectF()
-	effWin = QRectF()
-	squareQueue = QQueue<TRect>()
-	lineQueue = QQueue<TLine> ()
-	lineOnTopQueue = QQueue<TLine>()
-	ellipseQueue = QQueue<TEllipse>()
-	gradQueue = QQueue<TGrad>()
-	textQueue = QQueue<TText>()
+    win = QtCore.QRectF()
+    effWin = QtCore.QRectF
+    #Queue<TRect>
+    squareQueue = c.deque()
+    #Queue<TLine>
+    lineQueue = c.deque()
+    #Queue<TEllipse>
+    lineOnTopQueue = c.deque()
+    #Queue<TGrad>
+    gradQueue = c.deque()
+    #Queue<TText>
+    textQueue = c.deque()
 
-	qimg = QImage()
-    #For gray conversion
-	ctable = QVector<QRgb>() 
-	inicio = QPoint()
-    actual = QPoint()
-	translating = False
-	backPos = QPointF()
-	DRAW_AXIS = False
+    qimg = QtGui.QImage()
+    #For gray conversion -> Array<QRgb>
+    ctable = list()
+    inicio = QtCore.QPoint()
+    actual = QtCore.QPoint()
+    translating = False
+    backPos = QtCore.QPointF()
+    DRAW_AXIS = False
     DRAW_PERIMETER = False
 
-	linGrad = QLinearGradient()
+    linGrad = QtGui.QLinearGradient()
     
-    iniCoorSelected = QPointF()
-    endCoorSelected = QPointF()
+    iniCoorSelected = QtCore.QPointF()
+    endCoorSelected = QtCore.QPointF()
     onSelection = False  
-	
-    TRect = namedtuple('TRect', 'rect color id ang fill width')
-	TEllipse = namedtuple('TEllipse', 'rect center rx ry color id fill ang')
-	TLine = namedTuple('TLine', 'line color width')
-	TGrad = namedTuple('TGrad', 'line color color1 width')
-	TText = namedTuple('TText', 'pos size color text width')
+    
+ 
 
 #signals:
     #void windowSelected(QPointF center, int sizeX, int sizeY);
     #void pressEvent();
 
-	#imgVisor input qimage, imgFrame qimage parent
+    #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
-		
-		resize (width,height);
-		win.setRect(0,0,width,height);
-
-		if (img)
-			qimg = imgVisor;
-		
-        invertedVerticalAxis = False
-        W_AXIS = False
-        W_PERIMETER = False
-        imageScale = 1.0
-	
-        	if (qimg != NULL)
-            imageScale = width/qimg.width()
-	
-        	else
-            	qimg = new QImage(width,height,QImage.Format_Indexed8)
-		    qimg.fill(240)
-	
-        	#Gray color table
-        ctable.resize(256)
-	    
-		for (int i = 0; i < 256; i++)
-        		ctable[i] = qRgb(i,i,i)
-	
-        qimg->setColorTable(ctable)
-	    translating = False
-	    effWin = win
-		QGLFormat f = format()
-	
-		if (f.sampleBuffers())
-			f.setSampleBuffers( true )
-			setFormat( f )
-			print("Sample Buffers On in QGLWidget")
-	
-		else
-			print("Sample Buffers Off in QGLWidget")
-
-        onSelection = False
-		show()
         
+        QtCore.resize (width,heigth)
+        QtCore.win.setRect(0,0,width,heigth)
+
+        if imgVisor is not None:
+            self.qimg = imgVisor
+        
+        self.invertedVerticalAxis = False
+        self.W_AXIS = False
+        self.W_PERIMETER = False
+        self.imageScale = 1.0
+    
+        if self.qimg is not None:
+            self.imageScale = width/self.qimg.width()
+    
+        else:
+            self.qimg = QtCore.QImage(width,heigth, QtCore.QImage.Format_Indexed8)
+            self.qimg.fill(240)
+            
+        for i in range (0,256):
+            #ctable[i] = QtCore.qRgb(i,i,i)
+            self.ctable.append([i,i,i])
+    
+        self.qimg.setColorTable(self.ctable)
+        self.translating = False
+        self.effWin = self.win
+        
+        '''
+        QGLFormat f = format()
+    
+        if f.sampleBuffers():
+            f.setSampleBuffers(true)
+           setFormat(f)
+            print("Sample Buffers On in QGLWidget")
+    
+        else:
+            print("Sample Buffers Off in QGLWidget")
+        '''
+        
+        self.onSelection = False
+        QtWidgets.show()
+
+    '''     
     def mousePressEvent(mouseEvent):
-        if ( mouseEvent.button() == Qt.LeftButton )	
+        if mouseEvent.button() == Qt.LeftButton:
             iniCoorSelected.setX(mouseEvent.x())
             iniCoorSelected.setY(mouseEvent.y())
             endCoorSelected.setX(mouseEvent.x())
             endCoorSelected.setY(mouseEvent.y())
 
             onSelection = True
-            emit pressEvent()
+            #emit pressEvent()
 
-	
+    
     def mouseMoveEvent(mouseEvent):
         endCoorSelected.setX(mouseEvent.x())
         endCoorSelected.setY(mouseEvent.y())
     
     def mouseReleaseEvent(mouseEvent):
-        if (mouseEvent.button() == Qt.LeftButton)
-            emit windowSelected((iniCoorSelected+endCoorSelected)/2, abs(endCoorSelected.x()-iniCoorSelected.x()),abs(endCoorSelected.y()-iniCoorSelected.y()))
+        #if mouseEvent.button() == Qt.LeftButton:
+            #emit windowSelected((iniCoorSelected+endCoorSelected)/2, abs(endCoorSelected.x()-iniCoorSelected.x()),abs(endCoorSelected.y()-iniCoorSelected.y()))
         onSelection = False
+    '''
 
 '''
 void setImage(QImage *img);
@@ -148,7 +160,3 @@ uint32_t getHeight() { return height; }
 void autoResize();
 uchar *imageBuffer() { if (qimg != NULL) return qimg->bits(); return NULL; }
 '''
-
-};
-
-#endif
