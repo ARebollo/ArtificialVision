@@ -217,6 +217,8 @@ class Ui_MainWindow(object):
     def loadButtonAction(self):   
         print("Load")
         self.imgPath, _ = QFileDialog.getOpenFileName()
+        if self.captureState == True:
+            self.captureButtonAction()
         
         
         self.colorImage = cv2.imread(self.imgPath)
