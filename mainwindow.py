@@ -9,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QLabel
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, QTimer
 import cv2
 from cv2 import VideoCapture
 import numpy as np
@@ -27,9 +27,14 @@ class Ui_MainWindow(object):
         MainWindow.resize(875, 378)
         
         self.imgPath = ""
-        self.capture = VideoCapture()
+        self.capture = VideoCapture(0)
         self.captureState = False
         self.colorState = False  #False =  color, true = gray
+
+        #Timer to control the capture.
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerLoop)
+        self.timer.start(16)
         
         #Left image frame. Image prior to transformation
         self.imageFrameS = QtWidgets.QFrame(MainWindow)
@@ -43,9 +48,9 @@ class Ui_MainWindow(object):
         #self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         
         
-        self.label_S = QLabel(self.imageFrameS);
-        self.label_S.setObjectName("label_S");
-        self.label_S.setGeometry(QRect(0, 0, 320, 240));
+        self.label_S = QLabel(self.imageFrameS)
+        self.label_S.setObjectName("label_S")
+        self.label_S.setGeometry(QRect(0, 0, 320, 240))
         
         #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
@@ -58,9 +63,9 @@ class Ui_MainWindow(object):
         self.imgRight = QImage()
         #self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
-        self.label_D = QLabel(self.imageFrameD);
-        self.label_D.setObjectName("label_D");
-        self.label_D.setGeometry(QRect(0, 0, 320, 240));
+        self.label_D = QLabel(self.imageFrameD)
+        self.label_D.setObjectName("label_D")
+        self.label_D.setGeometry(QRect(0, 0, 320, 240))
         
         #Capture button.
         self.captureButton = QtWidgets.QPushButton(MainWindow)
@@ -177,8 +182,26 @@ class Ui_MainWindow(object):
             self.captureButton.setChecked(False)
             print("Stopped")
             self.captureState = False
-        
-    
+
+    def timerLoop(self):
+        if (self.captureState == True and self.capture.isOpened() == True):
+            if self.colorState == False:
+                ret, colorImage = self.capture.read()
+                self.colorImage = cv2.resize(self.colorImage, (320,240))
+                #self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
+                self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
+                         QImage.Format_RGB888)    
+                
+            else:
+                ret, grayImage = self.capture.read()
+                self.grayImage = cv2.resize(self.grayImage, (320,240))
+                #self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
+                self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
+                         QImage.Format_Grayscale8)
+                
+                
+            self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+            
     def colorButtonAction(self):
         if self.colorState == False:
             self.colorButton.setText("Gray Image")
@@ -211,10 +234,10 @@ class Ui_MainWindow(object):
         else:
             self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
-        #self.imgLeft = QImage(self.colorImage, width, height, QImage.Format_RGB888)
+        
 
         self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
-        #imgViewer.setImage(image)
+        
         print(self.imgPath)
         
     def saveButtonAction(self):
@@ -271,4 +294,5 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(Dialog)
     Dialog.show()
+
     sys.exit(app.exec_())
