@@ -26,7 +26,7 @@ class ImgViewer:
     width = 0
     height = 0
     win = QtCore.QRectF()
-    effWin = QtCore.QRectF
+    effWin = QtCore.QRectF()
     #Queue<TRect>
     squareQueue = c.deque()
     #Queue<TLine>
@@ -53,12 +53,10 @@ class ImgViewer:
     iniCoorSelected = QtCore.QPointF()
     endCoorSelected = QtCore.QPointF()
     onSelection = False  
-    
  
-
-#signals:
-    #void windowSelected(QPointF center, int sizeX, int sizeY);
-    #void pressEvent();
+    #signals:
+    windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
+    pressEvent = QtCore.pyqtSignal(int)
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
@@ -104,27 +102,27 @@ class ImgViewer:
         self.onSelection = False
         QtWidgets.show()
 
-    '''     
-    def mousePressEvent(mouseEvent):
-        if mouseEvent.button() == Qt.LeftButton:
-            iniCoorSelected.setX(mouseEvent.x())
-            iniCoorSelected.setY(mouseEvent.y())
-            endCoorSelected.setX(mouseEvent.x())
-            endCoorSelected.setY(mouseEvent.y())
+         
+    def mousePressEvent(self, mouseEvent):
+        if mouseEvent.button() == QtCore.LeftButton:
+            self.iniCoorSelected.setX(mouseEvent.x())
+            self.iniCoorSelected.setY(mouseEvent.y())
+            self.endCoorSelected.setX(mouseEvent.x())
+            self.endCoorSelected.setY(mouseEvent.y())
 
-            onSelection = True
-            #emit pressEvent()
+            self.onSelection = True
+            self.pressEvent.emit()
 
+    def mouseMoveEvent(self, mouseEvent):
+        self.endCoorSelected.setX(mouseEvent.x())
+        self.endCoorSelected.setY(mouseEvent.y())
     
-    def mouseMoveEvent(mouseEvent):
-        endCoorSelected.setX(mouseEvent.x())
-        endCoorSelected.setY(mouseEvent.y())
+    def mouseReleaseEvent(self, mouseEvent):
+        if mouseEvent.button() == QtCore.LeftButton:
+            self.windowSelected((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
+            abs(self.endCoorSelected.y()-self.iniCoorSelected.y())).emit()
+        self.onSelection = False
     
-    def mouseReleaseEvent(mouseEvent):
-        #if mouseEvent.button() == Qt.LeftButton:
-            #emit windowSelected((iniCoorSelected+endCoorSelected)/2, abs(endCoorSelected.x()-iniCoorSelected.x()),abs(endCoorSelected.y()-iniCoorSelected.y()))
-        onSelection = False
-    '''
 
 '''
 void setImage(QImage *img);
