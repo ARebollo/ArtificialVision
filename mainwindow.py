@@ -8,12 +8,12 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QLabel
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QImage, QPixmap, QColor
 from PyQt5.QtCore import QRect, QTimer
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-#import ImgViewer
+import ImgViewer
 
     
 
@@ -28,13 +28,18 @@ class Ui_MainWindow(object):
         
         self.imgPath = ""
         self.capture = VideoCapture(0)
+        self.imageWindow = cv2.Rect() #TODO Change to a list, since python doesn't need the kind of crap C++ does to handle lists and stuff
         self.captureState = False
         self.colorState = False  #False =  color, true = gray
+        self.winSelected = False 
 
         #Timer to control the capture.
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerLoop)
         self.timer.start(16)
+        
+        #Signals for window selection
+        
         
         #Left image frame. Image prior to transformation
         self.imageFrameS = QtWidgets.QFrame(MainWindow)
@@ -44,9 +49,9 @@ class Ui_MainWindow(object):
         self.imageFrameS.setObjectName("imageFrameS")
         self.colorImage = np.zeros(1)
         self.grayImage = np.zeros(1)
-        self.imgLeft = QImage()
-        #self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
-        
+        self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
+        self.imgVisorS = ImgViewer.ImgViewer(320,240, self.imgLeft, self.imageFrameS)
+        self.imgVisorS.windowSelected.connect(self.selectWindow)
         
         self.label_S = QLabel(self.imageFrameS)
         self.label_S.setObjectName("label_S")
@@ -60,8 +65,8 @@ class Ui_MainWindow(object):
         self.imageFrameD.setObjectName("imageFrameD")
         self.colorImageDest = np.zeros(1)
         self.grayImageDest = np.zeros(1)
-        self.imgRight = QImage()
-        #self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
+        self.imgRight = QImage(320, 240, QImage.Format_RGB888)
+        self.imgVisorD = ImgViewer.ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
         self.label_D = QLabel(self.imageFrameD)
         self.label_D.setObjectName("label_D")
@@ -170,7 +175,29 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-        
+    def windowSelected(self, point, posX, posY):
+        pEnd = QtCore.QPointF
+        if posX > 0 and posY>0:
+            self.imageWindow.x = point.x()-posX/2;
+            if self.imageWindow.x<0:
+                self.imageWindow.x = 0;
+            self.imageWindow.y = point.y()-posY/2;
+            if self.imageWindow.y<0:
+                self.imageWindow.y = 0;
+            pEnd.setX(point.x()+posX/2);
+            if pEnd.x()>=320:
+                pEnd.setX(319);
+            pEnd.setY(point.y()+posY/2);
+            if pEnd.y()>=240:
+                pEnd.setY(239);
+            self.imageWindow.width = pEnd.x()-self.imageWindow.x+1;
+            self.imageWindow.height = pEnd.y()-self.imageWindow.y+1;
+
+        self.winSelected = True;
+    
+                
+
+    
     def captureButtonAction(self):
         if self.captureState == False:
             self.captureButton.setText("Stop Capture")
@@ -201,6 +228,9 @@ class Ui_MainWindow(object):
                 
                 
             self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+            
+            if self.winSelected == True:
+                self.visorS.drawSquare(QRect(self.imageWindow.x, self.imageWindow.y, self.imageWindow.width,self.imageWindow.height), QColor.green );
             
     def colorButtonAction(self):
         if self.colorState == False:

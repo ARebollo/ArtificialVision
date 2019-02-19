@@ -9,16 +9,16 @@ Created on Wed Feb  6 12:10:15 2019
 import collections as c
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-class ImgViewer: 
+from PyQt5.QtWidgets import QWidget
+class ImgViewer(QWidget): 
 
 #Q_OBJECT
     
-    TRect = c.namedtuple('TRect', 'rect color id ang fill width')
-    TEllipse = c.namedtuple('TEllipse', 'rect center rx ry color id fill ang')
-    TLine = c.namedTuple('TLine', 'line color width')
-    TGrad = c.namedTuple('TGrad', 'line color color1 width')
-    TText = c.namedTuple('TText', 'pos size color text width')
+    #TRect = c.namedtuple('TRect', 'rect color id ang fill width')
+    #TEllipse = c.namedtuple('TEllipse', 'rect center rx ry color id fill ang')
+    #TLine = c.namedTuple('TLine', 'line color width')
+    #TGrad = c.namedTuple('TGrad', 'line color color1 width')
+    #TText = c.namedTuple('TText', 'pos size color text width')
 
     imageScale = 0.0
     invertedVerticalAxis = False
@@ -60,9 +60,10 @@ class ImgViewer:
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
+        super(ImgViewer, self).__init__()
         
-        QtCore.resize (width,heigth)
-        QtCore.win.setRect(0,0,width,heigth)
+        self.resize(width,heigth)
+        self.win.setRect(0,0,width,heigth)
 
         if imgVisor is not None:
             self.qimg = imgVisor
@@ -81,7 +82,7 @@ class ImgViewer:
             
         for i in range (0,256):
             #ctable[i] = QtCore.qRgb(i,i,i)
-            self.ctable.append([i,i,i])
+            self.ctable.append(QtGui.qRgb(i,i,i))
     
         self.qimg.setColorTable(self.ctable)
         self.translating = False
@@ -100,7 +101,7 @@ class ImgViewer:
         '''
         
         self.onSelection = False
-        QtWidgets.show()
+        #self.show()
 
          
     def mousePressEvent(self, mouseEvent):
