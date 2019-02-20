@@ -9,9 +9,9 @@ Created on Wed Feb  6 12:10:15 2019
 import collections as c
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QWidget
-class ImgViewer(QWidget): 
+#from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtOpenGL import QGLWidget
+class ImgViewer(QGLWidget): 
 
 #Q_OBJECT
     
@@ -61,11 +61,11 @@ class ImgViewer(QWidget):
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
-        super(ImgViewer, self).__init__(imgFrame)
         
+        super(ImgViewer, self).__init__(imgFrame)
         self.resize(width,heigth)
         self.win.setRect(0,0,width,heigth)
-
+        
         if imgVisor is not None:
             self.qimg = imgVisor
         
@@ -103,15 +103,15 @@ class ImgViewer(QWidget):
         
         self.onSelection = False
         self.show()
-
          
     def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
+        print("Mouse clicked")
         if mouseEvent.button() == QtCore.LeftButton:
             self.iniCoorSelected.setX(mouseEvent.x())
             self.iniCoorSelected.setY(mouseEvent.y())
             self.endCoorSelected.setX(mouseEvent.x())
             self.endCoorSelected.setY(mouseEvent.y())
-            print("Mouse clicked")
+            
             self.onSelection = True
             self.pressEvent.emit()
 
