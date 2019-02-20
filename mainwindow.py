@@ -28,7 +28,6 @@ class Ui_MainWindow(object):
         
         self.imgPath = ""
         self.capture = VideoCapture(0)
-        self.imageWindow = cv2.Rect() #TODO Change to a list, since python doesn't need the kind of crap C++ does to handle lists and stuff
         self.captureState = False
         self.colorState = False  #False =  color, true = gray
         self.winSelected = False 
@@ -175,23 +174,23 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-    def windowSelected(self, point, posX, posY):
+    def selectWindow(self, point, posX, posY):
         pEnd = QtCore.QPointF
         if posX > 0 and posY>0:
-            self.imageWindow.x = point.x()-posX/2;
-            if self.imageWindow.x<0:
-                self.imageWindow.x = 0;
-            self.imageWindow.y = point.y()-posY/2;
-            if self.imageWindow.y<0:
-                self.imageWindow.y = 0;
+            self.rectPosX = point.x()-posX/2;
+            if self.rectPosX<0:
+                self.rectPosX = 0;
+            self.rectPosY = point.y()-posY/2;
+            if self.rectPosY<0:
+                self.rectPosY = 0;
             pEnd.setX(point.x()+posX/2);
             if pEnd.x()>=320:
                 pEnd.setX(319);
             pEnd.setY(point.y()+posY/2);
             if pEnd.y()>=240:
                 pEnd.setY(239);
-            self.imageWindow.width = pEnd.x()-self.imageWindow.x+1;
-            self.imageWindow.height = pEnd.y()-self.imageWindow.y+1;
+            self.rectWidth = pEnd.x()-self.rectPosX+1;
+            self.rectHeight = pEnd.y()-self.rectPosY+1;
 
         self.winSelected = True;
     
@@ -230,7 +229,7 @@ class Ui_MainWindow(object):
             self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
             
             if self.winSelected == True:
-                self.visorS.drawSquare(QRect(self.imageWindow.x, self.imageWindow.y, self.imageWindow.width,self.imageWindow.height), QColor.green );
+                self.visorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
             
     def colorButtonAction(self):
         if self.colorState == False:
