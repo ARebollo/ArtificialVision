@@ -15,11 +15,8 @@ from cv2 import VideoCapture
 import numpy as np
 from ImgViewer import ImgViewer
 
-    
-
 class Ui_MainWindow(object):
     
-
     #path to the image, and storage of the origin and transformed image
 
     def setupUi(self, MainWindow):
@@ -230,7 +227,7 @@ class Ui_MainWindow(object):
             self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
             
             if self.winSelected == True:
-                self.visorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
+                self.imgVisorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
             
     def colorButtonAction(self):
         if self.colorState == False:
