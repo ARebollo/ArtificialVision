@@ -13,13 +13,10 @@ from PyQt5.QtCore import QRect, QTimer
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-#import ImgViewer
-
-    
+import ImgViewer
 
 class Ui_MainWindow(object):
     
-
     #path to the image, and storage of the origin and transformed image
 
     def setupUi(self, MainWindow):

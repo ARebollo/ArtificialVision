@@ -61,7 +61,7 @@ class ImgViewer:
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
         
-        QtCore.resize (width,heigth)
+        QtWidgets.resize(width,heigth)
         QtCore.win.setRect(0,0,width,heigth)
 
         if imgVisor is not None:
