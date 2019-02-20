@@ -9,6 +9,7 @@ Created on Wed Feb  6 12:10:15 2019
 import collections as c
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget
 class ImgViewer(QWidget): 
 
@@ -60,7 +61,7 @@ class ImgViewer(QWidget):
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
-        super(ImgViewer, self).__init__()
+        super(ImgViewer, self).__init__(imgFrame)
         
         self.resize(width,heigth)
         self.win.setRect(0,0,width,heigth)
@@ -101,24 +102,26 @@ class ImgViewer(QWidget):
         '''
         
         self.onSelection = False
-        #self.show()
+        self.show()
 
          
-    def mousePressEvent(self, mouseEvent):
+    def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
         if mouseEvent.button() == QtCore.LeftButton:
             self.iniCoorSelected.setX(mouseEvent.x())
             self.iniCoorSelected.setY(mouseEvent.y())
             self.endCoorSelected.setX(mouseEvent.x())
             self.endCoorSelected.setY(mouseEvent.y())
-
+            print("Mouse clicked")
             self.onSelection = True
             self.pressEvent.emit()
 
-    def mouseMoveEvent(self, mouseEvent):
+    def mouseMoveEvent(self, mouseEvent: QtGui.QMouseEvent):
         self.endCoorSelected.setX(mouseEvent.x())
         self.endCoorSelected.setY(mouseEvent.y())
+        print("Mouse clicked")
     
-    def mouseReleaseEvent(self, mouseEvent):
+    def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
+        print("Mouse clicked")
         if mouseEvent.button() == QtCore.LeftButton:
             self.windowSelected((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
             abs(self.endCoorSelected.y()-self.iniCoorSelected.y())).emit()

@@ -13,7 +13,7 @@ from PyQt5.QtCore import QRect, QTimer
 import cv2
 from cv2 import VideoCapture
 import numpy as np
-import ImgViewer
+from ImgViewer import ImgViewer
 
     
 
@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         self.colorImage = np.zeros(1)
         self.grayImage = np.zeros(1)
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
-        self.imgVisorS = ImgViewer.ImgViewer(320,240, self.imgLeft, self.imageFrameS)
+        self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         self.imgVisorS.windowSelected.connect(self.selectWindow)
         
         self.label_S = QLabel(self.imageFrameS)
@@ -65,7 +65,7 @@ class Ui_MainWindow(object):
         self.colorImageDest = np.zeros(1)
         self.grayImageDest = np.zeros(1)
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
-        self.imgVisorD = ImgViewer.ImgViewer(320,240, self.imgRight, self.imageFrameD)
+        self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
         self.label_D = QLabel(self.imageFrameD)
         self.label_D.setObjectName("label_D")
@@ -195,7 +195,8 @@ class Ui_MainWindow(object):
         self.winSelected = True;
     
                 
-
+    def mousePressEvent(self, QMouseEvent):
+        print("Mouse clicked")        
     
     def captureButtonAction(self):
         if self.captureState == False:
