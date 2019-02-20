@@ -177,22 +177,22 @@ class Ui_MainWindow(object):
     def selectWindow(self, point, posX, posY):
         pEnd = QtCore.QPointF
         if posX > 0 and posY>0:
-            self.rectPosX = point.x()-posX/2;
+            self.rectPosX = point.x()-posX/2
             if self.rectPosX<0:
-                self.rectPosX = 0;
-            self.rectPosY = point.y()-posY/2;
+                self.rectPosX = 0
+            self.rectPosY = point.y()-posY/2
             if self.rectPosY<0:
-                self.rectPosY = 0;
-            pEnd.setX(point.x()+posX/2);
+                self.rectPosY = 0
+            pEnd.setX(point.x()+posX/2)
             if pEnd.x()>=320:
-                pEnd.setX(319);
-            pEnd.setY(point.y()+posY/2);
+                pEnd.setX(319)
+            pEnd.setY(point.y()+posY/2)
             if pEnd.y()>=240:
-                pEnd.setY(239);
-            self.rectWidth = pEnd.x()-self.rectPosX+1;
-            self.rectHeight = pEnd.y()-self.rectPosY+1;
+                pEnd.setY(239)
+            self.rectWidth = pEnd.x()-self.rectPosX+1
+            self.rectHeight = pEnd.y()-self.rectPosY+1
 
-        self.winSelected = True;
+        self.winSelected = True
     
                 
     def mousePressEvent(self, QMouseEvent):
