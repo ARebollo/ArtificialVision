@@ -230,7 +230,8 @@ class Ui_MainWindow(object):
             
             if self.winSelected == True:
                 self.imgVisorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
-            
+            self.imgVisorS.repaint()
+            self.imgVisorS.update()
     def colorButtonAction(self):
         if self.colorState == False:
             self.colorButton.setText("Gray Image")
