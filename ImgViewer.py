@@ -127,6 +127,10 @@ class ImgViewer(QWidget):
             abs(self.endCoorSelected.y()-self.iniCoorSelected.y())).emit()
         self.onSelection = False
     
+    def horizontalTranslation(self):
+        
+
+    def verticalTranslation(self):
 
 '''
 void setImage(QImage *img);
