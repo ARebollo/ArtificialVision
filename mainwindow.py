@@ -50,10 +50,11 @@ class Ui_MainWindow(object):
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         self.imgVisorS.windowSelected.connect(self.selectWindow)
-        self.label_S = QLabel(self.imageFrameS)
+        self.label_S = QLabel(self.imgVisorS)
         self.label_S.setObjectName("label_S")
         self.label_S.setGeometry(QRect(0, 0, 320, 240))
         self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True);
+        #TODO: Delete label, set as attribute of imgViewer        
         
         #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
@@ -174,7 +175,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
     def selectWindow(self, point, posX, posY):
-        pEnd = QtCore.QPointF
+        pEnd = QtCore.QPointF()
         if posX > 0 and posY>0:
             self.rectPosX = point.x()-posX/2
             if self.rectPosX<0:

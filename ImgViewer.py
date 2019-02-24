@@ -26,8 +26,8 @@ class ImgViewer(QGLWidget):
     
     width = 0
     height = 0
-    win = QtCore.QRectF()
-    effWin = QtCore.QRectF()
+    win = QtCore.QRect()
+    effWin = QtCore.QRect()
     #Queue<TRect>
     squareQueue = c.deque()
     #Queue<TLine>
@@ -57,15 +57,16 @@ class ImgViewer(QGLWidget):
  
     #signals:
     windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
-    pressEvent = QtCore.pyqtSignal(int)
+    pressEvent = QtCore.pyqtSignal()
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
         
-        super(ImgViewer, self).__init__(imgFrame)
+        super(  ).__init__(imgFrame)
+        
         self.resize(width,heigth)
         self.win.setRect(0,0,width,heigth)
-        
+        self.setGeometry(self.win)
         if imgVisor is not None:
             self.qimg = imgVisor
         
@@ -106,7 +107,7 @@ class ImgViewer(QGLWidget):
          
     def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse clicked")
-        if mouseEvent.button() == QtCore.LeftButton:
+        if mouseEvent.button() == QtCore.Qt.LeftButton:
             self.iniCoorSelected.setX(mouseEvent.x())
             self.iniCoorSelected.setY(mouseEvent.y())
             self.endCoorSelected.setX(mouseEvent.x())
@@ -122,9 +123,9 @@ class ImgViewer(QGLWidget):
     
     def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse clicked")
-        if mouseEvent.button() == QtCore.LeftButton:
-            self.windowSelected((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
-            abs(self.endCoorSelected.y()-self.iniCoorSelected.y())).emit()
+        if mouseEvent.button() == QtCore.Qt.LeftButton:
+            self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
+            abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
         self.onSelection = False
     
 
