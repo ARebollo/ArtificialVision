@@ -5,11 +5,10 @@
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QLabel
 from PyQt5.QtGui import QImage, QPixmap, QColor
-from PyQt5.QtCore import QRect, QTimer
+from PyQt5.QtCore import QRect, QTimer, Qt
 import cv2
 from cv2 import VideoCapture
 import numpy as np
@@ -51,10 +50,11 @@ class Ui_MainWindow(object):
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         self.imgVisorS.windowSelected.connect(self.selectWindow)
-        
-        self.label_S = QLabel(self.imageFrameS)
+        self.label_S = QLabel(self.imgVisorS)
         self.label_S.setObjectName("label_S")
         self.label_S.setGeometry(QRect(0, 0, 320, 240))
+        self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True);
+        #TODO: Delete label, set as attribute of imgViewer        
         
         #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
     def selectWindow(self, point, posX, posY):
-        pEnd = QtCore.QPointF
+        pEnd = QtCore.QPointF()
         if posX > 0 and posY>0:
             self.rectPosX = point.x()-posX/2
             if self.rectPosX<0:
@@ -194,9 +194,8 @@ class Ui_MainWindow(object):
 
         self.winSelected = True;
     
-                
-    def mousePressEvent(self, QMouseEvent):
-        print("Mouse clicked")        
+    def pressMouseEvent(self, QMouseEvent):
+        print("What")
     
     def captureButtonAction(self):
         if self.captureState == False:
@@ -230,7 +229,7 @@ class Ui_MainWindow(object):
             self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
             
             if self.winSelected == True:
-                self.visorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
+                self.imgVisorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
             
     def colorButtonAction(self):
         if self.colorState == False:

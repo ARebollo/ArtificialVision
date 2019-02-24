@@ -9,9 +9,9 @@ Created on Wed Feb  6 12:10:15 2019
 import collections as c
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QWidget
-class ImgViewer(QWidget): 
+#from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtOpenGL import QGLWidget
+class ImgViewer(QGLWidget): 
 
 #Q_OBJECT
     
@@ -26,8 +26,8 @@ class ImgViewer(QWidget):
     
     width = 0
     height = 0
-    win = QtCore.QRectF()
-    effWin = QtCore.QRectF()
+    win = QtCore.QRect()
+    effWin = QtCore.QRect()
     #Queue<TRect>
     squareQueue = c.deque()
     #Queue<TLine>
@@ -57,15 +57,16 @@ class ImgViewer(QWidget):
  
     #signals:
     windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
-    pressEvent = QtCore.pyqtSignal(int)
+    pressEvent = QtCore.pyqtSignal()
 
     #imgVisor input qimage, imgFrame qimage parent
     def __init__(self, width, heigth, imgVisor, imgFrame):
-        super(ImgViewer, self).__init__(imgFrame)
+        
+        super(  ).__init__(imgFrame)
         
         self.resize(width,heigth)
         self.win.setRect(0,0,width,heigth)
-
+        self.setGeometry(self.win)
         if imgVisor is not None:
             self.qimg = imgVisor
         
@@ -103,15 +104,15 @@ class ImgViewer(QWidget):
         
         self.onSelection = False
         self.show()
-
          
     def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
-        if mouseEvent.button() == QtCore.LeftButton:
+        print("Mouse clicked")
+        if mouseEvent.button() == QtCore.Qt.LeftButton:
             self.iniCoorSelected.setX(mouseEvent.x())
             self.iniCoorSelected.setY(mouseEvent.y())
             self.endCoorSelected.setX(mouseEvent.x())
             self.endCoorSelected.setY(mouseEvent.y())
-            print("Mouse clicked")
+            
             self.onSelection = True
             self.pressEvent.emit()
 
@@ -122,9 +123,9 @@ class ImgViewer(QWidget):
     
     def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse clicked")
-        if mouseEvent.button() == QtCore.LeftButton:
-            self.windowSelected((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
-            abs(self.endCoorSelected.y()-self.iniCoorSelected.y())).emit()
+        if mouseEvent.button() == QtCore.Qt.LeftButton:
+            self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
+            abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
         self.onSelection = False
     
 
