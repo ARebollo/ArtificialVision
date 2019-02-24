@@ -62,8 +62,8 @@ class Ui_MainWindow(object):
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
-        self.colorImageDest = np.zeros(1)
-        self.grayImageDest = np.zeros(1)
+        self.colorImageDest = np.zeros((320,240))
+        self.grayImageDest = np.zeros((320,240))
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
@@ -283,6 +283,13 @@ class Ui_MainWindow(object):
         print("Save")
     
     def copyButtonAction(self):
+        if self.colorState == True:
+            self.colorImageDest[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight] = self.colorImage[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight]
+            #TODO: Paint it
+        else:
+            self.grayImageDest[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight] = self.grayImage[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight]
+            #TODO: Paint it
+            pass
         print("Copy")
     
     def resizeButtonAction(self):
