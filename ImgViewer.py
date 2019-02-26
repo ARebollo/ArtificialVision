@@ -9,6 +9,7 @@ Created on Wed Feb  6 12:10:15 2019
 import collections as c
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QPainter
 #from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtOpenGL import QGLWidget
 class ImgViewer(QGLWidget): 
@@ -119,10 +120,9 @@ class ImgViewer(QGLWidget):
     def mouseMoveEvent(self, mouseEvent: QtGui.QMouseEvent):
         self.endCoorSelected.setX(mouseEvent.x())
         self.endCoorSelected.setY(mouseEvent.y())
-        print("Mouse clicked")
     
     def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
-        print("Mouse clicked")
+        print("Mouse Released")
         if mouseEvent.button() == QtCore.Qt.LeftButton:
             self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
             abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
@@ -162,10 +162,12 @@ class ImgViewer(QGLWidget):
             pen.setWidth(penwidth)
             qp.setPen(pen)
     
-    #def horizontalTranslation(self):
-        
-    #def verticalTranslation(self):
-
+    def drawSquare(self, posX, posY, width, height):
+        painter = QPainter(self.qimg)
+        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.setPen(QtCore.Qt.red)
+        painter.drawRect(posX,posY,width,height)
+        #ui.imageLabel->setPixmap(QPixmap::fromImage(qImage));
 '''
 void setImage(QImage *img);
 void paintEvent(QPaintEvent *);
