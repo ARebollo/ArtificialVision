@@ -57,7 +57,8 @@ class ImgViewer(QGLWidget):
     onSelection = False  
  
     #signals:
-    windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
+    #Emits: Starting point, width, height
+    windowSelected = QtCore.pyqtSignal(int, int, int, int)
     pressEvent = QtCore.pyqtSignal()
 
     #imgVisor input qimage, imgFrame qimage parent
@@ -122,10 +123,9 @@ class ImgViewer(QGLWidget):
         self.endCoorSelected.setY(mouseEvent.y())
     
     def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
-        print("Mouse Released")
         if mouseEvent.button() == QtCore.Qt.LeftButton:
-            self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
-            abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
+            self.windowSelected.emit(self.iniCoorSelected.x(), self.iniCoorSelected.y(), (self.endCoorSelected.x()-self.iniCoorSelected.x()),
+            self.endCoorSelected.y()-self.iniCoorSelected.y())
         self.onSelection = False
     
     def drawSquare(self, posX, posY, width, height):

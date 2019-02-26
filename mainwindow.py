@@ -51,6 +51,7 @@ class Ui_MainWindow(object):
         self.imageFrameS.setObjectName("imageFrameS")
         self.colorImage = np.zeros((320,240))
         self.grayImage = np.zeros((320,240))
+        
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         self.imgVisorS.windowSelected.connect(self.selectWindow)
@@ -68,10 +69,10 @@ class Ui_MainWindow(object):
         self.imageFrameD.setObjectName("imageFrameD")
         self.colorImageDest = np.zeros((240,320,3))
         self.grayImageDest = np.zeros((240,320,3))
+        
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
-        
-        self.label_D = QLabel(self.imageFrameD)
+        self.label_D = QLabel(self.imgVisorD)
         self.label_D.setObjectName("label_D")
         self.label_D.setGeometry(QRect(0, 0, 320, 240))
         
@@ -178,23 +179,21 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-    def selectWindow(self, point, posX, posY):
-        pEnd = QtCore.QPointF()
+    def selectWindow(self, posX, posY, width, height):
+        
         if posX > 0 and posY>0:
-            self.posX = point.x()-posX/2
-            if self.posX<0:
+            self.posX = posX
+            if self.posX < 0:
                 self.posX = 0
-            self.posY = point.y()-posY/2
-            if self.posY<0:
+            if self.posX > 320:
+                self.posX = 319
+            self.posY = posY
+            if self.posY < 0:
                 self.posY = 0
-            pEnd.setX(point.x()+posX/2)
-            if pEnd.x()>=320:
-                pEnd.setX(319)
-            pEnd.setY(point.y()+posY/2)
-            if pEnd.y()>=240:
-                pEnd.setY(239)
-            self.rectWidth = pEnd.x()-self.posX+1
-            self.rectHeight = pEnd.y()-self.posY+1
+            if self.posY > 240:
+                self.posY = 239
+            self.rectWidth = width
+            self.rectHeight = height
             print("Values: " + str(posX)+ " " + str(posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
             self.winSelected = True;
     
@@ -235,6 +234,9 @@ class Ui_MainWindow(object):
         if self.winSelected == True:
             self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
         self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
+        self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
+        self.imgVisorD.repaint()
+        self.imgVisorD.update()
         self.imgVisorS.repaint()
         self.imgVisorS.update()
             
@@ -276,6 +278,9 @@ class Ui_MainWindow(object):
         
         self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
         
+        
+        
+        
         print(self.imgPath)
         
     def saveButtonAction(self):
@@ -294,21 +299,22 @@ class Ui_MainWindow(object):
         self.posY = int(self.posY)
         self.rectHeight = int(self.rectHeight)
         self.rectWidth = int(self.rectWidth)
-        print(self.colorImage.shape)
-        print(self.colorImageDest.shape)
+
+        print(str(self.posX) + " " + str(self.posY)+ " " + str(self.rectWidth) +" "+ str(self.rectHeight))
         if self.colorState == False:
-            self.colorImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.colorImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
+            tempArr = np.array(self.colorImage[self.posY:(self.posY+self.rectHeight),self.posX:(self.posX+self.rectWidth)], copy = True)    
+            temp = np.array(self.colorImageDest, copy = True)
+            self.colorImageDest[self.posY:(self.posY+self.rectHeight),self.posX:(self.posX+self.rectWidth)] = tempArr
+            print(np.array_equal(temp, self.colorImageDest))
             self.imgVisorD.qimg = QImage(self.colorImageDest, self.colorImageDest.shape[1], self.colorImageDest.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
+            
         else:
             self.grayImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.grayImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
             self.imgVisorD.qimg = QImage(self.grayImageDest, self.grayImageDest.shape[1], self.grayImageDest.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
-        self.imgVisorD.repaint()
-        self.imgVisorD.update()
-        print("Copy")
     
     def resizeButtonAction(self):
         print("Resize")
