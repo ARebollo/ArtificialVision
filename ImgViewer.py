@@ -127,40 +127,6 @@ class ImgViewer(QGLWidget):
             self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
             abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
         self.onSelection = False
-
-    def drawSquare(self, rect, color):           
-        r = self.TRect(rect, color, -1, 0, False, 0)
-        self.squareQueue.append(r)    
-    
-    def paintEvent(self, paintEvent: QtGui.QPaintEvent):
-        qp = QtGui.QPainter()
-        qp.setRenderHint(QtGui.Qpainter.HighQualityAntialiasing)
-        
-        if self.qimg is not None:
-            r = QtGui.QRectF(0.0, 0.0, self.imageScale*self.width, self.qimg, QtGui.QRectF(0,0,self.width, self.height))
-            qp.drawImage(r)
-        if self.onSelection is True:
-            self.drawSquare((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoordSelected.y()-self.iniCoordSelected.y()), QtGui.green)
-        
-        qp.setWindow(self.effWin.toRect())
-        
-        pen = qp.pen()
-        penwidth = pen.width()
-        
-        for i in self.squareQueue:
-            r = i.deque.pop()
-            if r.fill is True:
-                qp.setBrush(r.color)
-            else:
-                qp.setBrush(QtGui.transparent)
-            pen.setColor(r.color)
-            pen.setWidth(r.width)
-            qp.setPen(pen)
-            
-            qp.drawRect(r.rect)
-            
-            pen.setWidth(penwidth)
-            qp.setPen(pen)
     
     def drawSquare(self, posX, posY, width, height):
         painter = QPainter(self.qimg)
