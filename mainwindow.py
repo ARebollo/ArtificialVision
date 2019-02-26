@@ -306,7 +306,6 @@ class Ui_MainWindow(object):
             self.imgVisorD.qimg = QImage(self.grayImageDest, self.grayImageDest.shape[1], self.grayImageDest.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
-            pass
         self.imgVisorD.repaint()
         self.imgVisorD.update()
         print("Copy")
