@@ -181,22 +181,22 @@ class Ui_MainWindow(object):
     def selectWindow(self, point, posX, posY):
         pEnd = QtCore.QPointF()
         if posX > 0 and posY>0:
-            self.rectPosX = point.x()-posX/2
-            if self.rectPosX<0:
-                self.rectPosX = 0
-            self.rectPosY = point.y()-posY/2
-            if self.rectPosY<0:
-                self.rectPosY = 0
+            self.posX = point.x()-posX/2
+            if self.posX<0:
+                self.posX = 0
+            self.posY = point.y()-posY/2
+            if self.posY<0:
+                self.posY = 0
             pEnd.setX(point.x()+posX/2)
             if pEnd.x()>=320:
                 pEnd.setX(319)
             pEnd.setY(point.y()+posY/2)
             if pEnd.y()>=240:
                 pEnd.setY(239)
-            self.rectWidth = pEnd.x()-self.rectPosX+1
-            self.rectHeight = pEnd.y()-self.rectPosY+1
-
-            self.winSelected = True
+            self.rectWidth = pEnd.x()-self.posX+1
+            self.rectHeight = pEnd.y()-self.posY+1
+            print("Values: " + str(posX)+ " " + str(posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
+            self.winSelected = True;
     
     def pressMouseEvent(self, QMouseEvent):
         print("What")
@@ -233,7 +233,7 @@ class Ui_MainWindow(object):
             
             
             if self.winSelected == True:
-                self.imgVisorS.drawSquare(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight);
+                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.imgVisorS.repaint()
             self.imgVisorS.update()
@@ -290,11 +290,11 @@ class Ui_MainWindow(object):
         print("Save")
     
     def copyButtonAction(self):
-        if self.colorState == True:
-            self.colorImageDest[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight] = self.colorImage[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight]
+        if self.colorState == False:
+            self.colorImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.colorImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
             #TODO: Paint it
         else:
-            self.grayImageDest[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight] = self.grayImage[self.rectPosX:self.rectPosX+self.rectWidth,self.rectPosY:self.rectPosY+self.rectHeight]
+            self.grayImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.grayImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
             #TODO: Paint it
             pass
         print("Copy")
