@@ -66,8 +66,8 @@ class Ui_MainWindow(object):
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
-        self.colorImageDest = np.zeros((320,240))
-        self.grayImageDest = np.zeros((320,240))
+        self.colorImageDest = np.zeros((240,320,3))
+        self.grayImageDest = np.zeros((240,320,3))
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
@@ -226,17 +226,17 @@ class Ui_MainWindow(object):
                 ret, self.grayImage = self.capture.read()
                 self.grayImage = cv2.resize(self.grayImage, (320,240))
                 self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
-                self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
+                self.imgVisorS.qimg = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
                 
                 
             
             
-            if self.winSelected == True:
-                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
-            self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
-            self.imgVisorS.repaint()
-            self.imgVisorS.update()
+        if self.winSelected == True:
+            self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
+        self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
+        self.imgVisorS.repaint()
+        self.imgVisorS.update()
             
     def colorButtonAction(self):
         if self.colorState == False:
@@ -267,14 +267,14 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         if self.colorState == False:
-            self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
+            self.imgVisorS.qimg = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)
         else:
-            self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
+            self.imgVisorS.qimg = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
         
-
-        self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+        
+        self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
         
         print(self.imgPath)
         
@@ -290,13 +290,25 @@ class Ui_MainWindow(object):
         print("Save")
     
     def copyButtonAction(self):
+        self.posX = int(self.posX)
+        self.posY = int(self.posY)
+        self.rectHeight = int(self.rectHeight)
+        self.rectWidth = int(self.rectWidth)
+        print(self.colorImage.shape)
+        print(self.colorImageDest.shape)
         if self.colorState == False:
             self.colorImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.colorImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
-            #TODO: Paint it
+            self.imgVisorD.qimg = QImage(self.colorImageDest, self.colorImageDest.shape[1], self.colorImageDest.shape[0],                                                                                                                                                 
+                         QImage.Format_RGB888)
+            self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
         else:
             self.grayImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.grayImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
-            #TODO: Paint it
+            self.imgVisorD.qimg = QImage(self.grayImageDest, self.grayImageDest.shape[1], self.grayImageDest.shape[0],                                                                                                                                                 
+                         QImage.Format_Grayscale8)
+            self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             pass
+        self.imgVisorD.repaint()
+        self.imgVisorD.update()
         print("Copy")
     
     def resizeButtonAction(self):
