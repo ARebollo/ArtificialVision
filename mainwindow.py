@@ -303,9 +303,8 @@ class Ui_MainWindow(object):
         print(str(self.posX) + " " + str(self.posY)+ " " + str(self.rectWidth) +" "+ str(self.rectHeight))
         if self.colorState == False:
             tempArr = np.array(self.colorImage[self.posY:(self.posY+self.rectHeight),self.posX:(self.posX+self.rectWidth)], copy = True)    
-            temp = np.array(self.colorImageDest, copy = True)
+            
             self.colorImageDest[self.posY:(self.posY+self.rectHeight),self.posX:(self.posX+self.rectWidth)] = tempArr
-            print(np.array_equal(temp, self.colorImageDest))
             self.imgVisorD.qimg = QImage(self.colorImageDest, self.colorImageDest.shape[1], self.colorImageDest.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
