@@ -36,6 +36,13 @@ class Ui_MainWindow(object):
         self.timer.timeout.connect(self.timerLoop)
         self.timer.start(16)
         
+        
+        #Values for window selection
+        self.rectHeight = 0
+        self.rectWidth = 0
+        self.posX = 0
+        self.posY = 0
+        
         #Signals for window selection
         
         
@@ -191,8 +198,8 @@ class Ui_MainWindow(object):
                 pEnd.setY(239)
             self.rectWidth = pEnd.x()-self.rectPosX+1
             self.rectHeight = pEnd.y()-self.rectPosY+1
-
-        self.winSelected = True;
+            print("Values: " + str(posX)+ " " + str(posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
+            self.winSelected = True;
     
     def pressMouseEvent(self, QMouseEvent):
         print("What")
@@ -215,7 +222,7 @@ class Ui_MainWindow(object):
                 ret, self.colorImage = self.capture.read()
                 self.colorImage = cv2.resize(self.colorImage, (320,240))
                 self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
-                self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
+                self.imgVisorS.qimg = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)    
                 
             else:
@@ -226,12 +233,14 @@ class Ui_MainWindow(object):
                          QImage.Format_Grayscale8)
                 
                 
-            self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+            
             
             if self.winSelected == True:
-                self.imgVisorS.drawSquare(QRect(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight), QColor.green );
+                self.imgVisorS.drawSquare(self.rectPosX, self.rectPosY, self.rectWidth,self.rectHeight);
+            self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.imgVisorS.repaint()
             self.imgVisorS.update()
+            
     def colorButtonAction(self):
         if self.colorState == False:
             self.colorButton.setText("Gray Image")
