@@ -13,6 +13,7 @@ import cv2
 from cv2 import VideoCapture
 import numpy as np
 from ImgViewer import ImgViewer
+import copy
 
 class Ui_MainWindow(object):
     
@@ -49,15 +50,19 @@ class Ui_MainWindow(object):
         self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameS.setObjectName("imageFrameS")
-        self.colorImage = np.zeros((320,240))
-        self.grayImage = np.zeros((320,240))
+        # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
+        # self.colorImage = np.zeros((320,240))
+        # FIXED: original removed 2 of the 3 chanels with the np.zeros
+        # self.colorImage = np.zeros((320,240))
+        self.colorImage = np.zeros((240,320,3))
+        self.grayImage = np.zeros((240,320))
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
         self.imgVisorS.windowSelected.connect(self.selectWindow)
         self.label_S = QLabel(self.imgVisorS)
         self.label_S.setObjectName("label_S")
         self.label_S.setGeometry(QRect(0, 0, 320, 240))
-        self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True);
+        self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         #TODO: Delete label, set as attribute of imgViewer        
         
         #Right image frame. Image after transformation.
@@ -66,8 +71,10 @@ class Ui_MainWindow(object):
         self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
         self.imageFrameD.setObjectName("imageFrameD")
-        self.colorImageDest = np.zeros((320,240))
-        self.grayImageDest = np.zeros((320,240))
+        # FIXED: original removed 2 of the 3 chanels with the np.zeros
+        #self.colorImageDest = np.zeros((240,320))
+        self.colorImageDest = np.zeros((240,320,3))
+        self.grayImageDest = np.zeros((240,320))
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
         
@@ -180,23 +187,23 @@ class Ui_MainWindow(object):
         
     def selectWindow(self, point, posX, posY):
         pEnd = QtCore.QPointF()
-        if posX > 0 and posY>0:
-            self.posX = point.x()-posX/2
-            if self.posX<0:
+        if posX > 0 and posY > 0:
+            self.posX = int(point.x() - posX/2)
+            if self.posX < 0:
                 self.posX = 0
-            self.posY = point.y()-posY/2
-            if self.posY<0:
+            self.posY = int(point.y()-posY/2)
+            if self.posY < 0:
                 self.posY = 0
             pEnd.setX(point.x()+posX/2)
-            if pEnd.x()>=320:
+            if pEnd.x() >= 320:
                 pEnd.setX(319)
             pEnd.setY(point.y()+posY/2)
-            if pEnd.y()>=240:
+            if pEnd.y() >= 240:
                 pEnd.setY(239)
-            self.rectWidth = pEnd.x()-self.posX+1
-            self.rectHeight = pEnd.y()-self.posY+1
-            print("Values: " + str(posX)+ " " + str(posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
-            self.winSelected = True;
+            self.rectWidth = int(pEnd.x() - self.posX+1)
+            self.rectHeight = int(pEnd.y() - self.posY+1)
+            print("Values: " + str(self.posX)+ " " + str(self.posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
+            self.winSelected = True
     
     def pressMouseEvent(self, QMouseEvent):
         print("What")
@@ -217,24 +224,29 @@ class Ui_MainWindow(object):
         if (self.captureState == True and self.capture.isOpened() == True):
             if self.colorState == False:
                 ret, self.colorImage = self.capture.read()
-                self.colorImage = cv2.resize(self.colorImage, (320,240))
+                #print("Captured shape %s"%str(self.colorImage.shape))
+                self.colorImage = cv2.resize(self.colorImage, (320, 240))
+                #print("Resized shape %s"%str(self.colorImage.shape))
                 self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
-                self.imgVisorS.qimg = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
-                         QImage.Format_RGB888)    
+                # FIXED: astype is needed to convert the cv type to the qt expected one                
+                self.imgVisorS.qimg = QImage(self.colorImage.astype(np.int8), self.colorImage.shape[1], self.colorImage.shape[0], QImage.Format_RGB888)
+                #self.colorImageDest = self.colorImage
+                # FIXED: astype is needed to convert the cv type to the qt expected one
+                self.imgVisorD.qimg = QImage(self.colorImageDest.astype(np.int8), self.colorImageDest.shape[1], self.colorImageDest.shape[0], QtGui.QImage.Format_RGB888)     
                 
             else:
                 ret, self.grayImage = self.capture.read()
                 self.grayImage = cv2.resize(self.grayImage, (320,240))
                 self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
-                self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
-                         QImage.Format_Grayscale8)
-                
-                
-            
-            
+                # FIXED: astype is needed to convert the cv type to the qt expected one
+                self.imgVisorS.qimg = QImage(self.grayImage.astype(np.int8), self.grayImage.shape[1], self.grayImage.shape[0],self.grayImage.strides[0], QImage.Format_Grayscale8)
+                # FIXED: astype is needed to convert the cv type to the qt expected one
+                self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
+                  
             if self.winSelected == True:
-                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
+                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight)
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
+            self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             self.imgVisorS.repaint()
             self.imgVisorS.update()
             
@@ -266,6 +278,7 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.resize(self.grayImage, (320,240))
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
+        # TODO: remove to avoid double setting here and in the loopTimer method
         if self.colorState == False:
             self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)
@@ -290,13 +303,18 @@ class Ui_MainWindow(object):
         print("Save")
     
     def copyButtonAction(self):
+        # TODO: set dest images to black before copying the orig image into it
+        # TODO: recheck the window pos and sizes
+        # TODO: probably the local variables and deepcopy are uneeded
+        window_pos_y = copy.deepcopy(self.posY)
+        window_pos_x = copy.deepcopy(self.posX)
+        window_height = copy.deepcopy(self.rectHeight)
+        window_width = copy.deepcopy(self.rectWidth)
         if self.colorState == False:
-            self.colorImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.colorImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
-            #TODO: Paint it
+            self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
         else:
-            self.grayImageDest[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)] = self.grayImage[self.posX:(self.posX+self.rectWidth),self.posY:(self.posY+self.rectHeight)]
-            #TODO: Paint it
-            pass
+            self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+
         print("Copy")
     
     def resizeButtonAction(self):
