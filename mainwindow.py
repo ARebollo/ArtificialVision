@@ -28,6 +28,7 @@ class Ui_MainWindow(object):
         self.captureState = False
         self.colorState = False  #False =  color, true = gray
         self.winSelected = False 
+        self.warpState = False
 
         #Timer to control the capture.
         self.timer = QTimer()
@@ -129,12 +130,18 @@ class Ui_MainWindow(object):
         self.enlargeButton.setObjectName("enlargeButton")
         self.enlargeButton.clicked.connect(self.enlargeButtonAction)
         
+        #Warp zoom button
+        self.warpButton = QtWidgets.QPushButton(MainWindow)
+        self.warpButton.setGeometry(QtCore.QRect(740, 300, 101, 31))
+        self.warpButton.setObjectName("warpZoomButton")
+        self.warpButton.clicked.connect(self.warpButtonAction)
+        
         #Angle dial
         self.angleDial = QtWidgets.QDial(MainWindow)
         self.angleDial.setGeometry(QtCore.QRect(40, 260, 81, 91))
         self.angleDial.setObjectName("angleDial")
-        self.angleDial.setMinimum(0)
-        self.angleDial.setMaximum(359)
+        self.angleDial.setMinimum(-359)
+        self.angleDial.setMaximum(0)
         self.angleDial.setValue(0)
         self.angleDial.setWrapping(True)
         self.angleDial.valueChanged.connect(self.dialAction)
@@ -164,8 +171,8 @@ class Ui_MainWindow(object):
         self.zoomSlider.setGeometry(QtCore.QRect(530, 280, 160, 22))
         self.zoomSlider.setOrientation(QtCore.Qt.Horizontal)
         self.zoomSlider.setObjectName("zoomSlider")
-        self.zoomSlider.setMinimum(-50)
-        self.zoomSlider.setMaximum(50)
+        self.zoomSlider.setMinimum(0)
+        self.zoomSlider.setMaximum(10)
         self.zoomSlider.setValue(0)
         self.zoomSlider.valueChanged.connect(self.zoomSliderAction)
         
@@ -220,6 +227,13 @@ class Ui_MainWindow(object):
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
+
+            
+
+
+
+
+
             if self.colorState == False:
                 ret, self.colorImage = self.capture.read()
                 #print("Captured shape %s"%str(self.colorImage.shape))
@@ -240,7 +254,18 @@ class Ui_MainWindow(object):
                 self.imgVisorS.qimg = QImage(self.grayImage.astype(np.int8), self.grayImage.shape[1], self.grayImage.shape[0],self.grayImage.strides[0], QImage.Format_Grayscale8)
                 # FIXED: astype is needed to convert the cv type to the qt expected one
                 self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
-                  
+            
+            #To update the warping in real time
+            if self.warpState == True:
+                rotation_matrix = cv2.getRotationMatrix2D((320/2,240/2), -self.angleDial.value(),1+self.zoomSlider.value()/3)
+                if self.colorState == False:
+                    rotated_image = cv2.warpAffine(self.colorImage, rotation_matrix, (320,240))
+                    self.colorImageDest = rotated_image
+                    self.imgVisorD.qimg = QImage(self.colorImageDest.astype(np.int8), self.colorImageDest.shape[1], self.colorImageDest.shape[0], QtGui.QImage.Format_RGB888)
+                else:
+                    rotated_image = cv2.warpAffine(self.grayImage, rotation_matrix, (320,240))
+                    self.grayImageDest = rotated_image
+                    self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
             if self.winSelected == True:
                 self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight)
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
@@ -349,10 +374,8 @@ class Ui_MainWindow(object):
         window_height = copy.deepcopy(self.rectHeight)
         window_width = copy.deepcopy(self.rectWidth)
         
-        
-        
         proportion_y = 240/window_height
-        proportion_x = 240/window_width
+        proportion_x = 320/window_width
         
         if proportion_y > proportion_x:
             final_height = int(window_height * proportion_x) 
@@ -377,9 +400,28 @@ class Ui_MainWindow(object):
             self.grayImageDest = np.zeros((240,320))
             self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
                     
-        
         print("Enlarge")
         
+    def warpButtonAction(self):
+        if self.warpState == False:
+            self.warpButton.setChecked(True)
+            print("Swapping to Gray")
+            self.warpState = True
+        else: 
+            self.warpButton.setChecked(False)
+            print("Swapping to color")
+            self.warpState = False
+        print('warp')
+        '''
+        rotation_matrix = cv2.getRotationMatrix2D((320/2,240/2), -self.angleDial.value(),1+self.zoomSlider.value()/3)
+        
+        if self.colorState == False:
+            rotated_image = cv2.warpAffine(self.colorImage, rotation_matrix, (320,240))
+            self.colorImageDest = rotated_image
+        else:
+            rotated_image = cv2.warpAffine(self.grayImage, rotation_matrix, (320,240))
+            self.grayImageDest = rotated_image
+                '''
     def dialAction(self):
         print(self.angleDial.value())
         
@@ -402,6 +444,7 @@ class Ui_MainWindow(object):
         self.copyButton.setText(_translate("MainWindow", "Copy"))
         self.resizeButton.setText(_translate("MainWindow", "Resize"))
         self.enlargeButton.setText(_translate("MainWindow", "Enlarge"))
+        self.warpButton.setText(_translate("MainWindow", "Warp+Zoom"))
         self.label.setText(_translate("MainWindow", "Horizontal Translation"))
         self.label_2.setText(_translate("MainWindow", "Vertical Translation"))
         self.label_3.setText(_translate("MainWindow", "Zoom"))
