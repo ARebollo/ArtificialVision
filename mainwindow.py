@@ -63,7 +63,8 @@ class Ui_MainWindow(object):
         self.label_S.setObjectName("label_S")
         self.label_S.setGeometry(QRect(0, 0, 320, 240))
         self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        #TODO: Delete label, set as attribute of imgViewer        
+        #TODO: Delete label, set as attribute of imgViewer
+        #Isn't it the same? TODO later, it works *for now*        
         
         #Right image frame. Image after transformation.
         self.imageFrameD = QtWidgets.QFrame(MainWindow)
@@ -205,9 +206,6 @@ class Ui_MainWindow(object):
             print("Values: " + str(self.posX)+ " " + str(self.posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
             self.winSelected = True
     
-    def pressMouseEvent(self, QMouseEvent):
-        print("What")
-    
     def captureButtonAction(self):
         if self.captureState == False:
             self.captureButton.setText("Stop Capture")
@@ -303,24 +301,83 @@ class Ui_MainWindow(object):
         print("Save")
     
     def copyButtonAction(self):
-        # TODO: set dest images to black before copying the orig image into it
-        # TODO: recheck the window pos and sizes
-        # TODO: probably the local variables and deepcopy are uneeded
+        # TODO: set dest images to black before copying the orig image into it -> DONE
+        # TODO: recheck the window pos and sizes -> Change to get it centered. DONE
+        # TODO: probably the local variables and deepcopy are uneeded -> Probably?
         window_pos_y = copy.deepcopy(self.posY)
         window_pos_x = copy.deepcopy(self.posX)
+
         window_height = copy.deepcopy(self.rectHeight)
         window_width = copy.deepcopy(self.rectWidth)
+        centered_pos_y = int((240 - window_height) /2)
+        centered_pos_x = int((320 - window_width) /2)
         if self.colorState == False:
-            self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+            self.colorImageDest = np.zeros((240,320,3))
+            self.colorImageDest[centered_pos_y:centered_pos_y+window_height, centered_pos_x:centered_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+
+            #Working
+            #self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
         else:
+            self.grayImageDest = np.zeros((240,320))
             self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+            
+            #Working
+            #self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
 
         print("Copy")
     
     def resizeButtonAction(self):
-        print("Resize")
+        window_pos_y = copy.deepcopy(self.posY)
+        window_pos_x = copy.deepcopy(self.posX)
+
+        window_height = copy.deepcopy(self.rectHeight)
+        window_width = copy.deepcopy(self.rectWidth)
+        if self.colorState == False:
+            #TODO: Perhaps remove useless variable?
+            imageCopy = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+            imageCopy = cv2.resize(imageCopy, (320,240))
+            self.colorImageDest = imageCopy.copy()
+        else:
+            resized_image = cv2.resize(self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width], (320,240))
+            print(resized_image.shape)
+            self.grayImageDest = resized_image.copy()
         
     def enlargeButtonAction(self):
+        window_pos_y = copy.deepcopy(self.posY)
+        window_pos_x = copy.deepcopy(self.posX)
+
+        window_height = copy.deepcopy(self.rectHeight)
+        window_width = copy.deepcopy(self.rectWidth)
+        
+        
+        
+        proportion_y = 240/window_height
+        proportion_x = 240/window_width
+        
+        if proportion_y > proportion_x:
+            final_height = int(window_height * proportion_x) 
+            final_width = int(window_width * proportion_x) 
+        else:
+            final_height = int(window_height * proportion_y) 
+            final_width = int(window_width * proportion_y) 
+            
+        centered_pos_y = int((240 - final_height) /2)
+        centered_pos_x = int((320 - final_width) /2)
+        
+        imageCopy = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+        imageCopy = cv2.resize(imageCopy, (final_width,final_height))
+        
+        if self.colorState == False:
+            self.colorImageDest = np.zeros((240,320,3))
+            self.colorImageDest[centered_pos_y:centered_pos_y+final_height, centered_pos_x:centered_pos_x+final_width] = imageCopy.copy()
+
+            #Working
+            #self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+        else:
+            self.grayImageDest = np.zeros((240,320))
+            self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+                    
+        
         print("Enlarge")
         
     def dialAction(self):
