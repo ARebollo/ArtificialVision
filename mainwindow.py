@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QLabel
-from PyQt5.QtGui import QImage, QPixmap, QColor
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QRect, QTimer, Qt
 import cv2
 from cv2 import VideoCapture
@@ -110,78 +110,8 @@ class Ui_MainWindow(object):
         self.saveButton.setGeometry(QtCore.QRect(740, 140, 101, 31))
         self.saveButton.setObjectName("saveButton")
         self.saveButton.clicked.connect(self.saveButtonAction)
-        
-        #Copy selection button.
-        self.copyButton = QtWidgets.QPushButton(MainWindow)
-        self.copyButton.setGeometry(QtCore.QRect(740, 180, 101, 31))
-        self.copyButton.setObjectName("copyButton")
-        self.copyButton.clicked.connect(self.copyButtonAction)
-        
-        #Resize image button.
-        self.resizeButton = QtWidgets.QPushButton(MainWindow)
-        self.resizeButton.setGeometry(QtCore.QRect(740, 220, 101, 31))
-        self.resizeButton.setObjectName("resizeButton")
-        self.resizeButton.clicked.connect(self.resizeButtonAction)
-        
-        #Enlarge image button
-        self.enlargeButton = QtWidgets.QPushButton(MainWindow)
-        self.enlargeButton.setGeometry(QtCore.QRect(740, 260, 101, 31))
-        self.enlargeButton.setObjectName("enlargeButton")
-        self.enlargeButton.clicked.connect(self.enlargeButtonAction)
-        
-        #Angle dial
-        self.angleDial = QtWidgets.QDial(MainWindow)
-        self.angleDial.setGeometry(QtCore.QRect(40, 260, 81, 91))
-        self.angleDial.setObjectName("angleDial")
-        self.angleDial.setMinimum(0)
-        self.angleDial.setMaximum(359)
-        self.angleDial.setValue(0)
-        self.angleDial.setWrapping(True)
-        self.angleDial.valueChanged.connect(self.dialAction)
-        
-        #Horizontal translation slider
-        self.horizontalSlider = QtWidgets.QSlider(MainWindow)
-        self.horizontalSlider.setGeometry(QtCore.QRect(150, 280, 160, 22))
-        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.setMinimum(-100)
-        self.horizontalSlider.setMaximum(100)
-        self.horizontalSlider.setValue(0)
-        self.horizontalSlider.valueChanged.connect(self.horizontalSliderAction)
-        
-        #Vertical translation slider
-        self.verticalSlider = QtWidgets.QSlider(MainWindow)
-        self.verticalSlider.setGeometry(QtCore.QRect(340, 280, 160, 22))
-        self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.verticalSlider.setObjectName("verticalSlider")
-        self.verticalSlider.setMinimum(-80)
-        self.verticalSlider.setMaximum(80)
-        self.verticalSlider.setValue(0)
-        self.verticalSlider.valueChanged.connect(self.verticalSliderAction)
-        
-        #Zoom slider
-        self.zoomSlider = QtWidgets.QSlider(MainWindow)
-        self.zoomSlider.setGeometry(QtCore.QRect(530, 280, 160, 22))
-        self.zoomSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.zoomSlider.setObjectName("zoomSlider")
-        self.zoomSlider.setMinimum(-50)
-        self.zoomSlider.setMaximum(50)
-        self.zoomSlider.setValue(0)
-        self.zoomSlider.valueChanged.connect(self.zoomSliderAction)
-        
-        #Labels, in the order [Angle, Horizontal, Vertical, Zoom]
-        self.label = QtWidgets.QLabel(MainWindow)
-        self.label.setGeometry(QtCore.QRect(180, 310, 121, 16))
-        self.label.setObjectName("label")
-        self.label_2 = QtWidgets.QLabel(MainWindow)
-        self.label_2.setGeometry(QtCore.QRect(380, 310, 121, 16))
-        self.label_2.setObjectName("label_2")
-        self.label_3 = QtWidgets.QLabel(MainWindow)
-        self.label_3.setGeometry(QtCore.QRect(600, 310, 121, 16))
-        self.label_3.setObjectName("label_3")
-        self.label_4 = QtWidgets.QLabel(MainWindow)
-        self.label_4.setGeometry(QtCore.QRect(70, 350, 121, 16))
-        self.label_4.setObjectName("label_4")
+
+
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -299,32 +229,8 @@ class Ui_MainWindow(object):
         filename = QFileDialog.getSaveFileName()
         cv2.imWrite(filename, saveImage)
         print("Save")
-    
-    def copyButtonAction(self):
-        # TODO: set dest images to black before copying the orig image into it -> DONE
-        # TODO: recheck the window pos and sizes -> Change to get it centered. DONE
-        # TODO: probably the local variables and deepcopy are uneeded -> Probably?
-        window_pos_y = copy.deepcopy(self.posY)
-        window_pos_x = copy.deepcopy(self.posX)
 
-        window_height = copy.deepcopy(self.rectHeight)
-        window_width = copy.deepcopy(self.rectWidth)
-        centered_pos_y = int((240 - window_height) /2)
-        centered_pos_x = int((320 - window_width) /2)
-        if self.colorState == False:
-            self.colorImageDest = np.zeros((240,320,3))
-            self.colorImageDest[centered_pos_y:centered_pos_y+window_height, centered_pos_x:centered_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
 
-            #Working
-            #self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-        else:
-            self.grayImageDest = np.zeros((240,320))
-            self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-            
-            #Working
-            #self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-
-        print("Copy")
     
     def resizeButtonAction(self):
         window_pos_y = copy.deepcopy(self.posY)
@@ -341,57 +247,7 @@ class Ui_MainWindow(object):
             resized_image = cv2.resize(self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width], (320,240))
             print(resized_image.shape)
             self.grayImageDest = resized_image.copy()
-        
-    def enlargeButtonAction(self):
-        window_pos_y = copy.deepcopy(self.posY)
-        window_pos_x = copy.deepcopy(self.posX)
 
-        window_height = copy.deepcopy(self.rectHeight)
-        window_width = copy.deepcopy(self.rectWidth)
-        
-        
-        
-        proportion_y = 240/window_height
-        proportion_x = 240/window_width
-        
-        if proportion_y > proportion_x:
-            final_height = int(window_height * proportion_x) 
-            final_width = int(window_width * proportion_x) 
-        else:
-            final_height = int(window_height * proportion_y) 
-            final_width = int(window_width * proportion_y) 
-            
-        centered_pos_y = int((240 - final_height) /2)
-        centered_pos_x = int((320 - final_width) /2)
-        
-        imageCopy = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-        imageCopy = cv2.resize(imageCopy, (final_width,final_height))
-        
-        if self.colorState == False:
-            self.colorImageDest = np.zeros((240,320,3))
-            self.colorImageDest[centered_pos_y:centered_pos_y+final_height, centered_pos_x:centered_pos_x+final_width] = imageCopy.copy()
-
-            #Working
-            #self.colorImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.colorImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-        else:
-            self.grayImageDest = np.zeros((240,320))
-            self.grayImageDest[window_pos_y:window_pos_y+window_height, window_pos_x:window_pos_x+window_width] = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-                    
-        
-        print("Enlarge")
-        
-    def dialAction(self):
-        print(self.angleDial.value())
-        
-    def horizontalSliderAction(self):
-        print(self.horizontalSlider.value())
-    
-    def verticalSliderAction(self):
-        print(self.verticalSlider.value())
-        
-    def zoomSliderAction(self):
-        print("Zoom")
-        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Proyecto de Visión Artificial"))
@@ -399,13 +255,6 @@ class Ui_MainWindow(object):
         self.colorButton.setText(_translate("MainWindow", "Color Image"))
         self.loadButton.setText(_translate("MainWindow", "Load from File"))
         self.saveButton.setText(_translate("MainWindow", "Save to File"))
-        self.copyButton.setText(_translate("MainWindow", "Copy"))
-        self.resizeButton.setText(_translate("MainWindow", "Resize"))
-        self.enlargeButton.setText(_translate("MainWindow", "Enlarge"))
-        self.label.setText(_translate("MainWindow", "Horizontal Translation"))
-        self.label_2.setText(_translate("MainWindow", "Vertical Translation"))
-        self.label_3.setText(_translate("MainWindow", "Zoom"))
-        self.label_4.setText(_translate("MainWindow", "Angle"))
 
 if __name__ == "__main__":
     import sys
