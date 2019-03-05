@@ -161,8 +161,8 @@ class Ui_MainWindow(object):
         self.verticalSlider.setGeometry(QtCore.QRect(340, 280, 160, 22))
         self.verticalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.verticalSlider.setObjectName("verticalSlider")
-        self.verticalSlider.setMinimum(-80)
-        self.verticalSlider.setMaximum(80)
+        self.verticalSlider.setMinimum(-75)
+        self.verticalSlider.setMaximum(75)
         self.verticalSlider.setValue(0)
         self.verticalSlider.valueChanged.connect(self.verticalSliderAction)
         
@@ -228,12 +228,6 @@ class Ui_MainWindow(object):
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
 
-            
-
-
-
-
-
             if self.colorState == False:
                 ret, self.colorImage = self.capture.read()
                 #print("Captured shape %s"%str(self.colorImage.shape))
@@ -255,15 +249,18 @@ class Ui_MainWindow(object):
                 # FIXED: astype is needed to convert the cv type to the qt expected one
                 self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
             
-            #To update the warping in real time
+            #To update the warping in real time. TODO translation
             if self.warpState == True:
                 rotation_matrix = cv2.getRotationMatrix2D((320/2,240/2), -self.angleDial.value(),1+self.zoomSlider.value()/3)
+                translation_matrix = np.float32([[1,0,self.horizontalSlider.value()],[0,1,self.verticalSlider.value()]])
                 if self.colorState == False:
                     rotated_image = cv2.warpAffine(self.colorImage, rotation_matrix, (320,240))
+                    rotated_image = cv2.warpAffine(rotated_image, translation_matrix, (320,240))
                     self.colorImageDest = rotated_image
                     self.imgVisorD.qimg = QImage(self.colorImageDest.astype(np.int8), self.colorImageDest.shape[1], self.colorImageDest.shape[0], QtGui.QImage.Format_RGB888)
                 else:
                     rotated_image = cv2.warpAffine(self.grayImage, rotation_matrix, (320,240))
+                    rotated_image = cv2.warpAffine(rotated_image, translation_matrix, (320,240))
                     self.grayImageDest = rotated_image
                     self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
             if self.winSelected == True:
