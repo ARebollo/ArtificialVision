@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
-    <height>378</height>
+    <width>860</width>
+    <height>563</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>20</y>
+     <y>50</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -68,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>60</y>
+     <y>100</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -87,169 +87,297 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>100</y>
+     <y>150</y>
      <width>101</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Load from File</string>
+    <string>Load Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QFrame" name="processingFrame">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>831</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QComboBox" name="operationComboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>161</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Transform pixel</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Thresholding</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Equalize</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Gaussian Blur</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Median Blur</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Linear Filter</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dilate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Erode</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Apply several...</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="operationLabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Select operation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Gaussian width&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>50</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>30</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="kernelButton">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>40</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Kernel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="operOrderButton">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>40</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Operation Order</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pixelTButton">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>40</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Pixel Transformation</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="gaussWidthBox">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>50</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <number>19</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>440</y>
+     <width>221</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Image Processing&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
    </property>
   </widget>
   <widget class="QPushButton" name="saveButton">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>140</y>
+     <y>200</y>
      <width>101</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Save to File</string>
+    <string>Save Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="copyButton">
+  <widget class="QFrame" name="histoFrameS">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>180</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Copy</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="resizeButton">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>220</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Resize</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="enlargeButton">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>260</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enlarge</string>
-   </property>
-  </widget>
-  <widget class="QDial" name="angleDial">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>260</y>
-     <width>81</width>
-     <height>91</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QSlider" name="horizontalSlider">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
+     <x>50</x>
      <y>280</y>
-     <width>160</width>
-     <height>22</height>
+     <width>256</width>
+     <height>150</height>
     </rect>
    </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="lineWidth">
+    <number>4</number>
    </property>
   </widget>
-  <widget class="QSlider" name="verticalSlider">
+  <widget class="QFrame" name="histoFrameD">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>420</x>
      <y>280</y>
-     <width>160</width>
-     <height>22</height>
+     <width>256</width>
+     <height>150</height>
     </rect>
    </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
    </property>
-  </widget>
-  <widget class="QSlider" name="zoomSlider">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>280</y>
-     <width>160</width>
-     <height>22</height>
-    </rect>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>310</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Horizontal Translation</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>310</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Vertical Translation</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>310</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Zoom</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>350</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Angle</string>
+   <property name="lineWidth">
+    <number>4</number>
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>captureButton</tabstop>
+  <tabstop>colorButton</tabstop>
+  <tabstop>loadButton</tabstop>
+  <tabstop>saveButton</tabstop>
+  <tabstop>operationComboBox</tabstop>
+  <tabstop>gaussWidthBox</tabstop>
+  <tabstop>thresholdSpinBox</tabstop>
+  <tabstop>pixelTButton</tabstop>
+  <tabstop>kernelButton</tabstop>
+  <tabstop>operOrderButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

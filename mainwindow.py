@@ -5,23 +5,25 @@
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QLabel
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5.QtWidgets import QFileDialog, QLabel, QWidget
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import QRect, QTimer, Qt
+from PyQt5.QtCore import QRect, QTimer, Qt, QLineF
 import cv2
 from cv2 import VideoCapture
 import numpy as np
 from ImgViewer import ImgViewer
 import copy
 
-class Ui_MainWindow(object):
+class MainWindow(object):
     
     #path to the image, and storage of the origin and transformed image
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(875, 378)
+  #      self.ui = QWidget()
+  #      uic.loadUi("mainwindow.ui", self.ui)
         
         self.imgPath = ""
         self.capture = VideoCapture(0)
@@ -82,6 +84,9 @@ class Ui_MainWindow(object):
         self.label_D = QLabel(self.imageFrameD)
         self.label_D.setObjectName("label_D")
         self.label_D.setGeometry(QRect(0, 0, 320, 240))
+
+        # self.visorHistoS = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameS)
+        # self.visorHistoD = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameD)
         
         #Capture button.
         self.captureButton = QtWidgets.QPushButton(MainWindow)
@@ -247,6 +252,25 @@ class Ui_MainWindow(object):
             resized_image = cv2.resize(self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width], (320,240))
             print(resized_image.shape)
             self.grayImageDest = resized_image.copy()
+
+    def updateHistograms(self, image, visor):
+        histogram = np.array()
+        channels = [0, 0]
+        histoSize = 256
+        grange = [0, 256]
+        ranges = [grange]
+        minH = 0
+        maxH = 0
+
+        # cv2.calcHist(image, 1, channels, nONE, histogram, 1, histoSize, ranges, True, False )
+        histogram = cv2.calcHist([image], [0], channels, [histoSize], ranges, True, False)
+        minH, maxH = cv2.minMaxLoc(histogram)
+
+        maxY = visor.getHeight()
+
+        for i, hVal in enumerate(histogram):
+            minY = maxY - hVal * maxY / maxH
+            visor(QLineF(i, minY, i, maxY), Qt.red)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
