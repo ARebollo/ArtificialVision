@@ -10,9 +10,18 @@ import copy
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
+    
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
-        uic.loadUi('/home/salabeta/Escritorio/practica2/proyVA2/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        print("Trying to connect")
+        self.captureButton.clicked.connect(self.trying)
+    
+    def trying(self):
+        FilterUi = QtWidgets.QDialog()
+        uic.loadUi('lFilterForm.ui', FilterUi)
+        FilterUi.exec()
+        print("Works")
     
 if __name__ == '__main__':
     import sys
