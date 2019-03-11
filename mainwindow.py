@@ -233,7 +233,7 @@ class Ui_MainWindow(object):
             
             
             if self.winSelected == True:
-                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight);
+                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight)
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.imgVisorS.repaint()
             self.imgVisorS.update()
@@ -267,14 +267,15 @@ class Ui_MainWindow(object):
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         if self.colorState == False:
+            print("muestraColor")
             self.imgLeft = QImage(self.colorImage, self.colorImage.shape[1], self.colorImage.shape[0],                                                                                                                                                 
                          QImage.Format_RGB888)
         else:
+            print("muestraGris")
             self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0],                                                                                                                                                 
                          QImage.Format_Grayscale8)
-        
 
-        self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+        #self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
         
         print(self.imgPath)
         
