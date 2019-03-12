@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog, QLabel, QGraphicsScene
 from PyQt5.QtGui import QImage, QPixmap, QColor
-from PyQt5.QtCore import QRect, QTimer, Qt
+from PyQt5.QtCore import QRect, QTimer, Qt, QLineF
 import cv2
 from cv2 import VideoCapture
 import numpy as np
@@ -48,10 +48,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
         self.visorS.set_open_cv_image(self.grayImage)
         
-        # self.label_S = QLabel(self.visorS)
-        # self.label_S.setObjectName("label_S")
-        # self.label_S.setGeometry(QRect(0, 0, 320, 240))
-        # self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
         #TODO: Delete label, set as attribute of imgViewer
         #Isn't it the same? TODO later, it works *for now*        
     
@@ -59,15 +56,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.colorImageDest = np.zeros((240,320))
         #self.colorImageDest = np.zeros((240,320,3))
         self.grayImageDest = np.zeros((240,320), np.uint8)
-        self.imgRight = QImage(320, 240, QImage.Format_RGB888)
+        # self.grayImage = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.imgD = QImage(320, 240, QImage.Format_Grayscale8)
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
         self.visorS.set_open_cv_image(self.grayImageDest)
         
 
-        # self.visorHistoS = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameS)
-        # self.visorHistoD = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameD)
+        self.visorHistoS = ImgViewer(256, self.histoFrameS.height(), None, self.histoFrameS)
+        self.visorHistoD = ImgViewer(256, self.histoFrameD.height(), None, self.histoFrameD)
         
+
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadImageAction)
         self.pixelTButton.clicked.connect(self.setPixelTransfAction)
@@ -195,7 +193,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.captureButtonAction()
                 
         self.grayImage = cv2.imread(self.imgPath)
-        self.grayImage = cv2.resize(self.grayImage, (320,240))
+        self.grayImage = cv2.resize(self.grayImage, (320, 240))
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         # TODO: remove to avoid double setting here and in the loopTimer method
@@ -219,6 +217,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setOperationOrderAction(self):
         self.OrderForm.exec()
+    
+    def updateHistograms(self, image, visor):
+        histoSize = 256
+        range = [0, 256]
+
+
+        # cv2.calcHist(image, 1, channels, nONE, histogram, 1, histoSize, ranges, True, False )
+        histogram = cv2.calcHist(images=[image.astype(np.uint8)], channels=[0], mask=None, histSize=[histoSize], ranges=range, hist=True, accumulate=False)
+        minH, maxH,_,_ = cv2.minMaxLoc(histogram)
+
+        maxY = visor.height()
+
+        for i, hVal in enumerate(histogram):
+            minY = maxY - hVal * maxY / maxH
+            visor.drawLine(QLineF(i, minY, i, maxY), Qt.red)
+        visor.update()
     
 if __name__ == '__main__':
     import sys
