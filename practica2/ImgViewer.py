@@ -18,7 +18,6 @@ from PyQt5.QtGui import QPainter, QImage, QPen, QBrush
 from PyQt5.QtOpenGL import QGLWidget
 from PyQt5.QtWidgets import QApplication, QFrame, QWidget, QVBoxLayout
 
-#Q_OBJECT
     
 class TLine:
     line = None
@@ -185,6 +184,11 @@ class ImgViewer(QWidget):
     # def resizeEvent(self, event):
     #     self.repaint()
     #     super(ImgViewer, self).resizeEvent(event)
+
+    def set_open_cv_image(self, opencv_img):
+        self.qimg = QImage(opencv_img.astype(np.int8), opencv_img.shape[1], opencv_img.shape[0], opencv_img.strides[0], QImage.Format_Grayscale8)
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     frame = QFrame()
