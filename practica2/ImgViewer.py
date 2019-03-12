@@ -19,11 +19,12 @@ class ImgViewer(QGLWidget):
 
 #Q_OBJECT
     
-    TRect = c.namedtuple('TRect', 'rect color id ang fill width')
-    #TEllipse = c.namedtuple('TEllipse', 'rect center rx ry color id fill ang')
-    #TLine = c.namedTuple('TLine', 'line color width')
-    #TGrad = c.namedTuple('TGrad', 'line color color1 width')
-    #TText = c.namedTuple('TText', 'pos size color text width')
+class TLine:
+    line = None
+    color = None
+    width = None
+    def __init__(self):
+        pass
 
 class ImgViewer(QWidget):
     invertedVerticalAxis = False
