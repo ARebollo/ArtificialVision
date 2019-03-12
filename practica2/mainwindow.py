@@ -7,6 +7,7 @@ from cv2 import VideoCapture
 import numpy as np
 #from ImgViewer import ImgViewer
 import copy
+from ImgViewer import ImgViewer
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
@@ -15,6 +16,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('mainwindow.ui', self)
         print("Trying to connect")
 
+        self.PixelTF = QtWidgets.QDialog()
+        uic.loadUi('pixelTForm.ui', self.PixelTF)
+
+        self.Filter = QtWidgets.QDialog()
+        uic.loadUi('lFilterForm.ui', self.Filter)
+
+        self.OrderForm = QtWidgets.QDialog()
+        uic.loadUi('operOrderForm.ui', self.OrderForm)
+
         self.capture = VideoCapture(0)
         self.captureState = False
 
@@ -22,14 +32,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerLoop)
         self.timer.start(16)
-
-        '''
-        #Left image frame. Image prior to transformation
-        self.imageFrameS = QtWidgets.QFrame(Ui_MainWindow)
-        self.imageFrameS.setGeometry(QtCore.QRect(20, 20, 320, 240))
-        self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.imageFrameS.setObjectName("imageFrameS")
+        
         # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
         # self.colorImage = np.zeros((320,240))
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
@@ -38,20 +41,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.grayImage = np.zeros((240,320))
         self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
         self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
-        self.imgVisorS.windowSelected.connect(self.selectWindow)
+        
         self.label_S = QLabel(self.imgVisorS)
         self.label_S.setObjectName("label_S")
         self.label_S.setGeometry(QRect(0, 0, 320, 240))
         self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         #TODO: Delete label, set as attribute of imgViewer
         #Isn't it the same? TODO later, it works *for now*        
-        
-        #Right image frame. Image after transformation.
-        self.imageFrameD = QtWidgets.QFrame(MainWindow)
-        self.imageFrameD.setGeometry(QtCore.QRect(390, 20, 320, 240))
-        self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.imageFrameD.setObjectName("imageFrameD")
+    
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         #self.colorImageDest = np.zeros((240,320))
         #self.colorImageDest = np.zeros((240,320,3))
@@ -65,7 +62,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # self.visorHistoS = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameS)
         # self.visorHistoD = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameD)
-        '''
+        
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadImageAction)
         self.pixelTButton.clicked.connect(self.setPixelTransfAction)
@@ -116,8 +113,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # FIXED: astype is needed to convert the cv type to the qt expected one
             self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
                   
-            if self.winSelected == True:
-                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight)
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             self.imgVisorS.repaint()
@@ -150,19 +145,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print("Save")
 
     def setPixelTransfAction(self):
-        PixelTF = QtWidgets.QDialog()
-        uic.loadUi('pixelTForm.ui', PixelTF)
-        PixelTF.exec()
+        self.PixelTF.exec()
 
     def setKernelAction(self):
-        Filter = QtWidgets.QDialog()
-        uic.loadUi('lFilterForm.ui', Filter)
-        Filter.exec()
+        self.Filter.exec()
 
     def setOperationOrderAction(self):
-        OrderForm = QtWidgets.QDialog()
-        uic.loadUi('operOrderForm.ui', OrderForm)
-        OrderForm.exec()
+        self.OrderForm.exec()
     
 if __name__ == '__main__':
     import sys
