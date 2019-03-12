@@ -28,57 +28,67 @@ class TLine:
         pass
 
 class ImgViewer(QWidget):
-    invertedVerticalAxis = False
+#Q_OBJECT
+    # TRect = c.namedtuple('TRect', 'rect color id ang fill width')
+    # #TEllipse = c.namedtuple('TEllipse', 'rect center rx ry color id fill ang')
+    # #TLine = c.namedTuple('TLine', 'line color width')
+    # #TGrad = c.namedTuple('TGrad', 'line color color1 width')
+    # #TText = c.namedTuple('TText', 'pos size color text width')
+    #
     
-    width = 0
-    height = 0
-    win = QtCore.QRect()
-    effWin = QtCore.QRect()
-    #Queue<TRect>
-    squareQueue = c.deque()
-    #Queue<TLine>
-    lineQueue = c.deque()
-    #Queue<TEllipse>
-    lineOnTopQueue = c.deque()
-    #Queue<TGrad>
-    gradQueue = c.deque()
-    #Queue<TText>
-    textQueue = c.deque()
 
-    qimg = QtGui.QImage()
-    #For gray conversion -> Array<QRgb>
-    ctable = list()
-    inicio = QtCore.QPoint()
-    actual = QtCore.QPoint()
-    translating = False
-    backPos = QtCore.QPointF()
-    DRAW_AXIS = False
-    DRAW_PERIMETER = False
-
-    linGrad = QtGui.QLinearGradient()
-    
-    iniCoorSelected = QtCore.QPointF()
-    endCoorSelected = QtCore.QPointF()
-    onSelection = False  
- 
     #signals:
     windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
     pressEvent = QtCore.pyqtSignal()
 
     #imgVisor input qimage, imgFrame qimage parent
-    def __init__(self, width, heigth, imgVisor, imgFrame):
-        
-        super(  ).__init__(imgFrame)
-        
-        self.resize(width,heigth)
-        self.win.setRect(0,0,width,heigth)
-        self.setGeometry(self.win)
-        if imgVisor is not None:
-            self.qimg = imgVisor
-        
+    def __init__(self, width, height, q_img, imgFrame):
+        super(ImgViewer, self).__init__()
+        self.imageScale = 1.0
         self.invertedVerticalAxis = False
-        self.W_AXIS = False
-        self.W_PERIMETER = False
+        
+        # width = 0
+        # height = 0
+        self.win = QtCore.QRect()
+        self.effWin = QtCore.QRect()
+        # Queue<TRect>
+        self.squareQueue = c.deque()
+        # Queue<TLine>
+        self.lineQueue = c.deque()
+        # Queue<TEllipse>
+        self.lineOnTopQueue = c.deque()
+        # Queue<TGrad>
+        self.gradQueue = c.deque()
+        # Queue<TText>
+        self.textQueue = c.deque()
+        
+        self.qimg = None
+        # For gray conversion -> Array<QRgb>
+        self.ctable = list()
+        self.inicio = QtCore.QPoint()
+        self.actual = QtCore.QPoint()
+        self.translating = False
+        self.backPos = QtCore.QPointF()
+        self.DRAW_AXIS = False
+        self.DRAW_PERIMETER = False
+        
+        self.linGrad = QtGui.QLinearGradient()
+
+        self.iniCoorSelected = QtCore.QPointF()
+        self.endCoorSelected = QtCore.QPointF()
+        self.onSelection = False
+        # self.layout = QVBoxLayout()
+        # imgFrame.setLayout(self.layout)
+        self.resize(width, height)
+        self.setParent(imgFrame)
+        # self.layout.addWidget(self)
+        # self.layout.setContentsMargins(0,0,0,0)
+        # self.resize(width,height)
+        # self.win.setRect(0,0,width,height)
+        # self.setGeometry(self.win)
+        # self.invertedVerticalAxis = False
+        # self.W_AXIS = False
+        # self.W_PERIMETER = False
         self.imageScale = 1.0
     
         if self.qimg is not None:
