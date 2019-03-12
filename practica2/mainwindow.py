@@ -196,11 +196,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.grayImage = cv2.resize(self.grayImage, (320, 240))
         self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
-        # TODO: remove to avoid double setting here and in the loopTimer method
-        self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0], QImage.Format_Grayscale8)
-        
-        self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
-        
         print(self.imgPath)
 
     def saveImageAction(self):
