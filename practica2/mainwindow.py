@@ -72,11 +72,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        '''
+        
         dictionary = {
-            1: self.TransformPixel,
-            2: self.Thresholding,
-            3: self.Equalize,
+            'Transform Pixel': self.transformPixelAction,
+            'Thresholding': self.thresholdingAction,
+            'Equalize': self.equalizeAction,
             4: self.Gaussian Blur,
             5: self.Median Blur,
             6: self.Linear Filter,
@@ -84,12 +84,39 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             8: self.Erode,
             9: self.Apply Several...,
         }
-        '''
+        
             # Get the function from switcher dictionary
             # TODO
             #func = dictionary.get(valorDesplegable, lambda: "Invalid month")
             # Execute the function
             #print func()
+
+    def transformPixelAction(self):
+        pass
+
+    def thresholdingAction(self):
+        pass
+
+    def equalizeAction(self):
+        pass
+
+    def gaussianBlurAction(self):
+        pass
+
+    def medianBlurAction(self):
+        pass
+
+    def linearFilterAction(self):
+        pass
+
+    def dilateAction(self):
+        pass
+
+    def erodeAction(self):
+        pass
+
+    def applySeveralAction(self):
+        pass
 
     def captureButtonAction(self):
         if self.captureState == False:
@@ -112,7 +139,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imgVisorS.qimg = QImage(self.grayImage.astype(np.int8), self.grayImage.shape[1], self.grayImage.shape[0],self.grayImage.strides[0], QImage.Format_Grayscale8)
             # FIXED: astype is needed to convert the cv type to the qt expected one
             self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
-                  
+            print(self.operationComboBox.currentText())
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             self.imgVisorS.repaint()
