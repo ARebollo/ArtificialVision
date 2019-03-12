@@ -7,6 +7,9 @@ Created on Wed Feb  6 12:10:15 2019
 """
 
 import collections as c
+import signal
+import sys
+
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter
@@ -134,3 +137,12 @@ class ImgViewer(QGLWidget):
         painter.setPen(QtCore.Qt.green)
         painter.drawRect(posX,posY,width,height)
         #ui.imageLabel->setPixmap(QPixmap::fromImage(qImage));
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    frame = QFrame()
+    img = QImage()
+    img.load("/home/robolab/PycharmProjects/ArtificialVision/practica2/kitchen-2165756_1920.jpg")
+    img_viewer = ImgViewer(320,240,img, frame)
+    frame.show()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    app.exec_()
