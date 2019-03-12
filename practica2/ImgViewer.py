@@ -18,7 +18,7 @@ from PyQt5.QtGui import QPainter, QImage, QPen, QBrush
 from PyQt5.QtOpenGL import QGLWidget
 from PyQt5.QtWidgets import QApplication, QFrame, QWidget, QVBoxLayout
 
-    
+
 class TLine:
     line = None
     color = None
@@ -34,7 +34,7 @@ class ImgViewer(QWidget):
     # #TGrad = c.namedTuple('TGrad', 'line color color1 width')
     # #TText = c.namedTuple('TText', 'pos size color text width')
     #
-    
+
 
     #signals:
     windowSelected = QtCore.pyqtSignal(QtCore.QPointF, int, int)
@@ -45,7 +45,7 @@ class ImgViewer(QWidget):
         super(ImgViewer, self).__init__()
         self.imageScale = 1.0
         self.invertedVerticalAxis = False
-        
+
         # width = 0
         # height = 0
         self.win = QtCore.QRect()
@@ -60,7 +60,7 @@ class ImgViewer(QWidget):
         self.gradQueue = c.deque()
         # Queue<TText>
         self.textQueue = c.deque()
-        
+
         self.qimg = None
         # For gray conversion -> Array<QRgb>
         self.ctable = list()
@@ -70,7 +70,7 @@ class ImgViewer(QWidget):
         self.backPos = QtCore.QPointF()
         self.DRAW_AXIS = False
         self.DRAW_PERIMETER = False
-        
+
         self.linGrad = QtGui.QLinearGradient()
 
         self.iniCoorSelected = QtCore.QPointF()
@@ -89,7 +89,7 @@ class ImgViewer(QWidget):
         # self.W_AXIS = False
         # self.W_PERIMETER = False
         self.imageScale = 1.0
-    
+
         if q_img is not None:
             self.qimg = q_img
             self.imageScale = width / self.qimg.width()
@@ -97,7 +97,7 @@ class ImgViewer(QWidget):
             self.qimg = QImage(width, height, QImage.Format_Grayscale8)
             self.qimg.fill(240)
             self.imageScale = width / self.qimg.width()
-            
+
         #
         # for i in range (0,256):
         #     #ctable[i] = QtCore.qRgb(i,i,i)
@@ -106,7 +106,7 @@ class ImgViewer(QWidget):
         # # self.qimg.setColorTable(self.ctable)
         # self.translating = False
         # self.effWin = self.win
-        
+
         '''
         QGLFormat f = format()
     
@@ -121,7 +121,7 @@ class ImgViewer(QWidget):
         #
         # self.onSelection = False
         # self.show()
-         
+
     def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse clicked")
         if mouseEvent.button() == QtCore.Qt.LeftButton:
@@ -129,21 +129,21 @@ class ImgViewer(QWidget):
             self.iniCoorSelected.setY(mouseEvent.y())
             self.endCoorSelected.setX(mouseEvent.x())
             self.endCoorSelected.setY(mouseEvent.y())
-            
+
             self.onSelection = True
             self.pressEvent.emit()
 
     def mouseMoveEvent(self, mouseEvent: QtGui.QMouseEvent):
         self.endCoorSelected.setX(mouseEvent.x())
         self.endCoorSelected.setY(mouseEvent.y())
-    
+
     def mouseReleaseEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse Released")
         if mouseEvent.button() == QtCore.Qt.LeftButton:
             self.windowSelected.emit((self.iniCoorSelected+self.endCoorSelected)/2, abs(self.endCoorSelected.x()-self.iniCoorSelected.x()),
             abs(self.endCoorSelected.y()-self.iniCoorSelected.y()))
         self.onSelection = False
-    
+
     def drawSquare(self, posX, posY, width, height):
         painter = QPainter(self.qimg)
         painter.setBrush(QtCore.Qt.NoBrush)

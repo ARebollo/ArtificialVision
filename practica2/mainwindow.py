@@ -29,7 +29,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.OrderForm.okButton.clicked.connect(self.closeOrderFormAction)
 
         self.capture = VideoCapture(0)
-        self.captureState = False
+        self.captureState = True
+        self.captureButtonAction()
 
         #Timer to control the capture.
         self.timer = QTimer()
