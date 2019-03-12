@@ -161,12 +161,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
             ret, self.grayImage = self.capture.read()
-            self.grayImage = cv2.resize(self.grayImage, (320,240))
+            self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
-            # FIXED: astype is needed to convert the cv type to the qt expected one
-            self.imgVisorS.qimg = QImage(self.grayImage.astype(np.int8), self.grayImage.shape[1], self.grayImage.shape[0],self.grayImage.strides[0], QImage.Format_Grayscale8)
-            # FIXED: astype is needed to convert the cv type to the qt expected one
-            self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
+
             print(self.operationComboBox.currentText())
 
             func = self.dictionary.get(self.operationComboBox.currentText())
@@ -174,8 +171,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 
-            self.imgVisorS.repaint()
-            self.imgVisorS.update()
+            # self.label_S.setPixmap(QPixmap.fromImage(self.visorS.qimg))
+            # self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
+            # self.visorS.repaint()
+            # self.visorS.update()
+
+        self.updateHistograms(self.grayImage, self.visorHistoS)
+        self.updateHistograms(self.grayImageDest, self.visorHistoD)
+        # FIXED: astype is needed to convert the cv type to the qt expected one
+        self.visorS.set_open_cv_image(self.grayImage)
+        # FIXED: astype is needed to convert the cv type to the qt expected one
+        self.visorD.set_open_cv_image(self.grayImageDest)
+        self.visorS.update()
+        self.visorD.update()
 
     def colorImageAction(self):
         pass
