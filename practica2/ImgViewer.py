@@ -91,20 +91,22 @@ class ImgViewer(QWidget):
         # self.W_PERIMETER = False
         self.imageScale = 1.0
     
-        if self.qimg is not None:
-            self.imageScale = width/self.qimg.width()
-    
+        if q_img is not None:
+            self.qimg = q_img
+            self.imageScale = width / self.qimg.width()
         else:
-            self.qimg = QtCore.QImage(width,heigth, QtCore.QImage.Format_Indexed8)
+            self.qimg = QImage(width, height, QImage.Format_Grayscale8)
             self.qimg.fill(240)
+            self.imageScale = width / self.qimg.width()
             
-        for i in range (0,256):
-            #ctable[i] = QtCore.qRgb(i,i,i)
-            self.ctable.append(QtGui.qRgb(i,i,i))
-    
-        self.qimg.setColorTable(self.ctable)
-        self.translating = False
-        self.effWin = self.win
+        #
+        # for i in range (0,256):
+        #     #ctable[i] = QtCore.qRgb(i,i,i)
+        #     self.ctable.append(QtGui.qRgb(i,i,i))
+        #
+        # # self.qimg.setColorTable(self.ctable)
+        # self.translating = False
+        # self.effWin = self.win
         
         '''
         QGLFormat f = format()
@@ -117,9 +119,9 @@ class ImgViewer(QWidget):
         else:
             print("Sample Buffers Off in QGLWidget")
         '''
-        
-        self.onSelection = False
-        self.show()
+        #
+        # self.onSelection = False
+        # self.show()
          
     def mousePressEvent(self, mouseEvent: QtGui.QMouseEvent):
         print("Mouse clicked")
@@ -149,6 +151,8 @@ class ImgViewer(QWidget):
         painter.setPen(QtCore.Qt.green)
         painter.drawRect(posX,posY,width,height)
         #ui.imageLabel->setPixmap(QPixmap::fromImage(qImage));
+
+
     def drawLine(self, line, color, width=1):
         l = TLine()
         l.line = line
