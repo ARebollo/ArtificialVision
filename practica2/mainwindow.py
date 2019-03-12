@@ -48,10 +48,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
         self.visorS.set_open_cv_image(self.grayImage)
         
-        self.label_S = QLabel(self.imgVisorS)
-        self.label_S.setObjectName("label_S")
-        self.label_S.setGeometry(QRect(0, 0, 320, 240))
-        self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        # self.label_S = QLabel(self.visorS)
+        # self.label_S.setObjectName("label_S")
+        # self.label_S.setGeometry(QRect(0, 0, 320, 240))
+        # self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         #TODO: Delete label, set as attribute of imgViewer
         #Isn't it the same? TODO later, it works *for now*        
     
@@ -64,9 +64,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
         self.visorS.set_open_cv_image(self.grayImageDest)
         
-        self.label_D = QLabel(self.imageFrameD)
-        self.label_D.setObjectName("label_D")
-        self.label_D.setGeometry(QRect(0, 0, 320, 240))
 
         # self.visorHistoS = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameS)
         # self.visorHistoD = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameD)
@@ -175,8 +172,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             func = self.dictionary.get(self.operationComboBox.currentText())
             func()
 
-            self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
-            self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
+
+
             self.imgVisorS.repaint()
             self.imgVisorS.update()
 
