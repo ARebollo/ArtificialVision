@@ -12,10 +12,11 @@ import sys
 
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPainter
+from PyQt5.QtCore import QRectF
+from PyQt5.QtGui import QPainter, QImage, QPen, QBrush
 #from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtOpenGL import QGLWidget
-class ImgViewer(QGLWidget): 
+from PyQt5.QtWidgets import QApplication, QFrame, QWidget, QVBoxLayout
 
 #Q_OBJECT
     
@@ -138,6 +139,38 @@ class ImgViewer(QWidget):
         painter.setPen(QtCore.Qt.green)
         painter.drawRect(posX,posY,width,height)
         #ui.imageLabel->setPixmap(QPixmap::fromImage(qImage));
+    def drawLine(self, line, color, width=1):
+        l = TLine()
+        l.line = line
+        l.color = color
+        l.width = width
+        self.lineQueue.append(l)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.save()
+        painter.setRenderHint(QPainter.HighQualityAntialiasing)
+
+        if self.qimg is not None:
+            # painter.drawImage(QRectF(0., 0., self.width(), self.height()), self.qimg)
+            painter.drawImage(QRectF(0., 0., self.width(), self.height()), self.qimg,
+                                      QRectF(0, 0, self.qimg.width(), self.qimg.height()))
+
+
+        while len(self.lineQueue)>0:
+            l = self.lineQueue.pop()
+            painter.setPen(QPen(QBrush(l.color), l.width))
+            painter.drawLine(l.line)
+        painter.restore()
+        super(ImgViewer, self).paintEvent(event)
+
+
+    # def getHeight(self):
+    #     return self.height
+    #
+    # def resizeEvent(self, event):
+    #     self.repaint()
+    #     super(ImgViewer, self).resizeEvent(event)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     frame = QFrame()
