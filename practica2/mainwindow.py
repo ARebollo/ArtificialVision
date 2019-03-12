@@ -98,25 +98,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pass
 
     def thresholdingAction(self):
-        pass
+        cv2.threshold(self.grayImage, ui.thresholdSpinBox.value(), 255 ,self.grayImageDest, cv2.THRESH_BINARY)
 
     def equalizeAction(self):
-        pass
+        cv2.equalizeHist(self.grayImage, self.grayImageDest)
 
     def gaussianBlurAction(self):
-        pass
+        cv2.GaussianBlur(self.grayImage)
 
     def medianBlurAction(self):
-        pass
+        cv2.medianBlur(self.grayImage)
 
     def linearFilterAction(self):
         pass
 
     def dilateAction(self):
-        pass
+        cv2.dilate(self.grayImage, self.grayImageDest)
 
     def erodeAction(self):
-        pass
+        cv2.erode(self.grayImage, self.grayImageDest)
 
     def applySeveralAction(self):
         if self.OrderForm.firstOperCheckBox.isChecked() is True:
@@ -216,4 +216,3 @@ if __name__ == '__main__':
     window = Ui_MainWindow()
     window.show()
     sys.exit(app.exec_())
-
