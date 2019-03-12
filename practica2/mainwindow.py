@@ -60,11 +60,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imgD = QImage(320, 240, QImage.Format_Grayscale8)
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
         self.visorS.set_open_cv_image(self.grayImageDest)
-        
+
 
         self.visorHistoS = ImgViewer(256, self.histoFrameS.height(), None, self.histoFrameS)
         self.visorHistoD = ImgViewer(256, self.histoFrameD.height(), None, self.histoFrameD)
-        
+
 
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadImageAction)
@@ -77,7 +77,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         
         self.dictionary = {
-            'Transform Pixel': self.transformPixelAction,
+            'Transform pixel': self.transformPixelAction,
             'Thresholding': self.thresholdingAction,
             'Equalize': self.equalizeAction,
             'Gaussian Blur': self.gaussianBlurAction,
@@ -98,7 +98,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pass
 
     def thresholdingAction(self):
-        cv2.threshold(self.grayImage, ui.thresholdSpinBox.value(), 255 ,self.grayImageDest, cv2.THRESH_BINARY)
+        _, self.grayImageDest = cv2.threshold(self.grayImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
 
     def equalizeAction(self):
         cv2.equalizeHist(self.grayImage, self.grayImageDest)
@@ -160,7 +160,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if (self.captureState == True and self.capture.isOpened() == True):
             ret, self.grayImage = self.capture.read()
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
-            self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
+            self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
 
             print(self.operationComboBox.currentText())
 
@@ -199,7 +199,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print(self.imgPath)
 
     def saveImageAction(self):
-        saveImage = self.grayImage    
+        saveImage = self.grayImage
         filename = QFileDialog.getSaveFileName()
         cv2.imWrite(filename, saveImage)
         print("Save")
@@ -212,7 +212,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setOperationOrderAction(self):
         self.OrderForm.exec()
-    
+
     def updateHistograms(self, image, visor):
         histoSize = 256
         range = [0, 256]
