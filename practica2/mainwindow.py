@@ -42,9 +42,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         # self.colorImage = np.zeros((320,240))
         #self.colorImage = np.zeros((240,320,3))
-        self.grayImage = np.zeros((240,320))
-        self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
-        self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
+        self.grayImage = np.zeros((240, 320), np.uint8)
+        # self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
+        self.imgS = QImage(320, 240, QImage.Format_Grayscale8)
+        self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
+        self.visorS.set_open_cv_image(self.grayImage)
         
         self.label_S = QLabel(self.imgVisorS)
         self.label_S.setObjectName("label_S")
@@ -56,9 +58,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         #self.colorImageDest = np.zeros((240,320))
         #self.colorImageDest = np.zeros((240,320,3))
-        self.grayImageDest = np.zeros((240,320))
+        self.grayImageDest = np.zeros((240,320), np.uint8)
         self.imgRight = QImage(320, 240, QImage.Format_RGB888)
-        self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
+        self.imgD = QImage(320, 240, QImage.Format_Grayscale8)
+        self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
+        self.visorS.set_open_cv_image(self.grayImageDest)
         
         self.label_D = QLabel(self.imageFrameD)
         self.label_D.setObjectName("label_D")
