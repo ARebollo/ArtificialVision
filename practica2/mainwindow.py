@@ -18,12 +18,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.PixelTF = QtWidgets.QDialog()
         uic.loadUi('pixelTForm.ui', self.PixelTF)
+        self.PixelTF.okButton.clicked.connect(self.closePixelTransformAction)
 
         self.Filter = QtWidgets.QDialog()
         uic.loadUi('lFilterForm.ui', self.Filter)
+        self.Filter.okButton.clicked.connect(self.closeFilterFormAction)
 
         self.OrderForm = QtWidgets.QDialog()
         uic.loadUi('operOrderForm.ui', self.OrderForm)
+        self.OrderForm.okButton.clicked.connect(self.closeOrderFormAction)
 
         self.capture = VideoCapture(0)
         self.captureState = False
@@ -73,16 +76,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         
-        dictionary = {
+        self.dictionary = {
             'Transform Pixel': self.transformPixelAction,
             'Thresholding': self.thresholdingAction,
             'Equalize': self.equalizeAction,
-            4: self.Gaussian Blur,
-            5: self.Median Blur,
-            6: self.Linear Filter,
-            7: self.Dilate,
-            8: self.Erode,
-            9: self.Apply Several...,
+            'Gaussian Blur': self.gaussianBlurAction,
+            'Median Blur': self.medianBlurAction,
+            'Linear Filter': self.linearFilterAction,
+            'Dilate': self.dilateAction,
+            'Erode': self.erodeAction,
+            'Apply several...': self.applySeveralAction,
         }
         
             # Get the function from switcher dictionary
@@ -116,8 +119,31 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pass
 
     def applySeveralAction(self):
-        pass
+        if self.OrderForm.firstOperCheckBox.isChecked() is True:
+            func = self.dictionary.get(self.OrderForm.operationComboBox1.getText())
+            func()
 
+        if self.OrderForm.secondOperCheckBox.isChecked() is True:
+            func = self.dictionary.get(self.OrderForm.operationComboBox2.getText())
+            func()
+
+        if self.OrderForm.thirdOperCheckBox.isChecked() is True:
+            func = self.dictionary.get(self.OrderForm.operationComboBox3.getText())
+            func()
+
+        if self.OrderForm.fourthOperCheckBox.isChecked() is True:
+            func = self.dictionary.get(self.OrderForm.operationComboBox4.getText())
+            func()
+
+    def closeOrderFormAction(self):
+        self.OrderForm.hide()
+
+    def closePixelTransformAction(self):
+        self.PixelTF.hide()
+
+    def closeFilterFormAction(self):
+        self.Filter.hide()
+        
     def captureButtonAction(self):
         if self.captureState == False:
             self.captureButton.setText("Stop Capture")
@@ -140,6 +166,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # FIXED: astype is needed to convert the cv type to the qt expected one
             self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
             print(self.operationComboBox.currentText())
+
+            func = self.dictionary.get(self.operationComboBox.currentText())
+            func()
+
             self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
             self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             self.imgVisorS.repaint()
