@@ -10,30 +10,82 @@ import copy
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
-    
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
         uic.loadUi('mainwindow.ui', self)
         print("Trying to connect")
+
+        self.capture = VideoCapture(0)
+        self.captureState = False
+
+        #Timer to control the capture.
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerLoop)
+        self.timer.start(16)
+
+        '''
+        #Left image frame. Image prior to transformation
+        self.imageFrameS = QtWidgets.QFrame(Ui_MainWindow)
+        self.imageFrameS.setGeometry(QtCore.QRect(20, 20, 320, 240))
+        self.imageFrameS.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.imageFrameS.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.imageFrameS.setObjectName("imageFrameS")
+        # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
+        # self.colorImage = np.zeros((320,240))
+        # FIXED: original removed 2 of the 3 chanels with the np.zeros
+        # self.colorImage = np.zeros((320,240))
+        #self.colorImage = np.zeros((240,320,3))
+        self.grayImage = np.zeros((240,320))
+        self.imgLeft = QImage(320, 240, QImage.Format_RGB888)
+        self.imgVisorS = ImgViewer(320,240, self.imgLeft, self.imageFrameS)
+        self.imgVisorS.windowSelected.connect(self.selectWindow)
+        self.label_S = QLabel(self.imgVisorS)
+        self.label_S.setObjectName("label_S")
+        self.label_S.setGeometry(QRect(0, 0, 320, 240))
+        self.label_S.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        #TODO: Delete label, set as attribute of imgViewer
+        #Isn't it the same? TODO later, it works *for now*        
+        
+        #Right image frame. Image after transformation.
+        self.imageFrameD = QtWidgets.QFrame(MainWindow)
+        self.imageFrameD.setGeometry(QtCore.QRect(390, 20, 320, 240))
+        self.imageFrameD.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.imageFrameD.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.imageFrameD.setObjectName("imageFrameD")
+        # FIXED: original removed 2 of the 3 chanels with the np.zeros
+        #self.colorImageDest = np.zeros((240,320))
+        #self.colorImageDest = np.zeros((240,320,3))
+        self.grayImageDest = np.zeros((240,320))
+        self.imgRight = QImage(320, 240, QImage.Format_RGB888)
+        self.imgVisorD = ImgViewer(320,240, self.imgRight, self.imageFrameD)
+        
+        self.label_D = QLabel(self.imageFrameD)
+        self.label_D.setObjectName("label_D")
+        self.label_D.setGeometry(QRect(0, 0, 320, 240))
+
+        # self.visorHistoS = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameS)
+        # self.visorHistoD = ImgViewer(256, self.ui.histoFrameS.height(), self.ui.histoFrameD)
+        '''
         self.captureButton.clicked.connect(self.captureButtonAction)
+        self.loadButton.clicked.connect(self.loadImageAction)
         self.pixelTButton.clicked.connect(self.setPixelTransfAction)
         self.kernelButton.clicked.connect(self.setKernelAction)
         self.operOrderButton.clicked.connect(self.setOperationOrderAction)
 
+        #self.retranslateUi(MainWindow)
+        #QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
         '''
         dictionary = {
-            1: self.one,
-            2: self.two,
-            3: self.three,
-            4: self.four,
-            5: self.five,
-            6: self.six,
-            7: self.seven,
-            8: self.eight,
-            9: self.nine,
-            10: self.ten,
-            11: self.eleven,
-            12: self.twelve
+            1: self.TransformPixel,
+            2: self.Thresholding,
+            3: self.Equalize,
+            4: self.Gaussian Blur,
+            5: self.Median Blur,
+            6: self.Linear Filter,
+            7: self.Dilate,
+            8: self.Erode,
+            9: self.Apply Several...,
         }
         '''
             # Get the function from switcher dictionary
@@ -43,16 +95,59 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #print func()
 
     def captureButtonAction(self):
-        pass
+        if self.captureState == False:
+            self.captureButton.setText("Stop Capture")
+            self.captureButton.setChecked(True)
+            print("Started")
+            self.captureState = True
+        else: 
+            self.captureButton.setText("Start Capture")
+            self.captureButton.setChecked(False)
+            print("Stopped")
+            self.captureState = False
+
+    def timerLoop(self):
+        if (self.captureState == True and self.capture.isOpened() == True):
+            ret, self.grayImage = self.capture.read()
+            self.grayImage = cv2.resize(self.grayImage, (320,240))
+            self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)    
+            # FIXED: astype is needed to convert the cv type to the qt expected one
+            self.imgVisorS.qimg = QImage(self.grayImage.astype(np.int8), self.grayImage.shape[1], self.grayImage.shape[0],self.grayImage.strides[0], QImage.Format_Grayscale8)
+            # FIXED: astype is needed to convert the cv type to the qt expected one
+            self.imgVisorD.qimg = QImage(self.grayImageDest.astype(np.int8), self.grayImageDest.shape[1], self.grayImageDest.shape[0], QImage.Format_Grayscale8)
+                  
+            if self.winSelected == True:
+                self.imgVisorS.drawSquare(self.posX, self.posY, self.rectWidth,self.rectHeight)
+            self.label_S.setPixmap(QPixmap.fromImage(self.imgVisorS.qimg))
+            self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
+            self.imgVisorS.repaint()
+            self.imgVisorS.update()
 
     def colorImageAction(self):
         pass
 
     def loadImageAction(self):
-        pass
+        print("Load")
+        self.imgPath, _ = QFileDialog.getOpenFileName()
+        if self.captureState == True:
+            self.captureButtonAction()
+                
+        self.grayImage = cv2.imread(self.imgPath)
+        self.grayImage = cv2.resize(self.grayImage, (320,240))
+        self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
+        
+        # TODO: remove to avoid double setting here and in the loopTimer method
+        self.imgLeft = QImage(self.grayImage, self.grayImage.shape[1], self.grayImage.shape[0], QImage.Format_Grayscale8)
+        
+        self.label_S.setPixmap(QPixmap.fromImage(self.imgLeft))
+        
+        print(self.imgPath)
 
     def saveImageAction(self):
-        pass
+        saveImage = self.grayImage    
+        filename = QFileDialog.getSaveFileName()
+        cv2.imWrite(filename, saveImage)
+        print("Save")
 
     def setPixelTransfAction(self):
         PixelTF = QtWidgets.QDialog()
