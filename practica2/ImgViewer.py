@@ -25,7 +25,7 @@ class ImgViewer(QGLWidget):
     #TGrad = c.namedTuple('TGrad', 'line color color1 width')
     #TText = c.namedTuple('TText', 'pos size color text width')
 
-    imageScale = 0.0
+class ImgViewer(QWidget):
     invertedVerticalAxis = False
     
     width = 0
