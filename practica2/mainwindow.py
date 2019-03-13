@@ -119,7 +119,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         return returnImage
 
     def linearFilterAction(self, startImage):
-        pass
+        kernel = np.zeros((3,3), dtype = np.double)
+        for i in range (1,4):
+            for j in range (1,4):
+                result = 'kernelBox' + str(i) + str(j)
+                kernel[i-1,j-1] = getattr(self.Filter, result).value()
+        
+        returnImage = cv2.filter2D(startImage, ddepth = cv2.CV_8U, kernel = kernel, delta = self.Filter.addedVBox.value())
+        return returnImage
 
     def dilateAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
