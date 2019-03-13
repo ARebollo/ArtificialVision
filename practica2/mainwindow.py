@@ -98,9 +98,31 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #print func()
 
     def transformPixelAction(self, startImage):
-        return self.grayImageDest
-        pass
 
+        lutTable = np.ones((256), np.uint8)
+
+        src_1 = self.PixelTF.origPixelBox1.value()
+        src_2 = self.PixelTF.origPixelBox2.value()
+        src_3 = self.PixelTF.origPixelBox3.value()
+        src_4 = self.PixelTF.origPixelBox4.value()
+
+        dst_1 = self.PixelTF.newPixelBox1.value()
+        dst_2 = self.PixelTF.newPixelBox2.value()
+        dst_3 = self.PixelTF.newPixelBox3.value()
+        dst_4 = self.PixelTF.newPixelBox4.value()
+
+        self.applyTransformPixel(src_1, src_2, dst_1, dst_2, lutTable)
+        self.applyTransformPixel(src_2, src_3, dst_2, dst_3, lutTable)
+        self.applyTransformPixel(src_3, src_4 + 1, dst_3, dst_4 + 1, lutTable)
+
+        returnImage = cv2.LUT(startImage, lutTable)
+        return returnImage
+
+    def applyTransformPixel(self, src1, src2, dst1, dst2, lut):
+        for src in range(src1,src2):
+            s = ((dst2 - dst1))/(src2 - src1)*(src - src1) + dst1
+            lut[src] = s
+        
     def thresholdingAction(self, startImage):
         _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
         return returnImage
