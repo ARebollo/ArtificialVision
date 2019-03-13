@@ -170,8 +170,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
             print(self.operationComboBox.currentText())
 
-            func = self.dictionary.get(self.operationComboBox.currentText())
-            func()
+            
 
 
 
@@ -179,7 +178,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             # self.visorS.repaint()
             # self.visorS.update()
-
+        func = self.dictionary.get(self.operationComboBox.currentText())
+        func()
         self.updateHistograms(self.grayImage, self.visorHistoS)
         self.updateHistograms(self.grayImageDest, self.visorHistoD)
         # FIXED: astype is needed to convert the cv type to the qt expected one
