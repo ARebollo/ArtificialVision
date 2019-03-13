@@ -245,22 +245,22 @@
    </property>
    <item>
     <property name="text">
-     <string>Transform pixel</string>
+     <string>User Defined</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>Thresholding</string>
+     <string>Negative</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>Equalize</string>
+     <string>Brighten</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>Gaussian Blur</string>
+     <string>Darken</string>
     </property>
    </item>
    <item>
