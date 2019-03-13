@@ -97,50 +97,61 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # Execute the function
             #print func()
 
-    def transformPixelAction(self):
+    def transformPixelAction(self, startImage):
+        return self.grayImageDest
         pass
 
-    def thresholdingAction(self):
-        _, self.grayImageDest = cv2.threshold(self.grayImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
+    def thresholdingAction(self, startImage):
+        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
+        return returnImage
 
-    def equalizeAction(self):
-        self.grayImageDest = cv2.equalizeHist(self.grayImage)
+    def equalizeAction(self, startImage):
+        returnImage = cv2.equalizeHist(startImage)
+        return returnImage
 
-    def gaussianBlurAction(self):
-        kernel = np.ones((3,3), np.uint8)
+    def gaussianBlurAction(self, startImage):
         size = (int(self.gaussWidthBox.cleanText()), int(self.gaussWidthBox.cleanText()))
-        self.grayImageDest = cv2.GaussianBlur(self.grayImage,ksize = size, sigmaX = 0, sigmaY = 0)
+        returnImage = cv2.GaussianBlur(startImage,ksize = size, sigmaX = 0, sigmaY = 0)
+        return returnImage
 
-    def medianBlurAction(self):
-        cv2.medianBlur(self.grayImage, self.grayImageDest, 3)
+    def medianBlurAction(self, startImage):
+        returnImage = cv2.medianBlur(startImage, ksize = 3)
+        return returnImage
 
-    def linearFilterAction(self):
+    def linearFilterAction(self, startImage):
         pass
 
-    def dilateAction(self):
+    def dilateAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
-        cv2.dilate(self.grayImage, kernel, self.grayImageDest, iterations=1)
+        returnImage = cv2.dilate(startImage, kernel, iterations=1)
+        return returnImage
 
-    def erodeAction(self):
+    def erodeAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
-        cv2.erode(self.grayImage, kernel, self.grayImageDest, iterations=1)
+        returnImage = cv2.erode(startImage, kernel, iterations=1)
+        return returnImage
 
-    def applySeveralAction(self):
+    def applySeveralAction(self, startImage):
+
+        returnImage = startImage
+
         if self.OrderForm.firstOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox1.getText())
-            func()
+            func = self.dictionary.get(self.OrderForm.operationComboBox1.currentText())
+            returnImage = func(returnImage)
+        
 
         if self.OrderForm.secondOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox2.getText())
-            func()
+            func = self.dictionary.get(self.OrderForm.operationComboBox2.currentText())
+            returnImage = func(returnImage)
 
         if self.OrderForm.thirdOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox3.getText())
-            func()
+            func = self.dictionary.get(self.OrderForm.operationComboBox3.currentText())
+            returnImage = func(returnImage)
 
         if self.OrderForm.fourthOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox4.getText())
-            func()
+            func = self.dictionary.get(self.OrderForm.operationComboBox4.currentText())
+            returnImage = func(returnImage)
+        return returnImage
 
     def closeOrderFormAction(self):
         self.OrderForm.hide()
@@ -180,7 +191,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # self.visorS.repaint()
             # self.visorS.update()
         func = self.dictionary.get(self.operationComboBox.currentText())
-        func()
+        self.grayImageDest = func(self.grayImage)
         self.updateHistograms(self.grayImage, self.visorHistoS)
         self.updateHistograms(self.grayImageDest, self.visorHistoD)
         # FIXED: astype is needed to convert the cv type to the qt expected one
