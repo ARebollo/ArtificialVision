@@ -141,16 +141,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         return returnImage
 
     def linearFilterAction(self, startImage):
-        pass
+        kernel = np.zeros((3,3), dtype = np.double)
+        for i in range (1,4):
+            for j in range (1,4):
+                result = 'kernelBox' + str(i) + str(j)
+                kernel[i-1,j-1] = getattr(self.Filter, result).value()
+        
+        returnImage = cv2.filter2D(startImage, ddepth = cv2.CV_8U, kernel = kernel, delta = self.Filter.addedVBox.value())
+        return returnImage
 
     def dilateAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
-        returnImage = cv2.dilate(startImage, kernel, iterations=1)
+        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
+        returnImage = cv2.dilate(returnImage, kernel, iterations=1)
         return returnImage
 
     def erodeAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
-        returnImage = cv2.erode(startImage, kernel, iterations=1)
+        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
+        returnImage = cv2.erode(returnImage, kernel, iterations=1)
         return returnImage
 
     def applySeveralAction(self, startImage):
