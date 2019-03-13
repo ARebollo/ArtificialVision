@@ -88,6 +88,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'Apply several...': self.applySeveralAction,
         }
         
+        
             # Get the function from switcher dictionary
             # TODO
             #func = dictionary.get(valorDesplegable, lambda: "Invalid month")
