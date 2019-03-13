@@ -218,7 +218,7 @@
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>230</x>
      <y>190</y>
      <width>98</width>
      <height>27</height>
@@ -227,6 +227,62 @@
    <property name="text">
     <string>Ok</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="operationComboBox1">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>161</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>Transform pixel</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Thresholding</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Equalize</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Gaussian Blur</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Median Blur</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Linear Filter</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Dilate</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Erode</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <tabstops>

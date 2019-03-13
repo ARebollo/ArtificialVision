@@ -131,13 +131,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def dilateAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
         _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
-        returnImage = cv2.dilate(startImage, kernel, iterations=1)
+        returnImage = cv2.dilate(returnImage, kernel, iterations=1)
         return returnImage
 
     def erodeAction(self, startImage):
         kernel = np.ones((3,3), np.uint8)
         _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
-        returnImage = cv2.erode(startImage, kernel, iterations=1)
+        returnImage = cv2.erode(returnImage, kernel, iterations=1)
         return returnImage
 
     def applySeveralAction(self, startImage):
