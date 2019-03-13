@@ -112,7 +112,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.grayImageDest = cv2.GaussianBlur(self.grayImage,ksize = size, sigmaX = 0, sigmaY = 0)
 
     def medianBlurAction(self):
-        cv2.medianBlur(self.grayImage, self.grayImageDest, 3)
+        ret, self.grayImageDest = cv2.medianBlur(self.grayImage, 3)
 
     def linearFilterAction(self):
         pass
