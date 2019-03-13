@@ -101,14 +101,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         pass
 
     def thresholdingAction(self):
-        self.grayImageDest = cv2.threshold(self.grayImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
+        _, self.grayImageDest = cv2.threshold(self.grayImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
 
     def equalizeAction(self):
-        cv2.equalizeHist(self.grayImage, self.grayImageDest)
+        self.grayImageDest = cv2.equalizeHist(self.grayImage)
 
     def gaussianBlurAction(self):
         kernel = np.ones((3,3), np.uint8)
-        cv2.GaussianBlur(self.grayImage, self.grayImageDest, kernel, 0)
+        size = (int(self.gaussWidthBox.cleanText()), int(self.gaussWidthBox.cleanText()))
+        self.grayImageDest = cv2.GaussianBlur(self.grayImage,ksize = size, sigmaX = 0, sigmaY = 0)
 
     def medianBlurAction(self):
         cv2.medianBlur(self.grayImage, self.grayImageDest, 3)
