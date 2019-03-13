@@ -90,6 +90,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'Apply several...': self.applySeveralAction,
         }
         
+        self.operationDictionary = {
+            'User Defined ': 'test',
+            'Negative': 'test2',
+            'Brighten': 'test3',
+            'Darken': 'test4'
+        }
         
             # Get the function from switcher dictionary
             # TODO
