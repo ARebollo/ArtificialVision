@@ -91,10 +91,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         }
         
         self.operationDictionary = {
-            'User Defined ': 'test',
-            'Negative': 'test2',
-            'Brighten': 'test3',
-            'Darken': 'test4'
+            'Negative': [255, 170, 85, 0],
+            'Brighten': [0, 140, 220, 255],
+            'Darken': [0,40, 85, 120],
+            'Increase Contrast': [0, 50, 200, 255],
+            'Decrease Contrast': [40, 100, 155, 210]
         }
         
             # Get the function from switcher dictionary
@@ -111,11 +112,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         src_2 = self.PixelTF.origPixelBox2.value()
         src_3 = self.PixelTF.origPixelBox3.value()
         src_4 = self.PixelTF.origPixelBox4.value()
+        if self.PixelTF.operationComboBox1.currentText() == 'User Defined':
+            dst_1 = self.PixelTF.newPixelBox1.value()
+            dst_2 = self.PixelTF.newPixelBox2.value()
+            dst_3 = self.PixelTF.newPixelBox3.value()
+            dst_4 = self.PixelTF.newPixelBox4.value()
 
-        dst_1 = self.PixelTF.newPixelBox1.value()
-        dst_2 = self.PixelTF.newPixelBox2.value()
-        dst_3 = self.PixelTF.newPixelBox3.value()
-        dst_4 = self.PixelTF.newPixelBox4.value()
+        else:
+            OpList = self.operationDictionary.get(self.PixelTF.operationComboBox1.currentText())
+            dst_1 = OpList[0]
+            dst_2 = OpList[1]
+            dst_3 = OpList[2]
+            dst_4 = OpList[3]
 
         self.applyTransformPixel(src_1, src_2, dst_1, dst_2, lutTable)
         self.applyTransformPixel(src_2, src_3, dst_2, dst_3, lutTable)

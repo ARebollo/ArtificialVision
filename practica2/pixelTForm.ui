@@ -263,6 +263,16 @@
      <string>Darken</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Increase Contrast</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Decrease Contrast</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <tabstops>
