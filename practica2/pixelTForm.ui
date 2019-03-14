@@ -263,26 +263,6 @@
      <string>Darken</string>
     </property>
    </item>
-   <item>
-    <property name="text">
-     <string>Median Blur</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Linear Filter</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Dilate</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Erode</string>
-    </property>
-   </item>
   </widget>
  </widget>
  <tabstops>
