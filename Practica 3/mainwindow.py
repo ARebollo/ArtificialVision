@@ -78,146 +78,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         
-        self.dictionary = {
-            'Transform pixel': self.transformPixelAction,
-            'Thresholding': self.thresholdingAction,
-            'Equalize': self.equalizeAction,
-            'Gaussian Blur': self.gaussianBlurAction,
-            'Median Blur': self.medianBlurAction,
-            'Linear Filter': self.linearFilterAction,
-            'Dilate': self.dilateAction,
-            'Erode': self.erodeAction,
-            'Apply several...': self.applySeveralAction,
-        }
-        
-        self.operationDictionary = {
-            'Negative': [255, 170, 85, 0],
-            'Brighten': [0, 140, 220, 255],
-            'Darken': [0,40, 85, 120],
-            'Increase Contrast': [0, 50, 200, 255],
-            'Decrease Contrast': [40, 100, 155, 210]
-        }
-        
-            # Get the function from switcher dictionary
-            # TODO
-            #func = dictionary.get(valorDesplegable, lambda: "Invalid month")
-            # Execute the function
-            #print func()
-
-    def transformPixelAction(self, startImage):
-
-        lutTable = np.ones((256), np.uint8)
-
-        src_1 = self.PixelTF.origPixelBox1.value()
-        src_2 = self.PixelTF.origPixelBox2.value()
-        src_3 = self.PixelTF.origPixelBox3.value()
-        src_4 = self.PixelTF.origPixelBox4.value()
-        if self.PixelTF.operationComboBox1.currentText() == 'User Defined':
-            dst_1 = self.PixelTF.newPixelBox1.value()
-            dst_2 = self.PixelTF.newPixelBox2.value()
-            dst_3 = self.PixelTF.newPixelBox3.value()
-            dst_4 = self.PixelTF.newPixelBox4.value()
-
-        else:
-            OpList = self.operationDictionary.get(self.PixelTF.operationComboBox1.currentText())
-            dst_1 = OpList[0]
-            dst_2 = OpList[1]
-            dst_3 = OpList[2]
-            dst_4 = OpList[3]
-
-        self.applyTransformPixel(src_1, src_2, dst_1, dst_2, lutTable)
-        self.applyTransformPixel(src_2, src_3, dst_2, dst_3, lutTable)
-        self.applyTransformPixel(src_3, src_4 + 1, dst_3, dst_4 + 1, lutTable)
-
-        returnImage = cv2.LUT(startImage, lutTable)
-        return returnImage
-
-    def applyTransformPixel(self, src1, src2, dst1, dst2, lut):
-        for src in range(src1,src2):
-            s = ((dst2 - dst1))/(src2 - src1)*(src - src1) + dst1
-            lut[src] = s
-        
-    def thresholdingAction(self, startImage):
-        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
-        return returnImage
-
-    def equalizeAction(self, startImage):
-        returnImage = cv2.equalizeHist(startImage)
-        return returnImage
-
-    def gaussianBlurAction(self, startImage):
-        size = (int(self.gaussWidthBox.cleanText()), int(self.gaussWidthBox.cleanText()))
-        returnImage = cv2.GaussianBlur(startImage,ksize = size, sigmaX = 0, sigmaY = 0)
-        return returnImage
-
-    def medianBlurAction(self, startImage):
-        returnImage = cv2.medianBlur(startImage, ksize = 3)
-        return returnImage
-
-    def linearFilterAction(self, startImage):
-        kernel = np.zeros((3,3), dtype = np.double)
-        for i in range (1,4):
-            for j in range (1,4):
-                result = 'kernelBox' + str(i) + str(j)
-                kernel[i-1,j-1] = getattr(self.Filter, result).value()
-        
-        returnImage = cv2.filter2D(startImage, ddepth = cv2.CV_8U, kernel = kernel, delta = self.Filter.addedVBox.value())
-        return returnImage
-
-    def dilateAction(self, startImage):
-        kernel = np.ones((3,3), np.uint8)
-        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
-        returnImage = cv2.dilate(returnImage, kernel, iterations=1)
-        return returnImage
-
-    def erodeAction(self, startImage):
-        kernel = np.ones((3,3), np.uint8)
-        _, returnImage = cv2.threshold(startImage, self.thresholdSpinBox.value(), 255, cv2.THRESH_BINARY)
-        returnImage = cv2.erode(returnImage, kernel, iterations=1)
-        return returnImage
-
-    def applySeveralAction(self, startImage):
-
-        returnImage = startImage
-
-        if self.OrderForm.firstOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox1.currentText())
-            returnImage = func(returnImage)
-        
-
-        if self.OrderForm.secondOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox2.currentText())
-            returnImage = func(returnImage)
-
-        if self.OrderForm.thirdOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox3.currentText())
-            returnImage = func(returnImage)
-
-        if self.OrderForm.fourthOperCheckBox.isChecked() is True:
-            func = self.dictionary.get(self.OrderForm.operationComboBox4.currentText())
-            returnImage = func(returnImage)
-        return returnImage
-
-    def closeOrderFormAction(self):
-        self.OrderForm.hide()
-
-    def closePixelTransformAction(self):
-        self.PixelTF.hide()
-
-    def closeFilterFormAction(self):
-        self.Filter.hide()
-        
-    def captureButtonAction(self):
-        if self.captureState == False:
-            self.captureButton.setText("Stop Capture")
-            self.captureButton.setChecked(True)
-            print("Started")
-            self.captureState = True
-        else: 
-            self.captureButton.setText("Start Capture")
-            self.captureButton.setChecked(False)
-            print("Stopped")
-            self.captureState = False
+    def selectWindow(self, point, posX, posY):
+		pEnd = QtCore.QPointF()
+		if posX > 0 and posY > 0:
+        self.posX = int(point.x() - posX/2)
+        if self.posX < 0:
+            self.posX = 0
+        self.posY = int(point.y()-posY/2)
+        if self.posY < 0:
+            self.posY = 0
+        pEnd.setX(point.x()+posX/2)
+        if pEnd.x() >= 320:
+            pEnd.setX(319)
+        pEnd.setY(point.y()+posY/2)
+        if pEnd.y() >= 240:
+            pEnd.setY(239)
+        self.rectWidth = int(pEnd.x() - self.posX+1)
+        self.rectHeight = int(pEnd.y() - self.posY+1)
+        print("Values: " + str(self.posX)+ " " + str(self.posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
+        self.winSelected = True
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
