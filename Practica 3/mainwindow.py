@@ -56,7 +56,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addAction(self):
-        pass
+        print("Add")
 
     def removeAction(self):
         pass
