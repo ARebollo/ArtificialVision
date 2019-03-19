@@ -49,7 +49,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>30</y>
+     <y>20</y>
      <width>181</width>
      <height>41</height>
     </rect>
@@ -68,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>150</y>
+     <y>110</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -87,7 +87,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>200</y>
+     <y>190</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -106,13 +106,54 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>100</y>
+     <y>70</y>
      <width>181</width>
      <height>31</height>
     </rect>
    </property>
    <property name="editable">
     <bool>true</bool>
+   </property>
+   <property name="maxCount">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="renameButton">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>150</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Rename Object</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="removeButton_2">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>230</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Change Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
