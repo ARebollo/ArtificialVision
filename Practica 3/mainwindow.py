@@ -20,6 +20,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
+        self.renameObject =  QtWidgets.QDialog()
+        uic.loadUi('objectRename.ui', self.renameObject)
+        self.renameObject.okButton.clicked.connect(self.renameOkAction)
+
         self.capture = VideoCapture(0)
         self.captureState = True
         self.captureButtonAction()
@@ -54,6 +58,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.captureButton.clicked.connect(self.captureButtonAction)
 
         self.addButton.clicked.connect(self.addAction)
+        self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
         
         #self.retranslateUi(MainWindow)
@@ -67,6 +72,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #Add object to list
         self.addObject.hide()
         pass
+
+    def renameAction(self):
+        self.renameObject.show()
+
+    def renameOkAction(self):
+        self.renameObject.hide()
+
     def removeAction(self):
         pass
 

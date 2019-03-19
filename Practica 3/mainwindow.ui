@@ -32,7 +32,7 @@
   <widget class="QFrame" name="imageFrameD">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>380</x>
      <y>20</y>
      <width>320</width>
      <height>240</height>
@@ -137,7 +137,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="removeButton_2">
+  <widget class="QPushButton" name="changeImageButton">
    <property name="geometry">
     <rect>
      <x>740</x>
