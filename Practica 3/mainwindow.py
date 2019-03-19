@@ -16,9 +16,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('mainwindow.ui', self)
         print("Trying to connect")
 
-        self.objectName =  QtWidgets.QDialog()
-        uic.loadUi('objectName.ui', self.objectName)
-        self.objectName.okButton.clicked.connect(self.addOkAction)
+        self.addObject =  QtWidgets.QDialog()
+        uic.loadUi('objectName.ui', self.addObject)
+        self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.capture = VideoCapture(0)
         self.captureState = True
@@ -60,11 +60,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addAction(self):
-        self.objectName.show()
+        self.addObject.show()
         print("Add")
 
     def addOkAction(self):
         #Add object to list
+        self.addObject.hide()
         pass
     def removeAction(self):
         pass
