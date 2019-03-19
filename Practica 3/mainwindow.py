@@ -16,18 +16,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('mainwindow.ui', self)
         print("Trying to connect")
 
-        self.PixelTF = QtWidgets.QDialog()
-        uic.loadUi('pixelTForm.ui', self.PixelTF)
-        self.PixelTF.okButton.clicked.connect(self.closePixelTransformAction)
-
-        self.Filter = QtWidgets.QDialog()
-        uic.loadUi('lFilterForm.ui', self.Filter)
-        self.Filter.okButton.clicked.connect(self.closeFilterFormAction)
-
-        self.OrderForm = QtWidgets.QDialog()
-        uic.loadUi('operOrderForm.ui', self.OrderForm)
-        self.OrderForm.okButton.clicked.connect(self.closeOrderFormAction)
-
         self.capture = VideoCapture(0)
         self.captureState = True
         self.captureButtonAction()
@@ -49,10 +37,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         #self.visorS.set_open_cv_image(self.grayImage)
         
-
-        #TODO: Delete label, set as attribute of imgViewer
-        #Isn't it the same? TODO later, it works *for now*        
-    
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         #self.colorImageDest = np.zeros((240,320))
         #self.colorImageDest = np.zeros((240,320,3))
@@ -63,25 +47,34 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         #self.visorS.set_open_cv_image(self.grayImageDest)
 
-
-        self.visorHistoS = ImgViewer(256, self.histoFrameS.height(), None, self.histoFrameS)
-        self.visorHistoD = ImgViewer(256, self.histoFrameD.height(), None, self.histoFrameD)
-
-
         self.captureButton.clicked.connect(self.captureButtonAction)
-        self.loadButton.clicked.connect(self.loadImageAction)
-        self.pixelTButton.clicked.connect(self.setPixelTransfAction)
-        self.kernelButton.clicked.connect(self.setKernelAction)
-        self.operOrderButton.clicked.connect(self.setOperationOrderAction)
 
+        self.addButton.clicked.connect(self.addAction)
+        self.removeButton.clicked.connect(self.removeAction)
+        
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        
+    def addAction(self):
+        pass
+
+    def removeAction(self):
+        pass
+
+    def captureButtonAction(self):
+        if self.captureState is False:
+            self.captureButton.setChecked(True)
+            self.captureButton.setText("Stop Capture")
+            self.captureState = True
+        else:
+            self.captureState = False
+            self.captureButton.setChecked(False)
+            self.captureButton.setText("Start Capture")
+
     def selectWindow(self, point, posX, posY):
-		pEnd = QtCore.QPointF()
-		if posX > 0 and posY > 0:
-        self.posX = int(point.x() - posX/2)
+        pEnd = QtCore.QPointF()
+        if posX > 0 and posY > 0:
+            self.posX = int(point.x() - posX/2)
         if self.posX < 0:
             self.posX = 0
         self.posY = int(point.y()-posY/2)
@@ -104,7 +97,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
 
-            print(self.operationComboBox.currentText())
 
             
 
@@ -114,10 +106,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             # self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
             # self.visorS.repaint()
             # self.visorS.update()
-        func = self.dictionary.get(self.operationComboBox.currentText())
-        self.grayImageDest = func(self.grayImage)
-        self.updateHistograms(self.grayImage, self.visorHistoS)
-        self.updateHistograms(self.grayImageDest, self.visorHistoD)
+        
         # FIXED: astype is needed to convert the cv type to the qt expected one
         self.visorS.set_open_cv_image(self.grayImage)
         # FIXED: astype is needed to convert the cv type to the qt expected one
@@ -125,51 +114,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorS.update()
         self.visorD.update()
 
-    def colorImageAction(self):
-        pass
-
-    def loadImageAction(self):
-        print("Load")
-        self.imgPath, _ = QFileDialog.getOpenFileName()
-        if self.captureState == True:
-            self.captureButtonAction()
-                
-        self.grayImage = cv2.imread(self.imgPath)
-        self.grayImage = cv2.resize(self.grayImage, (320, 240))
-        self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-        
-        print(self.imgPath)
-
-    def saveImageAction(self):
-        saveImage = self.grayImage
-        filename = QFileDialog.getSaveFileName()
-        cv2.imWrite(filename, saveImage)
-        print("Save")
-
-    def setPixelTransfAction(self):
-        self.PixelTF.exec()
-
-    def setKernelAction(self):
-        self.Filter.exec()
-
-    def setOperationOrderAction(self):
-        self.OrderForm.exec()
-
-    def updateHistograms(self, image, visor):
-        histoSize = 256
-        range = [0, 256]
-
-
-        # cv2.calcHist(image, 1, channels, nONE, histogram, 1, histoSize, ranges, True, False )
-        histogram = cv2.calcHist(images=[image.astype(np.uint8)], channels=[0], mask=None, histSize=[histoSize], ranges=range, hist=True, accumulate=False)
-        minH, maxH,_,_ = cv2.minMaxLoc(histogram)
-
-        maxY = visor.height()
-
-        for i, hVal in enumerate(histogram):
-            minY = maxY - hVal * maxY / maxH
-            visor.drawLine(QLineF(i, minY, i, maxY), Qt.red)
-        visor.update()
     
 if __name__ == '__main__':
     import sys
