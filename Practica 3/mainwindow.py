@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog, QLabel, QGraphicsScene
 from PyQt5.QtGui import QImage, QPixmap, QColor
-from PyQt5.QtCore import QRect, QTimer, Qt, QLineF
+from PyQt5.QtCore import QRect, QTimer, Qt, QLineF, QPointF
 import cv2
 from cv2 import VideoCapture
 import numpy as np
@@ -29,6 +29,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.captureState = True
         self.captureButtonAction()
 
+        self.imageWindow = QRect()
+
+        self.winSelected = False
+ 
         #Timer to control the capture.
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerLoop)
@@ -51,8 +55,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imgM = QImage(700, 240, QImage.Format_RGB888)
         self.visorM = ImgViewer(700, 240, self.imgM, self.imageFrameS_2)
         
-        
-
         #self.visorS.set_open_cv_image(self.grayImageDest)
 
         self.captureButton.clicked.connect(self.captureButtonAction)
@@ -71,6 +73,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.showMat.clicked.connect(self.showMatAction)
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        self.visorS.windowSelected.connect(self.selectWindow)
+        self.visorS.pressEvent.connect(self.deSelectWindow)
 
 ########################### ORB TESTING ###############################
         self.orb = cv2.ORB_create()
@@ -141,25 +146,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.captureButton.setChecked(False)
             self.captureButton.setText("Start Capture")
 
-    def selectWindow(self, point, posX, posY):
-        pEnd = QtCore.QPointF()
-        if posX > 0 and posY > 0:
-            self.posX = int(point.x() - posX/2)
-        if self.posX < 0:
-            self.posX = 0
-        self.posY = int(point.y()-posY/2)
-        if self.posY < 0:
-            self.posY = 0
-        pEnd.setX(point.x()+posX/2)
-        if pEnd.x() >= 320:
-            pEnd.setX(319)
-        pEnd.setY(point.y()+posY/2)
-        if pEnd.y() >= 240:
-            pEnd.setY(239)
-        self.rectWidth = int(pEnd.x() - self.posX+1)
-        self.rectHeight = int(pEnd.y() - self.posY+1)
-        print("Values: " + str(self.posX)+ " " + str(self.posY) + " " + str(self.rectWidth) +" "+ str(self.rectHeight))
-        self.winSelected = True
+    def selectWindow(self,  p, w, h):
+        if w > 0 and h > 0:
+            pEnd = QPointF()
+            self.imageWindow.setX(p.x()-w / 2)
+            if self.imageWindow.x() < 0:
+                self.imageWindow.setX(0)
+            self.imageWindow.setY(p.y()-h / 2)
+            if self.imageWindow.y() < 0:
+                self.imageWindow.setY(0)
+            pEnd.setX(p.x()+w / 2)
+            if pEnd.x() >= 320:
+                pEnd.setX(319)
+            pEnd.setY(p.y()+h / 2)
+            if pEnd.y() >= 240:
+                pEnd.setY(239)
+            self.imageWindow.setWidth(pEnd.x()-self.imageWindow.x())
+            self.imageWindow.setHeight(pEnd.y()-self.imageWindow.y())
+            self.winSelected = True
+
+    def deSelectWindow(self):
+        self.winSelected = False
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
@@ -172,6 +179,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImageDest = copy.copy(self.grayImage)
             self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
         
+        if self.winSelected:
+            self.visorS.drawSquare(self.imageWindow, Qt.green)
+
         # FIXED: astype is needed to convert the cv type to the qt expected one
         self.visorS.set_open_cv_image(self.grayImage)
         # FIXED: astype is needed to convert the cv type to the qt expected one
