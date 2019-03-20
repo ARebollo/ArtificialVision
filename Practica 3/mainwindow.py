@@ -64,6 +64,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+########################### ORB TESTING ###############################
+        self.orb = cv2.ORB_create()
+
+
+
+
     def addAction(self):
         if self.objectList.count() is not 3:
             self.addObject.show()
@@ -120,9 +126,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             ret, self.grayImage = self.capture.read()
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-
-
-            
+            #print(self.grayImage.shape)
+            kp = self.orb.detect(self.grayImage,None)
+            kp, des = self.orb.compute(self.grayImage, kp)
+            self.grayImageDest = copy.copy(self.grayImage)
+            self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
+            print (self.grayImageDest.shape)
+            #self.grayImageDest = copy.copy(self.grayImage)
 
 
 
