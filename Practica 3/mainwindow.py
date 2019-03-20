@@ -65,8 +65,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addAction(self):
-        self.addObject.show()
-        print("Add")
+        if self.objectList.count() is not 3:
+            self.addObject.show()
+        else:
+            message = QtWidgets.QMessageBox()
+            message.about(None, 'Error', 'Error adding object: Maximum number of objects reached.')
 
     def addOkAction(self):
         #Add object to list
