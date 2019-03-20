@@ -7,21 +7,22 @@ from cv2 import VideoCapture
 import numpy as np
 #from ImgViewer import ImgViewer
 import copy
+from matplotlib import pyplot as plt
 from ImgViewer import ImgViewer
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
         print("Trying to connect")
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         self.capture = VideoCapture(0)
@@ -34,25 +35,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.timer.start(16)
         
         # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
-        # self.colorImage = np.zeros((320,240))
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
-        # self.colorImage = np.zeros((320,240))
-        #self.colorImage = np.zeros((240,320,3))
         self.grayImage = np.zeros((240, 320), np.uint8)
         # self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         self.imgS = QImage(320, 240, QImage.Format_Grayscale8)
         self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
-        
-        #self.visorS.set_open_cv_image(self.grayImage)
-        
+
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
-        #self.colorImageDest = np.zeros((240,320))
-        #self.colorImageDest = np.zeros((240,320,3))
+
         self.grayImageDest = np.zeros((240,320), np.uint8)
-        # self.grayImage = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.imgD = QImage(320, 240, QImage.Format_Grayscale8)
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
+
+        self.colorImageM = np.zeros((240, 700, 3))
+        self.imgM = QImage(700, 240, QImage.Format_RGB888)
+        self.visorM = ImgViewer(700, 240, self.imgM, self.imageFrameS_2)
         
+        
+
         #self.visorS.set_open_cv_image(self.grayImageDest)
 
         self.captureButton.clicked.connect(self.captureButtonAction)
@@ -105,18 +105,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if m.distance < 0.95*n.distance:
                 good.append([m])
 
-        result = cv2.drawMatchesKnn(self.grayImageLoad, kp1, self.grayImageLoad2, kp2, good, None, flags=2)
-        cv2.imwrite('ResultImage.png', result)
-        
-        #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-        #label = QLabel(self.imageFrameS_2)5
-        #imgMat = QImage(img3, img3.shape[1], img3.shape[0],                                                                                                                                                 
-                         #QImage.Format_Grayscale8)
-        
-
-        #label.setPixmap(QPixmap.fromImage(imgMat))
-        
-        
+        self.colorImageM = cv2.drawMatchesKnn(self.grayImageLoad, kp1, self.grayImageLoad2, kp2, good, None, flags=2)
+        cv2.imwrite('prueba.png', self.colorImageM)
+        self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
+        self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
 
     def addAction(self):
         if self.objectList.count() is not 3:
@@ -180,21 +172,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImageDest = copy.copy(self.grayImage)
             self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
             print (self.grayImageDest.shape)
-            #self.grayImageDest = copy.copy(self.grayImage)
-
-
-
-            # self.label_S.setPixmap(QPixmap.fromImage(self.visorS.qimg))
-            # self.label_D.setPixmap(QPixmap.fromImage(self.imgVisorD.qimg))
-            # self.visorS.repaint()
-            # self.visorS.update()
+            
         
         # FIXED: astype is needed to convert the cv type to the qt expected one
         self.visorS.set_open_cv_image(self.grayImage)
         # FIXED: astype is needed to convert the cv type to the qt expected one
+        
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorS.update()
         self.visorD.update()
+
+        self.visorM.set_open_cv_imageColor(self.colorImageM)
+        self.visorM.update()
 
     
 if __name__ == '__main__':
