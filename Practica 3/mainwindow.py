@@ -14,15 +14,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
         print("Trying to connect")
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         self.capture = VideoCapture(0)
