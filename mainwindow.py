@@ -232,7 +232,7 @@ class MainWindow(object):
             saveImage = self.grayImage    
 
         filename = QFileDialog.getSaveFileName()
-        cv2.imWrite(filename, saveImage)
+        cv2.imwrite(filename, saveImage)
         print("Save")
 
 

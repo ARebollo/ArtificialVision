@@ -60,7 +60,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.addButton.clicked.connect(self.addAction)
         self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
-        
+
+
+        self.load1.clicked.connect(self.load1act)
+        self.load2.clicked.connect(self.load2act)
+        self.grayImageLoad = np.zeros((240, 320), np.uint8)
+        self.grayImageLoad2 = np.zeros((240, 320), np.uint8)
+        self.imgLeftLoad = QImage(320, 240, QImage.Format_RGB888)
+        self.imgRightLoad = QImage(320, 240, QImage.Format_RGB888)
+        self.showMat.clicked.connect(self.showMatAction)
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -68,7 +76,47 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.orb = cv2.ORB_create()
 
 
+    def load1act(self):
+        imgPath, _ = QFileDialog.getOpenFileName()
+        self.grayImageLoad = cv2.imread(imgPath)
+        self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
+        self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
+        
 
+
+    def load2act(self):
+        imgPath, _ = QFileDialog.getOpenFileName()
+        self.grayImageLoad2 = cv2.imread(imgPath)
+        self.grayImageLoad2 = cv2.resize(self.grayImageLoad2, (320,240))
+        self.grayImageLoad2 = cv2.cvtColor(self.grayImageLoad2, cv2.COLOR_BGR2GRAY)
+        
+    def showMatAction(self):
+        print("Calculating...")
+        orb = cv2.ORB_create()
+        kp1, des1 = orb.detectAndCompute(self.grayImageLoad, None)
+        kp2, des2 = orb.detectAndCompute(self.grayImageLoad2, None)
+
+        bf = cv2.BFMatcher()
+
+        matches = bf.knnMatch(des1, des2, k = 2)
+
+        good = []
+        for m, n in matches:
+            if m.distance < 0.95*n.distance:
+                good.append([m])
+
+        result = cv2.drawMatchesKnn(self.grayImageLoad, kp1, self.grayImageLoad2, kp2, good, None, flags=2)
+        cv2.imwrite('ResultImage.png', result)
+        
+        #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+        #label = QLabel(self.imageFrameS_2)5
+        #imgMat = QImage(img3, img3.shape[1], img3.shape[0],                                                                                                                                                 
+                         #QImage.Format_Grayscale8)
+        
+
+        #label.setPixmap(QPixmap.fromImage(imgMat))
+        
+        
 
     def addAction(self):
         if self.objectList.count() is not 3:
