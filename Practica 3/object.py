@@ -21,6 +21,7 @@ class object:
         self.scaleList[1] = cv2.resize(image,0, 0.7, 0.7)
 
     def calculateKpAndDes(self):
+        #TODO Fix
         for i in self.scaleList:
             self.keyPointList[i], self.descriptorList[i] = self.orb.detectAndCompute(i, None)
     
