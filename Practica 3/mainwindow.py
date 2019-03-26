@@ -7,22 +7,21 @@ from cv2 import VideoCapture
 import numpy as np
 #from ImgViewer import ImgViewer
 import copy
-from matplotlib import pyplot as plt
 from ImgViewer import ImgViewer
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
         print("Trying to connect")
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         self.capture = VideoCapture(0)
@@ -32,6 +31,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imageWindow = QRect()
 
         self.winSelected = False
+        self.actionReady = False
  
         #Timer to control the capture.
         self.timer = QTimer()
@@ -63,7 +63,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
 
-        self.objectList = []
+        self.imageList = []
+        self.mapObjects = {}
 
         self.load1.clicked.connect(self.load1act)
         self.load2.clicked.connect(self.load2act)
@@ -80,7 +81,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 ########################### ORB TESTING ###############################
         self.orb = cv2.ORB_create()
-
 
     def load1act(self):
         imgPath, _ = QFileDialog.getOpenFileName()
@@ -128,8 +128,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def addOkAction(self):
         #Add object to list
         self.addObject.hide()
-        pass
-
+        if self.actionReady is True:
+            self.imageList.append()
+            self.mapObjects[self.addObject.lineEdit.text()] = self.imageList[self.imageList[-1]]
+            
     def renameAction(self):
         self.renameObject.show()
 
@@ -137,7 +139,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameObject.hide()
 
     def removeAction(self):
-        pass
+        item = self.objectList.itemData(self.objectList.currentIndex())
+        self.objectList.removeItem(item)
+        self.imageList.remove(item)
 
     def captureButtonAction(self):
         if self.captureState is False:
@@ -170,6 +174,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def deSelectWindow(self):
         self.winSelected = False
+        self.actionReady = True
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
