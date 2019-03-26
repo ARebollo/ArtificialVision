@@ -63,6 +63,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
 
+        self.objectList = []
 
         self.load1.clicked.connect(self.load1act)
         self.load2.clicked.connect(self.load2act)
@@ -83,17 +84,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def load1act(self):
         imgPath, _ = QFileDialog.getOpenFileName()
-        self.grayImageLoad = cv2.imread(imgPath)
-        self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
-        self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
+        if imgPath != "":
+            self.grayImageLoad = cv2.imread(imgPath)
+            self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
+            self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
         
 
 
     def load2act(self):
         imgPath, _ = QFileDialog.getOpenFileName()
-        self.grayImageLoad2 = cv2.imread(imgPath)
-        self.grayImageLoad2 = cv2.resize(self.grayImageLoad2, (320,240))
-        self.grayImageLoad2 = cv2.cvtColor(self.grayImageLoad2, cv2.COLOR_BGR2GRAY)
+        if imgPath != "":
+            self.grayImageLoad2 = cv2.imread(imgPath)
+            self.grayImageLoad2 = cv2.resize(self.grayImageLoad2, (320,240))
+            self.grayImageLoad2 = cv2.cvtColor(self.grayImageLoad2, cv2.COLOR_BGR2GRAY)
         
     def showMatAction(self):
         print("Calculating...")
@@ -116,7 +119,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
 
     def addAction(self):
-        if self.objectList.count() is not 3:
+        if len(self.objectList) != 3:
             self.addObject.show()
         else:
             message = QtWidgets.QMessageBox()
