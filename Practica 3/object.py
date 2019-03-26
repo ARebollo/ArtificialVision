@@ -28,6 +28,9 @@ class object:
     def calculateMatches(self, descriptors):
         bf = cv2.BFMatcher()
         obtainedMatches = []
+        #TODO Add distance to bfMatcher, Hamming distance.
+        #TODO Distance is an integer
+        #TODO Instead of doing it object by object, mainwindow pulls from each object and matches everything
         for i in self.descriptorList:
             obtainedMatches.append(bf.knnMatch(descriptors, i, k = 2))
         goodMatches = []
