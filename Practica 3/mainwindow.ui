@@ -208,32 +208,13 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>280</y>
+     <y>270</y>
      <width>181</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Load1</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="load2">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>320</y>
-     <width>181</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Load2</string>
+    <string>Load Image</string>
    </property>
    <property name="checkable">
     <bool>false</bool>

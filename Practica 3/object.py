@@ -25,6 +25,9 @@ class object:
         for i in self.scaleList:
             self.keyPointList[i], self.descriptorList[i] = self.orb.detectAndCompute(i, None)
     
+    def returnKpDes(self):
+        return self.keyPointList, self.descriptorList
+    #TODO: This function will have to be moved to mainwindow
     def calculateMatches(self, descriptors):
         bf = cv2.BFMatcher()
         obtainedMatches = []
