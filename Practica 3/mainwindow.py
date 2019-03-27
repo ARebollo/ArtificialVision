@@ -14,8 +14,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
+
+        ##################      UI loading      ##################
+
         uic.loadUi('mainwindow.ui', self)
-        print("Trying to connect")
 
         self.addObject =  QtWidgets.QDialog()
         uic.loadUi('objectName.ui', self.addObject)
@@ -24,6 +26,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameObject =  QtWidgets.QDialog()
         uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
+
+        ##########################################################
 
         self.capture = VideoCapture(0)
         self.captureState = True
@@ -39,6 +43,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.timerLoop)
         self.timer.start(16)
         
+        ##################      Image arrays and viewer objects     ##################
+
         # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         self.grayImage = np.zeros((240, 320), np.uint8)
@@ -55,29 +61,45 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.colorImageM = np.zeros((240, 700, 3))
         self.imgM = QImage(700, 240, QImage.Format_RGB888)
         self.visorM = ImgViewer(700, 240, self.imgM, self.imageFrameS_2)
-        
         #self.visorS.set_open_cv_image(self.grayImageDest)
+        
+        ##############################################################################
+
+
+        ##################      Buttons     ##################
 
         self.captureButton.clicked.connect(self.captureButtonAction)
-
         self.addButton.clicked.connect(self.addAction)
         self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
+        self.loadButton.clicked.connect(self.loadAction)
+
+        ######################################################
+
+        
+        ##################      Image matching      ##################
 
         self.imageList = []
         self.mapObjects = {}
+        #In these, 0:2 are the first object, 3:5 the second and 6:8 the third.
         self.descriptorList = []
         self.keyPointList = []
+        #ORB and BFMatcher, using Hamming distance.
         self.orb = cv2.ORB_create()
-        self.loadButton.clicked.connect(self.loadAction)
+        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
+        
+        ##############################################################
         
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        ##################      Signals     ##################
+
         self.visorS.windowSelected.connect(self.selectWindow)
         self.visorS.pressEvent.connect(self.deSelectWindow)
 
-########################### ORB TESTING ###############################
+        ######################################################
+
         '''
             To use: findHomography(), with LMEDS.
             Para hacer la transformación de vectores, se usa perspectiveTransform()
@@ -100,7 +122,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
         
     def calculateMatches(self):
-        pass
+        kp, des = self.orb.detectAndCompute(self.grayImage, None)
+        obtainedMatches = []
+        for i in self.descriptorList:
+            obtainedMatches.append(self.bf.knnMatch(des, i, k = 2))
+        
 
     def showMatAction(self):
         print("Calculating...")
