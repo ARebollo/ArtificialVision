@@ -204,7 +204,7 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="loadbutton">
+  <widget class="QPushButton" name="loadButton">
    <property name="geometry">
     <rect>
      <x>740</x>
