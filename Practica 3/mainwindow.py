@@ -69,13 +69,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 
-        self.load1.clicked.connect(self.load1act)
+        self.loadbutton.clicked.connect(self.loadAction)
         
         self.grayImageLoad = np.zeros((240, 320), np.uint8)
         self.grayImageLoad2 = np.zeros((240, 320), np.uint8)
         self.imgLeftLoad = QImage(320, 240, QImage.Format_RGB888)
         self.imgRightLoad = QImage(320, 240, QImage.Format_RGB888)
-        self.showMat.clicked.connect(self.showMatAction)
         #self.retranslateUi(MainWindow)
         #QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -85,14 +84,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 ########################### ORB TESTING ###############################
         self.orb = cv2.ORB_create()
 
-    def load1act(self):
-        imgPath, _ = QFileDialog.getOpenFileName()
-        if imgPath != "":
-            self.grayImageLoad = cv2.imread(imgPath)
-            self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
-            self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
+    def loadAction(self):
+        if len(self.objectList) != 3:
+            imgPath, _ = QFileDialog.getOpenFileName()
+            if imgPath != "":
+                self.grayImageLoad = cv2.imread(imgPath)
+                self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
+                self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
+        else:
+            message = QtWidgets.QMessageBox()
+            message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
         
-        
+    '''    
     def showMatAction(self):
         print("Calculating...")
         orb = cv2.ORB_create()
@@ -112,7 +115,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
-
+    '''
     def addAction(self):
         if len(self.objectList) != 3:
             self.addObject.show()

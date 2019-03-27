@@ -1,7 +1,7 @@
 import cv2
 
 
-class object:
+class ImageObject:
     
     def __init__(self, name, selectedImage):
         self.orb = cv2.ORB_create()
@@ -23,11 +23,15 @@ class object:
     def calculateKpAndDes(self):
         #TODO Fix
         for i in self.scaleList:
-            self.keyPointList[i], self.descriptorList[i] = self.orb.detectAndCompute(i, None)
+            kp, des = self.orb.detectAndCompute(i, None)
+            self.descriptorList.append(des)
+            self.keyPointList.append(kp)
+
     
     def returnKpDes(self):
         return self.keyPointList, self.descriptorList
     #TODO: This function will have to be moved to mainwindow
+
     def calculateMatches(self, descriptors):
         bf = cv2.BFMatcher()
         obtainedMatches = []
@@ -43,4 +47,5 @@ class object:
                 if m.distance < 0.95*n.distance:
                     goodMatches[i].append([m])
 
+        return goodMatches
         
