@@ -67,7 +67,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imageList = []
         self.mapObjects = {}
         self.descriptorList = []
-
+        self.keyPointList = []
+        self.orb = cv2.ORB_create()
         self.loadButton.clicked.connect(self.loadAction)
         
         #self.retranslateUi(MainWindow)
@@ -133,10 +134,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         if self.actionReady is True:
             #Get coordinates and size of the selected rectangle
-            y_OffSet = self.imageWindow.y
-            x_OffSet = self.imageWindow.x
-            height = self.imageWindow.height
-            width = self.imageWindow.width
+            y_OffSet = self.imageWindow.y()
+            x_OffSet = self.imageWindow.x()
+            height = self.imageWindow.height()
+            width = self.imageWindow.width()
             
             #Get the relevant slice of the source image
             crop_img = self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width]
@@ -146,12 +147,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             image = ImageObject(imgName, crop_img)
             self.imageList.append(image)
             self.mapObjects[imgName] = self.imageList[-1]
-            
+            self.objectList.addItem(imgName)
             #Get the image descriptors and add them to the descriptor collection
-            ret, desc = image.returnKpDes()
+            kp, desc = image.returnKpDes()
             for i in desc:
                 self.descriptorList.append(i)
-            
+            for i in kp:
+                self.keyPointList.append(i)            
     def renameAction(self):
         self.renameObject.show()
 

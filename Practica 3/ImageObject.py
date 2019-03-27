@@ -16,12 +16,11 @@ class ImageObject:
         self.name = name
 
     def scaleImage(self, image):
-        self.scaleList[0] = image
-        self.scaleList[1] = cv2.resize(image,0, 1.3, 1.3)
-        self.scaleList[1] = cv2.resize(image,0, 0.7, 0.7)
+        self.scaleList.append(image)
+        self.scaleList.append(cv2.resize(image,dsize = None, fx = 1.3, fy = 1.3)) 
+        self.scaleList.append(cv2.resize(image,dsize = None, fx = 0.7, fy = 0.7)) 
 
     def calculateKpAndDes(self):
-        #TODO Fix
         for i in self.scaleList:
             kp, des = self.orb.detectAndCompute(i, None)
             self.descriptorList.append(des)
@@ -30,7 +29,7 @@ class ImageObject:
     
     def returnKpDes(self):
         return self.keyPointList, self.descriptorList
-    
+    #TODO: This has to be done in the mainwindow
     def calculateMatches(self, descriptors):
         bf = cv2.BFMatcher()
         obtainedMatches = []
