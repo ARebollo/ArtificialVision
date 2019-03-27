@@ -141,8 +141,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #Add object to list
         self.addObject.hide()
         if self.actionReady is True:
+            crop_img = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width]
+            imgName = self.addObject.lineEdit.text()
+            image = ImageObject(imgName, crop_img)
             self.imageList.append()
-            self.mapObjects[self.addObject.lineEdit.text()] = self.imageList[self.imageList[-1]]
+            self.mapObjects[imgName] = self.imageList[self.imageList[-1]]
             
 
     def renameAction(self):
