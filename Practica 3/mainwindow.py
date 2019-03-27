@@ -80,7 +80,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorS.pressEvent.connect(self.deSelectWindow)
 
 ########################### ORB TESTING ###############################
-        self.orb = cv2.ORB_create()
+        '''
+            To use: findHomography(), with LMEDS.
+            Para hacer la transformación de vectores, se usa perspectiveTransform()
+            Se parte de las listas de keypoints: la de la imagen y la del objeto
+            con la escala seleccionada. QueryIdx son los de la imagen, trainIdx los del objeto.
+            Tras selecciona el knnmatch con mas 
+        
+        
+        '''
 
     def loadAction(self):
         if len(self.objectList) != 3:
