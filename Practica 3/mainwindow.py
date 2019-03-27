@@ -7,21 +7,22 @@ from cv2 import VideoCapture
 import numpy as np
 #from ImgViewer import ImgViewer
 import copy
+import ImageObject
 from ImgViewer import ImgViewer
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui_MainWindow, self).__init__()
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
         print("Trying to connect")
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         self.capture = VideoCapture(0)
@@ -65,12 +66,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.imageList = []
         self.mapObjects = {}
-        self.bf = cv2.BFMatcher()
 
-
-
-        self.loadbutton.clicked.connect(self.loadAction)
-        
+        self.load1.clicked.connect(self.load1act)
+        self.load2.clicked.connect(self.load2act)
         self.grayImageLoad = np.zeros((240, 320), np.uint8)
         self.grayImageLoad2 = np.zeros((240, 320), np.uint8)
         self.imgLeftLoad = QImage(320, 240, QImage.Format_RGB888)
@@ -95,7 +93,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
         
-    '''    
+
+
+    def load2act(self):
+        imgPath, _ = QFileDialog.getOpenFileName()
+        if imgPath != "":
+            self.grayImageLoad2 = cv2.imread(imgPath)
+            self.grayImageLoad2 = cv2.resize(self.grayImageLoad2, (320,240))
+            self.grayImageLoad2 = cv2.cvtColor(self.grayImageLoad2, cv2.COLOR_BGR2GRAY)
+        
     def showMatAction(self):
         print("Calculating...")
         orb = cv2.ORB_create()
@@ -115,7 +121,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
-    '''
+    
     def addAction(self):
         if len(self.objectList) != 3:
             self.addObject.show()
@@ -130,6 +136,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imageList.append()
             self.mapObjects[self.addObject.lineEdit.text()] = self.imageList[self.imageList[-1]]
             
+
     def renameAction(self):
         self.renameObject.show()
 
