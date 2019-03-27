@@ -121,7 +121,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
-    '''
+    
     def addAction(self):
         if len(self.objectList) != 3:
             self.addObject.show()
