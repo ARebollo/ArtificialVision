@@ -66,6 +66,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.imageList = []
         self.mapObjects = {}
+        self.descriptorList = []
 
         self.loadButton.clicked.connect(self.loadAction)
         
@@ -97,6 +98,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
         
+    def calculateMatches(self):
+        pass
 
     def showMatAction(self):
         print("Calculating...")
@@ -129,18 +132,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.addObject.hide()
 
         if self.actionReady is True:
-
+            #Get coordinates and size of the selected rectangle
             y_OffSet = self.imageWindow.y
             x_OffSet = self.imageWindow.x
             height = self.imageWindow.height
             width = self.imageWindow.width
             
+            #Get the relevant slice of the source image
             crop_img = self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width]
+
+            #Add the image to the comboBox and the list
             imgName = self.addObject.lineEdit.text()
             image = ImageObject(imgName, crop_img)
-            
             self.imageList.append(image)
             self.mapObjects[imgName] = self.imageList[-1]
+            
+            #Get the image descriptors and add them to the descriptor collection
+            ret, desc = image.returnKpDes()
+            for i in desc:
+                self.descriptorList.append(i)
             
     def renameAction(self):
         self.renameObject.show()
