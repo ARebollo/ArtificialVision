@@ -30,7 +30,7 @@ class ImageObject:
     
     def returnKpDes(self):
         return self.keyPointList, self.descriptorList
-
+    
     def calculateMatches(self, descriptors):
         bf = cv2.BFMatcher()
         obtainedMatches = []
