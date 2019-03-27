@@ -7,7 +7,7 @@ from cv2 import VideoCapture
 import numpy as np
 #from ImgViewer import ImgViewer
 import copy
-import ImageObject
+from ImageObject import ImageObject
 from ImgViewer import ImgViewer
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -126,18 +126,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message.about(None, 'Error', 'Error adding object: Maximum number of objects reached.')
 
     def addOkAction(self):
-        #Add object to list
         self.addObject.hide()
+
         if self.actionReady is True:
-            crop_img = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width]
+
+            y_OffSet = self.imageWindow.y
+            x_OffSet = self.imageWindow.x
+            height = self.imageWindow.height
+            width = self.imageWindow.width
+            
+            crop_img = self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width]
             imgName = self.addObject.lineEdit.text()
             image = ImageObject(imgName, crop_img)
-            self.imageList.append()
-            self.mapObjects[imgName] = self.imageList[self.imageList[-1]]
             
+            self.imageList.append(image)
+            self.mapObjects[imgName] = self.imageList[-1]
             
-            
-
     def renameAction(self):
         self.renameObject.show()
 
