@@ -81,9 +81,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.imageList = []
         self.mapObjects = {}
-        #In these, 0:2 are the first object, 3:5 the second and 6:8 the third.
+        #In these, 0:2 are the first object, 3:5 the second and 6:8 the third. The last are the keypoints of the actual image
         self.descriptorList = []
-        self.keyPointList = []
+        self.ObjectKeyPointList = []
+        self.imageKeypointList = []
         #ORB and BFMatcher, using Hamming distance.
         self.orb = cv2.ORB_create()
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
@@ -122,7 +123,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
         
     def calculateMatches(self):
-        kp, des = self.orb.detectAndCompute(self.grayImage, None)
+        self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
         obtainedMatches = []
         for i in self.descriptorList:
             obtainedMatches.append(self.bf.knnMatch(des, i, k = 2))
@@ -179,7 +180,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             for i in desc:
                 self.descriptorList.append(i)
             for i in kp:
-                self.keyPointList.append(i)            
+                self.ObjectKeyPointList.append(i)            
     def renameAction(self):
         self.renameObject.show()
 
