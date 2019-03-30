@@ -37,6 +37,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.winSelected = False
         self.actionReady = False
+        self.openVideo = False
  
         #Timer to control the capture.
         self.timer = QTimer()
@@ -73,6 +74,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameButton.clicked.connect(self.renameAction)
         self.removeButton.clicked.connect(self.removeAction)
         self.loadButton.clicked.connect(self.loadAction)
+        self.loadButton_Video.clicked.connect(self.loadVideoAction)
 
         ######################################################
 
@@ -121,7 +123,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
-        
+
+    def loadVideoAction(self):
+        imgPath, _ = QFileDialog.getOpenFileName()
+        if imgPath != "":
+            self.captureState = True
+            self.capture = VideoCapture(imgPath)
+            
     def calculateMatches(self):
         self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
         obtainedMatches = []
@@ -194,9 +202,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def captureButtonAction(self):
         if self.captureState is False:
+            self.capture = VideoCapture(0)
             self.captureButton.setChecked(True)
             self.captureButton.setText("Stop Capture")
             self.captureState = True
+            
         else:
             self.captureState = False
             self.captureButton.setChecked(False)
@@ -228,6 +238,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
             ret, self.grayImage = self.capture.read()
+            if ret is False:
+                self.capture.release()
+                self.captureState = False
+                self.grayImage = np.zeros((240, 320), np.uint8)
+                self.grayImageDest = np.zeros((240, 320), np.uint8)
+                return
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
             #print(self.grayImage.shape)
@@ -235,7 +251,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             kp, des = self.orb.compute(self.grayImage, kp)
             self.grayImageDest = copy.copy(self.grayImage)
             self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
-        
         if self.winSelected:
             self.visorS.drawSquare(self.imageWindow, Qt.green)
 
@@ -249,7 +264,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.visorM.set_open_cv_imageColor(self.colorImageM)
         self.visorM.update()
-
+        
     
 if __name__ == '__main__':
     import sys
