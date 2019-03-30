@@ -129,6 +129,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         if imgPath != "":
             self.captureState = True
             self.capture = VideoCapture(imgPath)
+            self.timer.stop()
+            fps = self.capture.get(cv2.CAP_PROP_FPS)
+            self.timer.start(1000/fps)
             
     def calculateMatches(self):
         self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
@@ -243,6 +246,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.captureState = False
                 self.grayImage = np.zeros((240, 320), np.uint8)
                 self.grayImageDest = np.zeros((240, 320), np.uint8)
+                self.timer.stop()
+                self.timer.start(16)
                 return
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
