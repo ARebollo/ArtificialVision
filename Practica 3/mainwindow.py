@@ -143,6 +143,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 #TODO: Check this line tomorrow
                 if m.distance < 50+n.distance:
                     goodMatches[i].append([m])
+        #Iterates over goodMatches, separated in two different loops for clarity.
+        #Takes the best scale for each object and adds all of its matches and keypoints to
+        #the bestScaleMatches and bestScaleKeypoints lists.
+        for i in range(0, len(goodMatches), 3):
+            for i in range(2):
+                pass
+
         bestScaleMatches = []
         bestScaleKeypoints = []
         return bestScaleMatches, bestScaleKeypoints
