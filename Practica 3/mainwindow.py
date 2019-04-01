@@ -135,7 +135,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #This loop should iterate over each piece of the list and find, for each scale of each object, the one with the most matches
         #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
         #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
-        #with the most matches (so, the cale closest to the captured image).
+        #with the most matches (so, the scale closest to the captured image).
         for i in range(len(obtainedMatches)):
             pass
         goodMatches = []
