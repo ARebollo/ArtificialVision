@@ -136,10 +136,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
         #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
         #with the most matches (so, the scale closest to the captured image).
-        for i in range(len(obtainedMatches)):
-            pass
         goodMatches = []
-        return goodMatches
+        for i in range(len(obtainedMatches)):
+            goodMatches[i] = []
+            for m, n in obtainedMatches[i]:
+                #TODO: Check this line tomorrow
+                if m.distance < 50+n.distance:
+                    goodMatches[i].append([m])
+        bestScaleMatches = []
+        bestScaleKeypoints = []
+        return bestScaleMatches, bestScaleKeypoints
         
 
     def showMatAction(self):
