@@ -144,12 +144,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #Iterates over goodMatches, separated in two different loops for clarity.
         #Takes the best scale for each object and adds all of its matches and keypoints to
         #the bestScaleMatches and bestScaleKeypoints lists.
-        for i in range(0, len(goodMatches), 3):
-            for i in range(2):
-                pass
-
         bestScaleMatches = []
         bestScaleKeypoints = []
+
+        #This is a big ñapa, but it might work
+        for i in range(0, len(goodMatches), 3):
+            bestMatch = goodMatches[i]
+            for j in range(3):
+                if len(goodMatches[i+j]) > len(bestMatch):
+                    bestMatch = goodMatches[i+j]
+                    if j == 2:
+                        bestScaleMatches.append(bestMatch)
+                        bestScaleKeypoints.append(self.ObjectKeyPointList[i+j])
+            
+
+       
         return bestScaleMatches, bestScaleKeypoints
         
 
