@@ -81,7 +81,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.imageList = []
         self.mapObjects = {}
-        #In these, 0:2 are the first object, 3:5 the second and 6:8 the third. The last are the keypoints of the actual image
+        #In these, 0:2 are the first object, 3:5 the second and 6:8 the third. The last are the keypoints of the actual image.
+        #They are all a list of lists.
         self.descriptorList = []
         self.ObjectKeyPointList = []
         self.imageKeypointList = []
@@ -121,12 +122,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
-        
+
+    #Calculates the matches between the image captured by the webcam/video and the objects stored. Stores them in obtainedMatches().
+    #Returns a list containing, for each of the three (or two, or however many there are), the scale with the most matches.
     def calculateMatches(self):
         self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
         obtainedMatches = []
         for i in self.descriptorList:
             obtainedMatches.append(self.bf.knnMatch(des, i, k = 2))
+        #This loop should iterate over each piece of the list and find, for each scale of each object, the one with the most matches
+        #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
+        #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
+        #with the most matches (so, the cale closest to the captured image).
+        for i in range(len(obtainedMatches)):
+            pass
+        goodMatches = []
+        return goodMatches
         
 
     def showMatAction(self):
