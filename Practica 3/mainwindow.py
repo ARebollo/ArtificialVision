@@ -17,14 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        #uic.loadUi('objectName.ui', self)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        #uic.loadUi('objectRename.ui', self)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
