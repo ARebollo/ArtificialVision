@@ -224,7 +224,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             kp, desc = image.returnKpDes()
             for i in desc:
                 print(len(self.bf.getTrainDescriptors()))
-                self.bf.add(i)
+                self.bf.add([i])
             print(len(self.bf.getTrainDescriptors()))
             for i in kp:
                 self.ObjectKeyPointList.append(i)            
