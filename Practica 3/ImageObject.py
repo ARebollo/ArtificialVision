@@ -3,8 +3,8 @@ import cv2
 
 class ImageObject:
     
-    def __init__(self, name, selectedImage):
-        self.orb = cv2.ORB_create()
+    def __init__(self, name, selectedImage, orb):
+        self.orb = orb
         self.name = name
         self.scaleList = []
         self.keyPointList = []
@@ -17,8 +17,8 @@ class ImageObject:
 
     def scaleImage(self, image):
         self.scaleList.append(image)
-        self.scaleList.append(cv2.resize(image,dsize = None, fx = 1.3, fy = 1.3)) 
-        self.scaleList.append(cv2.resize(image,dsize = None, fx = 0.7, fy = 0.7)) 
+        self.scaleList.append(cv2.resize(image,dsize = (0,0), fx = 1.3, fy = 1.3)) 
+        self.scaleList.append(cv2.resize(image,dsize = (0,0), fx = 0.7, fy = 0.7)) 
 
     def calculateKpAndDes(self):
         for i in self.scaleList:
@@ -28,11 +28,6 @@ class ImageObject:
 
     
     def returnKpDes(self):
-        print("Returning keypointList, length " + str(len(self.keyPointList)) + ". Returning descriptor list, length " + str(len(self.descriptorList)) + ".")
-        print("Descriptor list:\n")
-        print(self.descriptorList)
-        print("Keypoint list:\n")
-        print(self.keyPointList)
         return self.keyPointList, self.descriptorList
     #TODO: This has to be done in the mainwindow
     def calculateMatches(self, descriptors):
