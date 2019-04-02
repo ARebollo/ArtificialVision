@@ -216,7 +216,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #Get the image descriptors and add them to the descriptor collection
             kp, desc = image.returnKpDes()
             for i in desc:
-                self.descriptorList.append(i)
                 self.bf.add(i)
             for i in kp:
                 self.ObjectKeyPointList.append(i)            
