@@ -29,8 +29,10 @@ class ImageObject:
     
     def returnKpDes(self):
         print("Returning keypointList, length " + str(len(self.keyPointList)) + ". Returning descriptor list, length " + str(len(self.descriptorList)) + ".")
-        print("Descriptor list:\n" + self.descriptorList)
-        print("Keypoint list:\n" + self.keyPointList)
+        print("Descriptor list:\n")
+        print(self.descriptorList)
+        print("Keypoint list:\n")
+        print(self.keyPointList)
         return self.keyPointList, self.descriptorList
     #TODO: This has to be done in the mainwindow
     def calculateMatches(self, descriptors):
