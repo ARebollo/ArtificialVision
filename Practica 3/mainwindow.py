@@ -270,7 +270,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             kp, des = self.orb.compute(self.grayImage, kp)
             self.grayImageDest = copy.copy(self.grayImage)
             self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
-        
+            metches, keypoints = self.calculateMatches()
+            print(matches)
+            print(keypoints)
         if self.winSelected:
             self.visorS.drawSquare(self.imageWindow, Qt.green)
 
