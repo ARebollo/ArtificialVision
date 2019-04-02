@@ -130,19 +130,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     #Calculates the matches between the image captured by the webcam/video and the objects stored. Stores them in obtainedMatches().
     #Returns a list containing, for each of the three (or two, or however many there are), the scale with the most matches.
     def calculateMatches(self):
-        self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
-               
-        obtainedMatches = self.bf.knnMatch(des, k = 3)
+        if len(self.bf.getTrainDescriptors())!= 0:
+            self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
+            print(len(des))
+            obtainedMatches = self.bf.knnMatch(des, k = 3)
+
+        '''
+
+
+
+
         #This loop should iterate over each piece of the list and find, for each scale of each object, the one with the most matches
         #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
         #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
         #with the most matches (so, the scale closest to the captured image).
 
         #TODO BIEN GORDO: REHACER ESTO
-        goodMatches = []
-        for i in range(len(obtainedMatches)):
-            goodMatches[i] = []
-            for m, n in obtainedMatches[i]:
+            goodMatches = []
+            for i in range(len(obtainedMatches)):
+                goodMatches[i] = []
+                for m, n in obtainedMatches[i]:
                 #TODO: Check this line tomorrow
                 if m.distance < 50+n.distance:
                     goodMatches[i].append([m])
@@ -167,7 +174,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
        
         return bestScaleMatches, bestScaleKeypoints
-        
+        '''
 
     def showMatAction(self):
         print("Calculating...")
@@ -207,18 +214,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             width = self.imageWindow.width()
             
             #Get the relevant slice of the source image
-            crop_img = self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width]
+            crop_img = copy.copy(self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width])
 
             #Add the image to the comboBox and the list
             imgName = self.addObject.lineEdit.text()
-            image = ImageObject(imgName, crop_img)
+            image = ImageObject(imgName, crop_img, self.orb)
             self.imageList.append(image)
             self.mapObjects[imgName] = self.imageList[-1]
             self.objectList.addItem(imgName)
             #Get the image descriptors and add them to the descriptor collection
             kp, desc = image.returnKpDes()
             for i in desc:
+                print(len(self.bf.getTrainDescriptors()))
                 self.bf.add(i)
+            print(len(self.bf.getTrainDescriptors()))
             for i in kp:
                 self.ObjectKeyPointList.append(i)            
     def renameAction(self):
@@ -285,7 +294,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             kp, des = self.orb.compute(self.grayImage, kp)
             self.grayImageDest = copy.copy(self.grayImage)
             self.grayImageDest = cv2.drawKeypoints(self.grayImage, kp, self.grayImageDest, color= (255,255,255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG)
-            matches, keypoints = self.calculateMatches()
+            self.calculateMatches()
             #print(matches)
             #print(keypoints)
         if self.winSelected:
