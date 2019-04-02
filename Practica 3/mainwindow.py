@@ -147,15 +147,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         bestScaleMatches = []
         bestScaleKeypoints = []
 
-        #This is a big ñapa, but it might work
+        #This is a big ñapa, but it might work. Or not.
         for i in range(0, len(goodMatches), 3):
+            bestIndex = i
             bestMatch = goodMatches[i]
             for j in range(3):
                 if len(goodMatches[i+j]) > len(bestMatch):
+                    bestIndex = i+j
                     bestMatch = goodMatches[i+j]
-                    if j == 2:
-                        bestScaleMatches.append(bestMatch)
-                        bestScaleKeypoints.append(self.ObjectKeyPointList[i+j])
+                if j == 2:
+                    bestScaleMatches.append(bestMatch)
+                    bestScaleKeypoints.append(self.ObjectKeyPointList[bestIndex])
             
 
        
