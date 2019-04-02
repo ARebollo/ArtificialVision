@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
-        #uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        #uic.loadUi('objectName.ui', self)
+        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        #uic.loadUi('objectRename.ui', self)
+        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -86,7 +86,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mapObjects = {}
         #In these, 0:2 are the first object, 3:5 the second and 6:8 the third. The last are the keypoints of the actual image.
         #They are all a list of lists.
-        self.descriptorList = []
         self.ObjectKeyPointList = []
         self.imageKeypointList = []
         #ORB and BFMatcher, using Hamming distance.
@@ -130,13 +129,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     #Returns a list containing, for each of the three (or two, or however many there are), the scale with the most matches.
     def calculateMatches(self):
         self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
-        obtainedMatches = []
-        for i in self.descriptorList:
-            obtainedMatches.append(self.bf.knnMatch(des, i, k = 2))
+               
+        obtainedMatches = self.bf.knnMatch(des, k = 3)
         #This loop should iterate over each piece of the list and find, for each scale of each object, the one with the most matches
         #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
         #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
         #with the most matches (so, the scale closest to the captured image).
+
+        #TODO BIEN GORDO: REHACER ESTO
         goodMatches = []
         for i in range(len(obtainedMatches)):
             goodMatches[i] = []
@@ -217,6 +217,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             kp, desc = image.returnKpDes()
             for i in desc:
                 self.descriptorList.append(i)
+                self.bf.add(i)
             for i in kp:
                 self.ObjectKeyPointList.append(i)            
     def renameAction(self):
