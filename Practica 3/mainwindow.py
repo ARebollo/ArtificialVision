@@ -130,7 +130,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def calculateMatches(self):
         if len(self.bf.getTrainDescriptors())!= 0:
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
-            print(len(des))
+            #print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
         '''
 
@@ -211,21 +211,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             
             #Get the relevant slice of the source image
             crop_img = copy.copy(self.grayImage[y_OffSet:y_OffSet + height, x_OffSet:x_OffSet + width])
-
+            
+            
             #Add the image to the comboBox and the list
             imgName = self.addObject.lineEdit.text()
             image = ImageObject(imgName, crop_img, self.orb)
-            self.imageList.append(image)
-            self.mapObjects[imgName] = self.imageList[-1]
-            self.objectList.addItem(imgName)
-            #Get the image descriptors and add them to the descriptor collection
-            kp, desc = image.returnKpDes()
-            for i in desc:
-                print(len(self.bf.getTrainDescriptors()))
-                self.bf.add([i])
-            print(len(self.bf.getTrainDescriptors()))
-            for i in kp:
-                self.ObjectKeyPointList.append([i])            
+            kp, desc, valid = image.returnKpDes()
+            if valid is True:
+                self.imageList.append(image)
+                self.mapObjects[imgName] = self.imageList[-1]
+                self.objectList.addItem(imgName)
+                #Get the image descriptors and add them to the descriptor collection
+            
+            
+                print("DESC:")
+                for i in desc:
+                    print(len(i))
+                    self.bf.add([i])
+                print("KP:")
+                for i in kp:
+                    print(len(i))
+                    self.ObjectKeyPointList.append([i])     
+            else:
+                message = QtWidgets.QMessageBox()
+                message.about(None, 'Error', 'Error adding object: The selected object is not descriptive enough.')
     def renameAction(self):
         self.renameObject.show()
 
