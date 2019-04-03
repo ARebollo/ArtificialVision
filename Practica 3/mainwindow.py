@@ -134,7 +134,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
             print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
-            
         '''
 
 
@@ -236,11 +235,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameObject.hide()
 
     def removeAction(self):
-        item = self.objectList.itemData(self.objectList.currentIndex())
-        self.objectList.removeItem(item)
-        self.imageList.remove(item)
+        del self.imageList[self.objectList.currentIndex()]
+        self.objectList.removeItem(self.objectList.currentIndex())
+        for i in range(self.objectList.currentIndex(),self.objectList.currentIndex()+2,1):
+            del self.imageKeypointList[i]
+        
         self.bf.clear()
-        for i in self.objectList:
+        for i in self.imageList:
             _, des = i.returnKpDes()
             self.bf.add([des])
 
