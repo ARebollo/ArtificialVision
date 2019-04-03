@@ -119,8 +119,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             imgPath, _ = QFileDialog.getOpenFileName()
             if imgPath != "":
                 self.grayImageLoad = cv2.imread(imgPath)
-                self.grayImageLoad = cv2.resize(self.grayImageLoad, (320,240))
+                self.grayImageLoad = cv2.resize(self.grayImageLoad, (240,180))
                 self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
+
+                imgName = imgPath
+                image = ImageObject(imgName, self.grayImageLoad, self.orb)
+                kp, desc, valid = image.returnKpDes()
+                if valid is True:
+                    self.imageList.append(image)
+                    self.mapObjects[imgName] = self.imageList[-1]
+                    self.objectList.addItem(imgName)
+                    #Get the image descriptors and add them to the descriptor collection
+                    
+                    print("DESC:")
+                    for i in desc:
+                        print(len(i))
+                        self.bf.add([i])
+                    print("KP:")
+                    for i in kp:
+                        print(len(i))
+                        self.ObjectKeyPointList.append([i])     
+                else:
+                    message = QtWidgets.QMessageBox()
+                    message.about(None, 'Error', 'Error adding object: The selected object is not descriptive enough.')
+
+
+
+
         else:
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
