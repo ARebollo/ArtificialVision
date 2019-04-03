@@ -130,7 +130,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.mapObjects[imgName] = self.imageList[-1]
                     self.objectList.addItem(imgName)
                     #Get the image descriptors and add them to the descriptor collection
-                    
+
                     print("DESC:")
                     for i in desc:
                         print(len(i))
@@ -157,46 +157,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
             #print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
-        '''
+            for i in obtainedMatches:
+                print(i)
+        #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
+        #What we have to do is iterate over that list, choosing the valid matches and adding them to a list of valid matches. That list has 3*object elements
+        #and each element contains the matches for that object and scale. After that is done, for each object we choose the scale with the most matches and 
+        #choose it as the best one. Then, we have to get the pair <keypoint, matchedKeypoint> (the image ones are stored in self.imageKeypointList, index queryIdx,
+        #the object ones are stored in self.objectKeypointList, index trainIdx. After matching them, choose if a set of matches for an object actually represents and object
+        #(minimum number of matches) and apply the homography. Draw it.
 
 
 
-
-        #This loop should iterate over each piece of the list and find, for each scale of each object, the one with the most matches
-        #It then stores those "good matches" in a smaller list, goodMatches, that has only one entry for each object instead of three.
-        #Could be done in two parts: one calculates the acceptable matches (distance <50, for example) and the other keeps the ones
-        #with the most matches (so, the scale closest to the captured image).
-
-        #TODO BIEN GORDO: REHACER ESTO
-            goodMatches = []
-            for i in range(len(obtainedMatches)):
-                goodMatches[i] = []
-                for m, n in obtainedMatches[i]:
-                #TODO: Check this line tomorrow
-                if m.distance < 50+n.distance:
-                    goodMatches[i].append([m])
-        #Iterates over goodMatches, separated in two different loops for clarity.
-        #Takes the best scale for each object and adds all of its matches and keypoints to
-        #the bestScaleMatches and bestScaleKeypoints lists.
-        bestScaleMatches = []
-        bestScaleKeypoints = []
-
-        #This is a big ñapa, but it might work. Or not.
-        for i in range(0, len(goodMatches), 3):
-            bestIndex = i
-            bestMatch = goodMatches[i]
-            for j in range(3):
-                if len(goodMatches[i+j]) > len(bestMatch):
-                    bestIndex = i+j
-                    bestMatch = goodMatches[i+j]
-                if j == 2:
-                    bestScaleMatches.append(bestMatch)
-                    bestScaleKeypoints.append(self.ObjectKeyPointList[bestIndex])
-            
-
-       
-        return bestScaleMatches, bestScaleKeypoints
-        '''
 
     def showMatAction(self):
         print("Calculating...")
