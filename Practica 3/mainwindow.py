@@ -134,7 +134,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
             print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
-
+            
         '''
 
 
@@ -185,7 +185,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         bf = cv2.BFMatcher()
 
         matches = bf.knnMatch(des1, des2, k = 2)
-
         good = []
         for m, n in matches:
             if m.distance < 0.95*n.distance:
@@ -229,7 +228,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.bf.add([i])
             print(len(self.bf.getTrainDescriptors()))
             for i in kp:
-                self.ObjectKeyPointList.append(i)            
+                self.ObjectKeyPointList.append([i])            
     def renameAction(self):
         self.renameObject.show()
 
@@ -240,6 +239,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         item = self.objectList.itemData(self.objectList.currentIndex())
         self.objectList.removeItem(item)
         self.imageList.remove(item)
+        self.bf.clear()
+        for i in self.objectList:
+            _, des = i.returnKpDes()
+            self.bf.add([des])
 
     def captureButtonAction(self):
         if self.captureState is False:
