@@ -159,8 +159,32 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
             #print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
+            goodMatches = []
+            for i in range(len(self.ObjectKeyPointList)):
+                goodMatches[i] = []
+            #Iterate over the collection of matches
             for i in obtainedMatches:
-                print(i)
+                bestMatch = cv2.DMatch()
+                bestMatch.distance = 999999
+                #Iterate over each triplet of best matches for each descriptor
+                for j in i:
+                    if j.distance < bestMatch.distance:
+                        bestMatch = j
+                    #Tells us that there's a match in some object of that element, and inserts it in the appropiate list    
+                    goodMatches[bestMatch.trainIdx].append(bestMatch)
+
+                    
+            bestScaleList = []
+            for i in range(0, len(self.imageList),1):
+                bestScaleList[i] = []
+            for i in range(0,len(goodMatches),3):
+                bestScale = []
+                matchCount = 0
+                for j in range(3):
+                    if len(j) > matchCount:
+                        bestScale = j
+                bestScaleList.append(bestScale)
+                        
         #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
         #What we have to do is iterate over that list, choosing the valid matches and adding them to a list of valid matches. That list has 3*object elements
         #and each element contains the matches for that object and scale. After that is done, for each object we choose the scale with the most matches and 
