@@ -171,7 +171,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     #Tells us that there's a match in some object of that element, and inserts it in the appropiate list    
                     goodMatches[bestMatch.trainIdx].append(bestMatch)
 
-                    
+
             bestScaleList = []
             for i in range(0, len(self.imageList),1):
                 bestScaleList[i] = []
@@ -182,7 +182,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     if len(j) > matchCount:
                         bestScale = j
                 bestScaleList.append(bestScale)
-                        
+            #After this, bestScaleList should have <number of items> elements, and each element is a list containing the matches each object, for the scale with the most matches            
+            
         #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
         #What we have to do is iterate over that list, choosing the valid matches and adding them to a list of valid matches. That list has 3*object elements
         #and each element contains the matches for that object and scale. After that is done, for each object we choose the scale with the most matches and 
