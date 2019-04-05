@@ -164,19 +164,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 goodMatches[i] = []
             #Iterate over the collection of matches
             for i in obtainedMatches:
-                bestMatch = cv2.DMatch()
-                bestMatch.distance = 999999
                 #Iterate over each triplet of best matches for each descriptor
                 for j in i:
-                    if j.distance < bestMatch.distance:
-                        bestMatch = j
-                    #Tells us that there's a match in some object of that element, and inserts it in the appropiate list    
-                    goodMatches[bestMatch.trainIdx].append(bestMatch)
+                    #Tells us that the match is valid, and inserts it in the appropiate list
+                    if j.distance < 50:
+                        goodMatches[j.trainIdx].append(j)
+                        
 
-
+            #Create a list of <number of images> elements. For each object, we find the scale with the most matches, and add all the matches in its list
+            #to the list of lists bestScaleList.
             bestScaleList = []
             for i in range(0, len(self.imageList),1):
                 bestScaleList[i] = []
+            #Iterate over the goodmatches list, for each element get the scale with the most matches
             for i in range(0,len(goodMatches),3):
                 bestScale = []
                 matchCount = 0
