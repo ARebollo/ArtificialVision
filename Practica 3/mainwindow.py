@@ -84,11 +84,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##################      Image matching      ##################
 
+        #Actual imageObject objects that represent the images. Their keypoints and descriptors can also be obtained from these directly
         self.imageList = []
+        #A dictionary mapping object names in the comboBox to the actual objects
         self.mapObjects = {}
         #In these, 0:2 are the first object, 3:5 the second and 6:8 the third. The last are the keypoints of the actual image.
         #They are all a list of lists.
         self.ObjectKeyPointList = []
+        #Keypoints of the captured image. 
         self.imageKeypointList = []
         #ORB and BFMatcher, using Hamming distance.
         self.orb = cv2.ORB_create()
@@ -160,7 +163,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
             goodMatches = []
-            for i in range(len(self.ObjectKeyPointList)):
+            for i in range(len(self.imageList*3)):
                 goodMatches[i] = []
             #Iterate over the collection of matches
             for i in obtainedMatches:
@@ -189,7 +192,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
         #What we have to do is iterate over that list, choosing the valid matches and adding them to a list of valid matches. That list has 3*object elements
         #and each element contains the matches for that object and scale. After that is done, for each object we choose the scale with the most matches and 
-        #choose it as the best one. Then, we have to get the pair <keypoint, matchedKeypoint> (the image ones are stored in self.imageKeypointList, index queryIdx,
+        #choose it as the best one. 
+        #Then, we have to get the pair <keypoint, matchedKeypoint> (the image ones are stored in self.imageKeypointList, index queryIdx,
         #the object ones are stored in self.objectKeypointList, index trainIdx. After matching them, choose if a set of matches for an object actually represents and object
         #(minimum number of matches) and apply the homography. Draw it.
 
