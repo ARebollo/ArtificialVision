@@ -271,7 +271,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.objectList.removeItem(self.objectList.currentIndex())
         for i in range(self.objectList.currentIndex(),self.objectList.currentIndex()+2,1):
             del self.imageKeypointList[i]
-        
+        #TODO: Regenerar bien listas de descriptores y keypoints
         self.bf.clear()
         for i in self.imageList:
             _, des = i.returnKpDes()
