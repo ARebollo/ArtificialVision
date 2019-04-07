@@ -171,23 +171,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 for j in i:
                     #Tells us that the match is valid, and inserts it in the appropiate list
                     if j.distance < 50:
-                        print("Index: " + str(j.trainIdx))
-                        goodMatches[j.trainIdx].append(j)
+                        goodMatches[j.imgIdx].append(j)
                         
 
             #Create a list of <number of images> elements. For each object, we find the scale with the most matches, and add all the matches in its list
             #to the list of lists bestScaleList.
             bestScaleList = []
-            for i in range(0, len(self.imageList),1):
-                bestScaleList[i] = []
+            for i in range(0, len(self.imageList), 1):
+                print("i: " + str(i))
+                print("len imagelist: " + str(len(self.imageList)))
+                bestScaleList.append([])
             #Iterate over the goodmatches list, for each element get the scale with the most matches
             for i in range(0,len(goodMatches),3):
                 bestScale = []
                 matchCount = 0
                 for j in range(3):
-                    if len(j) > matchCount:
-                        bestScale = j
-                bestScaleList.append(bestScale)
+                    if len(goodMatches[j]) > matchCount:
+                        bestScale = goodMatches[j]
+                        matchCount = len(goodMatches[j])
+                    bestScaleList.append(bestScale)
+            
+            print("bestScaleList len: " + str(len(bestScaleList)))
+
             #After this, bestScaleList should have <number of items> elements, and each element is a list containing the matches each object, for the scale with the most matches            
             
         #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
@@ -197,9 +202,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #Then, we have to get the pair <keypoint, matchedKeypoint> (the image ones are stored in self.imageKeypointList, index queryIdx,
         #the object ones are stored in self.objectKeypointList, index trainIdx. After matching them, choose if a set of matches for an object actually represents and object
         #(minimum number of matches) and apply the homography. Draw it.
+            
+            self.ObjectKeyPointList, des2 = self.orb.detectAndCompute(self.imageWindow, None)
 
+            # Match features.
+            matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+            matches = matcher.match(des, des2, None)
+            
+            # Sort matches by score
+            matches.sort(key=lambda x: x.distance, reverse=False)
+            
+            # Remove not so good matches
+            numGoodMatches = int(len(matches) * 0.15)
+            matches = matches[:numGoodMatches]
 
+            # Extract location of good matches
+            points1 = np.zeros((len(matches), 2), dtype=np.float32)
+            points2 = np.zeros((len(matches), 2), dtype=np.float32)
 
+            for i, match in enumerate(matches):
+                points1[i, :] = self.imageKeypointList[match.queryIdx].pt
+                points2[i, :] = self.ObjectKeyPointList[match.trainIdx].pt
+        
+            # Find homography
+            h, mask = cv2.findHomography(points1, points2, cv2.RANSAC)
 
     def showMatAction(self):
         print("Calculating...")
