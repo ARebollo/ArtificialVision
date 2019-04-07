@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/mainwindow.ui', self)
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        #uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        #uic.loadUi('/home/salabeta/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        #uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -162,13 +162,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             obtainedMatches = self.bf.knnMatch(des, k = 3)
             goodMatches = []
             for i in range(len(self.imageList*3)):
-                goodMatches[i] = []
+                goodMatches.append([])
             #Iterate over the collection of matches
             for i in obtainedMatches:
                 #Iterate over each triplet of best matches for each descriptor
                 for j in i:
                     #Tells us that the match is valid, and inserts it in the appropiate list
                     if j.distance < 50:
+                        print("Index: " + str(j.trainIdx))
                         goodMatches[j.trainIdx].append(j)
                         
 
