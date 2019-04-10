@@ -158,73 +158,78 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def calculateMatches(self):
         if len(self.bf.getTrainDescriptors())!= 0:
             self.imageKeypointList, des = self.orb.detectAndCompute(self.grayImage, None)
-            #print(len(des))
             obtainedMatches = self.bf.knnMatch(des, k = 3)
-            goodMatches = []
-            for i in range(len(self.imageList*3)):
-                goodMatches.append([])
+            
+            #print("obtainedMatches" + str([len(z) for z in obtainedMatches]))
+            
+            orderedMatches = [[] for z in range(len(self.imageList)*3)]
+
+            for l in obtainedMatches:
+                for m in l:
+                    orderedMatches[m.imgIdx].append(m)
+            
+            #print("before" + str(len(orderedMatches[1])))
+            #print("obtainedMatches length" + str(len(obtainedMatches)))
+     
+            #print("keypoints antes 1: " + str(len(self.imageList[0].returnKpDes()[0][0])))
+            #print("keypoints antes 2: " + str(len(self.imageList[0].returnKpDes()[0][1])))
+            #print("keypoints antes 3: " + str(len(self.imageList[0].returnKpDes()[0][2])))
+
             #Iterate over the collection of matches
-            for i in obtainedMatches:
+            for i in orderedMatches:
                 #Iterate over each triplet of best matches for each descriptor
-                for j in i:
+                for id in range (len(orderedMatches)):
                     #Tells us that the match is valid, and inserts it in the appropiate list
-                    if j.distance < 50:
-                        goodMatches[j.imgIdx].append(j)
-                        
+                    if i[id].distance > 25:
+                        i.pop(id)
+            #print("after" + str(len(orderedMatches[1])))
+            #print("orderedMatches" + str([len(z) for z in orderedMatches]))
 
-            #Create a list of <number of images> elements. For each object, we find the scale with the most matches, and add all the matches in its list
-            #to the list of lists bestScaleList.
-            bestScaleList = []
-            for i in range(0, len(self.imageList), 1):
-                print("i: " + str(i))
-                print("len imagelist: " + str(len(self.imageList)))
-                bestScaleList.append([])
-            #Iterate over the goodmatches list, for each element get the scale with the most matches
-            for i in range(0,len(goodMatches),3):
-                bestScale = []
-                matchCount = 0
-                for j in range(3):
-                    if len(goodMatches[j]) > matchCount:
-                        bestScale = goodMatches[j]
-                        matchCount = len(goodMatches[j])
-                    bestScaleList.append(bestScale)
-            
-            print("bestScaleList len: " + str(len(bestScaleList)))
+            for id, image in enumerate(self.imageList, 0):
+                index = id*3
+                # Sorts the orderedMatches by the number of matches of each scale, picks the one with most matches and 
+                # assigns it to scaleWithMostMatches, also returns the position on x
+                scaleWithMostMatches = sorted([[x,y] for x,y in enumerate(orderedMatches[index:index+3], 0)], 
+                key = lambda x: len(x[1]), reverse = True)[0]
+                
+                #print(str(scaleWithMostMatches[0]))
 
-            #After this, bestScaleList should have <number of items> elements, and each element is a list containing the matches each object, for the scale with the most matches            
-            
-        #INFO and TODO: obtainedMatches is a list of lists that contains, for each keypoint in the image, a list of the k best matches as a DMatch object
-        #What we have to do is iterate over that list, choosing the valid matches and adding them to a list of valid matches. That list has 3*object elements
-        #and each element contains the matches for that object and scale. After that is done, for each object we choose the scale with the most matches and 
-        #choose it as the best one. 
-        #Then, we have to get the pair <keypoint, matchedKeypoint> (the image ones are stored in self.imageKeypointList, index queryIdx,
-        #the object ones are stored in self.objectKeypointList, index trainIdx. After matching them, choose if a set of matches for an object actually represents and object
-        #(minimum number of matches) and apply the homography. Draw it.
-            
-            self.ObjectKeyPointList, des2 = self.orb.detectAndCompute(self.imageWindow, None)
+                if (len(scaleWithMostMatches[1]) > 50):
+                    points1 = []
+                    points2 = []
 
-            # Match features.
-            matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
-            matches = matcher.match(des, des2, None)
-            
-            # Sort matches by score
-            matches.sort(key=lambda x: x.distance, reverse=False)
-            
-            # Remove not so good matches
-            numGoodMatches = int(len(matches) * 0.15)
-            matches = matches[:numGoodMatches]
+                    for j in scaleWithMostMatches[1]:
+                        points1.append(self.imageKeypointList[j.queryIdx].pt)
+                        #print("..." + str(len(image.returnKpDes()[0][scaleWithMostMatches[0]])))
+                        #print("trainidx" + str(j.trainIdx))
+                        points2.append(image.returnKpDes()[0][scaleWithMostMatches[0]][j.trainIdx].pt)
+ 
+                    h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
+    
+                    
+                    if h is not None:
 
-            # Extract location of good matches
-            points1 = np.zeros((len(matches), 2), dtype=np.float32)
-            points2 = np.zeros((len(matches), 2), dtype=np.float32)
+                        corners = np.zeros((4,2), dtype=np.float32)
 
-            for i, match in enumerate(matches):
-                points1[i, :] = self.imageKeypointList[match.queryIdx].pt
-                points2[i, :] = self.ObjectKeyPointList[match.trainIdx].pt
-        
-            # Find homography
-            h, mask = cv2.findHomography(points1, points2, cv2.RANSAC)
+                        corners[1, 0] = image.getScales()[0].shape[1]
+                        corners[2, 0] = image.getScales()[0].shape[1]
+                        corners[2, 1] = image.getScales()[0].shape[0]
+                        corners[3, 1] = image.getScales()[0].shape[0]
 
+                        #for id, i in enumerate(corners, 0):
+                        #    print("Corner " + str(id) + " : " + str(i))
+
+                        #print("corners: " + str(corners))
+                    
+                        M = cv2.perspectiveTransform(np.array([corners]), h)
+
+                        #print("M: " + str(M))
+
+                        cv2.line(self.grayImage, (M[0][0][0], M[0][0][1]), (M[0][1][0], M[0][1][1]), (255,255,255), 4)
+                        cv2.line(self.grayImage, (M[0][1][0], M[0][1][1]), (M[0][2][0], M[0][2][1]), (255,255,255), 4)
+                        cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
+                        cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
+                                          
     def showMatAction(self):
         print("Calculating...")
         orb = cv2.ORB_create()
@@ -277,9 +282,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             
             
                 print("DESC:")
+                auxList = []
                 for i in desc:
                     print(len(i))
-                    self.bf.add([i])
+                    auxList.append(i)
+                self.bf.add(auxList)
                 print("KP:")
                 for i in kp:
                     print(len(i))
@@ -331,6 +338,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 pEnd.setY(239)
             self.imageWindow.setWidth(pEnd.x()-self.imageWindow.x())
             self.imageWindow.setHeight(pEnd.y()-self.imageWindow.y())
+            
+            window_pos_x = self.imageWindow.x()
+            window_pos_y = self.imageWindow.y()
+            window_width = self.imageWindow.width()
+            window_height = self.imageWindow.height()
+
+            self.colorImageM = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
+            self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
+            self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_GRAY2RGB)
+            self.visorM.set_open_cv_imageColor(self.colorImageM)
+            self.visorM.update()
+            
             self.winSelected = True
 
     def deSelectWindow(self):
