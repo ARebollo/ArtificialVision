@@ -208,29 +208,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
  
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
     
-                    
                     if h is not None:
+                        if len(orderedMatches[scaleWithMostMatches[0]]) > 200:
 
-                        corners = np.zeros((4,2), dtype=np.float32)
+                            corners = np.zeros((4,2), dtype=np.float32)
 
-                        corners[1, 0] = image.getScales()[0].shape[1]
-                        corners[2, 0] = image.getScales()[0].shape[1]
-                        corners[2, 1] = image.getScales()[0].shape[0]
-                        corners[3, 1] = image.getScales()[0].shape[0]
+                            corners[1, 0] = image.getScales()[scaleWithMostMatches[0]].shape[1]
+                            corners[2, 0] = image.getScales()[scaleWithMostMatches[0]].shape[1]
+                            corners[2, 1] = image.getScales()[scaleWithMostMatches[0]].shape[0]
+                            corners[3, 1] = image.getScales()[scaleWithMostMatches[0]].shape[0]
 
-                        #for id, i in enumerate(corners, 0):
-                        #    print("Corner " + str(id) + " : " + str(i))
+                            #for id, i in enumerate(corners, 0):
+                            #    print("Corner " + str(id) + " : " + str(i))
 
-                        #print("corners: " + str(corners))
-                    
-                        M = cv2.perspectiveTransform(np.array([corners]), h)
+                            #print("corners: " + str(corners))
+                        
+                            M = cv2.perspectiveTransform(np.array([corners]), h)
 
-                        #print("M: " + str(M))
+                            #print("M: " + str(M))
 
-                        cv2.line(self.grayImage, (M[0][0][0], M[0][0][1]), (M[0][1][0], M[0][1][1]), (255,255,255), 4)
-                        cv2.line(self.grayImage, (M[0][1][0], M[0][1][1]), (M[0][2][0], M[0][2][1]), (255,255,255), 4)
-                        cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
-                        cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
+                            cv2.line(self.grayImage, (M[0][0][0], M[0][0][1]), (M[0][1][0], M[0][1][1]), (255,255,255), 4)
+                            cv2.line(self.grayImage, (M[0][1][0], M[0][1][1]), (M[0][2][0], M[0][2][1]), (255,255,255), 4)
+                            cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
+                            cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
                                           
     def showMatAction(self):
         print("Calculating...")
