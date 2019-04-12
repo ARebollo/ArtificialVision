@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        #uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        #uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -183,7 +183,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 newOrderedMatches = []
                 for id in range (len(i)):
                     #Tells us that the match is valid, and inserts it in the appropiate list
-                    if i[id].distance < 25:
+                    if i[id].distance < 0:
                         newOrderedMatches.append(i[id])
                         #i.pop(id)
                 i = copy.copy(newOrderedMatches)
@@ -258,6 +258,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 good.append([m])
         '''
 
+        #print("len matches: " + str(matches))
+        
         self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2[0], matches, None, flags=2)
         #cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
