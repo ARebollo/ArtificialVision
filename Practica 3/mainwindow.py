@@ -231,8 +231,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             cv2.line(self.grayImage, (M[0][1][0], M[0][1][1]), (M[0][2][0], M[0][2][1]), (255,255,255), 4)
                             cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
                             cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
+
+                            #imageAux = np.zeros((240, 320), np.uint8)
+                            imageAux = self.mapObjects[self.objectList.currentText()]
+                            imageAux = np.array(imageAux.getScales()[0], dtype=np.uint8)
+
+                            self.showMatAction(self.grayImage, self.imageKeypointList, 
+                            imageAux, self.ObjectKeyPointList[scaleWithMostMatches[0]], orderedMatches)
                                           
-    def showMatAction(self):
+    def showMatAction(self, img1, kp1, img2, kp2, matches):
+        '''
         print("Calculating...")
         orb = cv2.ORB_create()
         kp1, des1 = orb.detectAndCompute(self.grayImageLoad, None)
@@ -245,11 +253,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for m, n in matches:
             if m.distance < 0.95*n.distance:
                 good.append([m])
-
-        self.colorImageM = cv2.drawMatchesKnn(self.grayImageLoad, kp1, self.grayImageLoad2, kp2, good, None, flags=2)
-        cv2.imwrite('prueba.png', self.colorImageM)
+        '''
+        self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, flags=2)
+        #cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
+        self.visorM.set_open_cv_imageColor(self.colorImageM)
+        self.visorM.update()
     
     def addAction(self):
         if len(self.objectList) != 3:
@@ -342,7 +352,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 pEnd.setY(239)
             self.imageWindow.setWidth(pEnd.x()-self.imageWindow.x())
             self.imageWindow.setHeight(pEnd.y()-self.imageWindow.y())
-            
+
+            '''            
             window_pos_x = self.imageWindow.x()
             window_pos_y = self.imageWindow.y()
             window_width = self.imageWindow.width()
@@ -353,7 +364,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_GRAY2RGB)
             self.visorM.set_open_cv_imageColor(self.colorImageM)
             self.visorM.update()
-            
+            '''
+
             self.winSelected = True
 
     def deSelectWindow(self):
