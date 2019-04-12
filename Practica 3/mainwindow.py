@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        #uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        #uic.loadUi('objectName.ui', self.addObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        #uic.loadUi('objectRename.ui', self.renameObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -165,10 +165,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #print("obtainedMatches" + str([len(z) for z in obtainedMatches]))
             
             orderedMatches = [[] for z in range(len(self.imageList)*3)]
-
             for l in obtainedMatches:
                 for m in l:
-                    orderedMatches[m.imgIdx].append(m)
+                    if (m.imgIdx < len(self.imageList)*3): #Ñapa, pero es que daba ID =  1056 y eso no tiene ni puto sentido
+                        orderedMatches[m.imgIdx].append(m)
             
             #print("before" + str(len(orderedMatches[1])))
             #print("obtainedMatches length" + str(len(obtainedMatches)))
@@ -176,17 +176,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #print("keypoints antes 1: " + str(len(self.imageList[0].returnKpDes()[0][0])))
             #print("keypoints antes 2: " + str(len(self.imageList[0].returnKpDes()[0][1])))
             #print("keypoints antes 3: " + str(len(self.imageList[0].returnKpDes()[0][2])))
-
+            GoodOrderedMatches = []
             #Iterate over the collection of matches
+
             for i in orderedMatches:
+            
                 #Iterate over each triplet of best matches for each descriptor
                 newOrderedMatches = []
                 for id in range (len(i)):
                     #Tells us that the match is valid, and inserts it in the appropiate list
-                    if i[id].distance < 0:
+                    if i[id].distance < 75:
                         newOrderedMatches.append(i[id])
                         #i.pop(id)
-                i = copy.copy(newOrderedMatches)
+                GoodOrderedMatches.append(newOrderedMatches)
+            
+            orderedMatches = GoodOrderedMatches
+
+            
             #print("after" + str(len(orderedMatches[1])))
             #print("orderedMatches" + str([len(z) for z in orderedMatches]))
 
@@ -197,22 +203,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 scaleWithMostMatches = sorted([[x,y] for x,y in enumerate(orderedMatches[index:index+3], 0)], 
                 key = lambda x: len(x[1]), reverse = True)[0]
                 
-                #print(str(scaleWithMostMatches[0]))
+                #print(len(scaleWithMostMatches[1]))
 
-                if (len(scaleWithMostMatches[1]) > 50):
+                if (len(scaleWithMostMatches[1]) > 20):
                     points1 = []
                     points2 = []
-
                     for j in scaleWithMostMatches[1]:
                         points1.append(self.imageKeypointList[j.queryIdx].pt)
                         #print("..." + str(len(image.returnKpDes()[0][scaleWithMostMatches[0]])))
                         #print("trainidx" + str(j.trainIdx))
-                        points2.append(image.returnKpDes()[0][scaleWithMostMatches[0]][j.trainIdx].pt)
- 
+                        imageKp, _, _ = image.returnKpDes()
+                        imageKp = imageKp[scaleWithMostMatches[0]]
+                        #print("Should be a number: " + str(len(imageKp)))
+                        points2.append(imageKp[j.trainIdx].pt)
+                    #print("Points1: " + str(len(points1)) + " Points2: " + str(len(points2)))
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
     
                     if h is not None:
-                        if len(orderedMatches[scaleWithMostMatches[0]]) > 200:
+                        if len(orderedMatches[scaleWithMostMatches[0]]) > 50:
 
                             corners = np.zeros((4,2), dtype=np.float32)
 
@@ -241,6 +249,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
                             self.showMatAction(self.grayImage, self.imageKeypointList, 
                             imageAux, self.ObjectKeyPointList[scaleWithMostMatches[0]], orderedMatches)
+                    
                                           
     def showMatAction(self, img1, kp1, img2, kp2, matches):
         '''
