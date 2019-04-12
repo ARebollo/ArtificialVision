@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        #uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        #uic.loadUi('objectName.ui', self.addObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        #uic.loadUi('objectRename.ui', self.renameObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -180,10 +180,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             #Iterate over the collection of matches
             for i in orderedMatches:
                 #Iterate over each triplet of best matches for each descriptor
-                for id in range (len(orderedMatches)):
+                newOrderedMatches = []
+                for id in range (len(i)):
                     #Tells us that the match is valid, and inserts it in the appropiate list
-                    if i[id].distance > 25:
-                        i.pop(id)
+                    if i[id].distance < 25:
+                        newOrderedMatches.append(i[id])
+                        #i.pop(id)
+                i = copy.copy(newOrderedMatches)
             #print("after" + str(len(orderedMatches[1])))
             #print("orderedMatches" + str([len(z) for z in orderedMatches]))
 
@@ -254,7 +257,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if m.distance < 0.95*n.distance:
                 good.append([m])
         '''
-        self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, flags=2)
+
+        self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2[0], matches, None, flags=2)
         #cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
