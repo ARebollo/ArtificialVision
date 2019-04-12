@@ -122,7 +122,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             imgPath, _ = QFileDialog.getOpenFileName()
             if imgPath != "":
                 self.grayImageLoad = cv2.imread(imgPath)
-                self.grayImageLoad = cv2.resize(self.grayImageLoad, (240,180))
+                #print("escala: " + str(self.grayImageLoad.shape))
+                y, x, a = self.grayImageLoad.shape
+                scaleFactor = x/y
+                #print("scaleFactor: " + str(scaleFactor))
+                width = int(180*scaleFactor)
+                height = int(180)
+                dim = (width, height)
+                self.grayImageLoad = cv2.resize(self.grayImageLoad, dim)
                 self.grayImageLoad = cv2.cvtColor(self.grayImageLoad, cv2.COLOR_BGR2GRAY)
 
                 imgName = imgPath
@@ -217,7 +224,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         points2.append(imageKp[j.trainIdx].pt)
                     #print("Points1: " + str(len(points1)) + " Points2: " + str(len(points2)))
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
-    
+
                     if h is not None:
                         if len(orderedMatches[scaleWithMostMatches[0]]) > 50:
 
@@ -241,14 +248,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             cv2.line(self.grayImage, (M[0][1][0], M[0][1][1]), (M[0][2][0], M[0][2][1]), (255,255,255), 4)
                             cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
                             cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
+                            
+                        #imageAux = np.zeros((240, 320), np.uint8)
+                        imageAux = self.mapObjects[self.objectList.currentText()]
+                        imageAux = np.array(imageAux.getScales()[0], dtype=np.uint8)
 
-                            #imageAux = np.zeros((240, 320), np.uint8)
-                            imageAux = self.mapObjects[self.objectList.currentText()]
-                            imageAux = np.array(imageAux.getScales()[0], dtype=np.uint8)
-
-                            self.showMatAction(self.grayImage, self.imageKeypointList, 
-                            imageAux, self.ObjectKeyPointList[scaleWithMostMatches[0]], orderedMatches)
-                    
+                        self.showMatAction(self.grayImage, self.imageKeypointList, 
+                        imageAux, self.ObjectKeyPointList[scaleWithMostMatches[0]], orderedMatches)
                                           
     def showMatAction(self, img1, kp1, img2, kp2, matches):
         '''
@@ -268,7 +274,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         #print("len matches: " + str(matches))
         
-        self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2[0], matches[0:1], None, flags=2)
+        # BGR (142, 255, 132) light blue
+        # (255, 102, 51) light green
+        self.colorImageM = cv2.drawMatchesKnn(img1, kp1, img2, kp2[0], matches[0:1], None, flags=2, matchColor=(142, 255 ,132))
         #cv2.imwrite('prueba.png', self.colorImageM)
         self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
         self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_BGR2RGB)
