@@ -202,27 +202,48 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             
             #print("after" + str(len(orderedMatches[1])))
             #print("orderedMatches" + str([len(z) for z in orderedMatches]))
-
+            
+            
+            #Iterate over the list of objects, and an id from 0 to number of objects
             for id, image in enumerate(self.imageList, 0):
                 index = id*3
                 # Sorts the orderedMatches by the number of matches of each scale, picks the one with most matches and 
                 # assigns it to scaleWithMostMatches, also returns the position on x
                 scaleWithMostMatches = sorted([[x,y] for x,y in enumerate(orderedMatches[index:index+3], 0)], 
                 key = lambda x: len(x[1]), reverse = True)[0]
+
+                imageScales = orderedMatches[index:index+3]
+                mostMatchesId = -1
+                mostMatchesNum = -1
+                mostMatches = []
+                for i in range(len(imageScales)):
+                    print("Matches for scale " + str(i) + ": " + str(len(imageScales[i])))
+                    if len(imageScales[i]) > mostMatchesNum:
+                        mostMatches = imageScales[i]
+                        mostMatchesNum = len(imageScales[i])
+                        mostMatchesId = i
+
                 
                 #print(len(scaleWithMostMatches[1]))
-
-                if (len(scaleWithMostMatches[1]) > 10):
+                if (len(mostMatches) > 10):
+                #if (len(scaleWithMostMatches[1]) > 10):
                     points1 = []
                     points2 = []
-                    for j in scaleWithMostMatches[1]:
+                    for j in mostMatches:
+                    #for j in scaleWithMostMatches[1]:
                         points1.append(self.imageKeypointList[j.queryIdx].pt)
                         #print("..." + str(len(image.returnKpDes()[0][scaleWithMostMatches[0]])))
                         #print("trainidx" + str(j.trainIdx))
                         imageKp, _, _ = image.returnKpDes()
-                        imageKp = imageKp[scaleWithMostMatches[0]]
-                        print("Should be a number: " + str(len(imageKp)) + " The one that crashes it: " + str(j.trainIdx))
+                        #imageKp = imageKp[scaleWithMostMatches[0]]
+                        imageKp = imageKp[mostMatchesId]
+                        #print("Image number: " + str(id) + " scale chosen: " + str(mostMatchesId) )
+                        #print("Should be a number: " + str(len(imageKp)) + " The one that crashes it: " + str(j.trainIdx))
                         points2.append(imageKp[j.trainIdx].pt)
+
+
+
+
                     #print("Points1: " + str(len(points1)) + " Points2: " + str(len(points2)))
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
 
