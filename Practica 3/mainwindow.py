@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        #uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        #uic.loadUi('objectName.ui', self.addObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        #uic.loadUi('objectRename.ui', self.renameObject)
+        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -137,6 +137,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 imgName = imgPath
                 image = ImageObject(imgName, self.grayImageLoad, self.orb)
                 kp, desc, valid = image.returnKpDes()
+
                 if valid is True:
                     self.imageList.append(image)
                     self.mapObjects[imgName] = self.imageList[-1]
@@ -222,7 +223,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         #print("trainidx" + str(j.trainIdx))
                         imageKp, _, _ = image.returnKpDes()
                         imageKp = imageKp[scaleWithMostMatches[0]]
-                        #print("Should be a number: " + str(len(imageKp)))
+                        print("Should be a number: " + str(len(imageKp)) + " The one that crashes it: " + str(j.trainIdx))
                         points2.append(imageKp[j.trainIdx].pt)
                     #print("Points1: " + str(len(points1)) + " Points2: " + str(len(points2)))
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
@@ -310,6 +311,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             imgName = self.addObject.lineEdit.text()
             image = ImageObject(imgName, crop_img, self.orb)
             kp, desc, valid = image.returnKpDes()
+
             if valid is True:
                 self.imageList.append(image)
                 self.mapObjects[imgName] = self.imageList[-1]
@@ -344,8 +346,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #TODO: Regenerar bien listas de descriptores y keypoints
         self.bf.clear()
         for i in self.imageList:
-            _, des = i.returnKpDes()
-            self.bf.add([des])
+            _, des, _ = i.returnKpDes()
+            for i in des:
+                self.bf.add([i])
 
     def captureButtonAction(self):
         if self.captureState is False:
