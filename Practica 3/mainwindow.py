@@ -17,17 +17,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
 
         self.addObject =  QtWidgets.QDialog()
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
-        uic.loadUi('objectName.ui', self.addObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectName.ui', self.addObject)
+        #uic.loadUi('objectName.ui', self.addObject)
         self.addObject.okButton.clicked.connect(self.addOkAction)
 
         self.renameObject =  QtWidgets.QDialog()
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
-        uic.loadUi('objectRename.ui', self.renameObject)
+        uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/objectRename.ui', self.renameObject)
+        #uic.loadUi('objectRename.ui', self.renameObject)
         self.renameObject.okButton.clicked.connect(self.renameOkAction)
 
         ##########################################################
@@ -62,6 +62,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
 
         self.colorImageM = np.zeros((240, 700, 3))
+        self.colorImageM = cv2.imread("Practica 3/noMatches.jpg")
         self.imgM = QImage(700, 240, QImage.Format_RGB888)
         self.visorM = ImgViewer(700, 240, self.imgM, self.imageFrameS_2)
         #self.visorS.set_open_cv_image(self.grayImageDest)
@@ -173,6 +174,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             orderedMatches = [[] for z in range(len(self.imageList)*3)]
             for l in obtainedMatches:
                 for m in l:
+                    #print("match id: " + str(m.imgIdx))
                     if (m.imgIdx < len(self.imageList)*3): #Ñapa, pero es que daba ID =  1056 y eso no tiene ni puto sentido
                         orderedMatches[m.imgIdx].append(m)
             
@@ -185,9 +187,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             GoodOrderedMatches = []
             #Iterate over the collection of matches
 
+            '''
             for i in orderedMatches:
-            
-                #Iterate over each triplet of best matches for each descriptor
                 newOrderedMatches = []
                 for id in range (len(i)):
                     #Tells us that the match is valid, and inserts it in the appropiate list
@@ -198,11 +199,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     GoodOrderedMatches.append(newOrderedMatches)
             
             orderedMatches = GoodOrderedMatches
+            '''
 
-            
+            #print("antes " + str(len(orderedMatches[0])))
+
+            '''
+            aux = copy.copy(orderedMatches)
+
+            for i in aux:
+                for j in i:
+                    if j.distance > 0:
+                        i.remove(j)
+                        
+            orderedMatches = copy.copy(aux)
+            '''
+
+            for i in orderedMatches:
+                j = 0
+                while j < len(i):
+                    if i[j].distance > 50:
+                        i.pop(j)
+                    else:
+                        j += 1
+
+            #print("despues" + str(len(orderedMatches[0])))
+
             #print("after" + str(len(orderedMatches[1])))
             #print("orderedMatches" + str([len(z) for z in orderedMatches]))
-            
             
             #Iterate over the list of objects, and an id from 0 to number of objects
             for id, image in enumerate(self.imageList, 0):
@@ -217,15 +240,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 mostMatchesNum = -1
                 mostMatches = []
                 for i in range(len(imageScales)):
-                    print("Matches for scale " + str(i) + ": " + str(len(imageScales[i])))
+                    #print("Matches for scale " + str(i) + ": " + str(len(imageScales[i])))
                     if len(imageScales[i]) > mostMatchesNum:
                         mostMatches = imageScales[i]
                         mostMatchesNum = len(imageScales[i])
                         mostMatchesId = i
-
                 
+                self.colorImageM = np.zeros((700, 240, 3))
+                self.colorImageM = cv2.imread("Practica 3/noMatches.jpg")
+                self.visorM.set_open_cv_imageColor(self.colorImageM)
+                #self.noMatchesImg = cv2.resize(self.noMatchesImg, (700, 240))
+                #self.visorM.set_open_cv_imageColor(self.noMatchesImg)
+                self.visorM.update()
+
                 #print(len(scaleWithMostMatches[1]))
-                if (len(mostMatches) > 10):
+                if (len(mostMatches) > 50):
                 #if (len(scaleWithMostMatches[1]) > 10):
                     points1 = []
                     points2 = []
@@ -235,27 +264,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         #print("..." + str(len(image.returnKpDes()[0][scaleWithMostMatches[0]])))
                         #print("trainidx" + str(j.trainIdx))
                         imageKp, _, _ = image.returnKpDes()
-                        #imageKp = imageKp[scaleWithMostMatches[0]]
                         imageKp = imageKp[mostMatchesId]
-                        #print("Image number: " + str(id) + " scale chosen: " + str(mostMatchesId) )
                         #print("Should be a number: " + str(len(imageKp)) + " The one that crashes it: " + str(j.trainIdx))
                         points2.append(imageKp[j.trainIdx].pt)
-
-
-
 
                     #print("Points1: " + str(len(points1)) + " Points2: " + str(len(points2)))
                     h, mask = cv2.findHomography(np.array(points2), np.array(points1), cv2.RANSAC)
 
                     if h is not None:
-                        if len(orderedMatches[scaleWithMostMatches[0]]) > 50:
+                        if len(mostMatches) > 50:
 
                             corners = np.zeros((4,2), dtype=np.float32)
 
-                            corners[1, 0] = image.getScales()[scaleWithMostMatches[0]].shape[1]
-                            corners[2, 0] = image.getScales()[scaleWithMostMatches[0]].shape[1]
-                            corners[2, 1] = image.getScales()[scaleWithMostMatches[0]].shape[0]
-                            corners[3, 1] = image.getScales()[scaleWithMostMatches[0]].shape[0]
+                            corners[1, 0] = image.getScales()[mostMatchesId].shape[1]
+                            corners[2, 0] = image.getScales()[mostMatchesId].shape[1]
+                            corners[2, 1] = image.getScales()[mostMatchesId].shape[0]
+                            corners[3, 1] = image.getScales()[mostMatchesId].shape[0]
 
                             #for id, i in enumerate(corners, 0):
                             #    print("Corner " + str(id) + " : " + str(i))
@@ -271,30 +295,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             cv2.line(self.grayImage, (M[0][2][0], M[0][2][1]), (M[0][3][0], M[0][3][1]), (255,255,255), 4)
                             cv2.line(self.grayImage, (M[0][3][0], M[0][3][1]), (M[0][0][0], M[0][0][1]), (255,255,255), 4)
                             
-                        #imageAux = np.zeros((240, 320), np.uint8)
-                        imageAux = self.mapObjects[self.objectList.currentText()]
-                        imageAux = np.array(imageAux.getScales()[0], dtype=np.uint8)
+                            #imageAux = np.zeros((240, 320), np.uint8)
+                            imageAux = self.mapObjects[self.objectList.currentText()]
+                            imageAux = np.array(imageAux.getScales()[0], dtype=np.uint8)
 
-                        self.showMatAction(self.grayImage, self.imageKeypointList, 
-                        imageAux, self.ObjectKeyPointList[scaleWithMostMatches[0]], orderedMatches)
+                            self.showMatAction(self.grayImage, self.imageKeypointList, 
+                            imageAux, self.ObjectKeyPointList[mostMatchesId], orderedMatches)
                                           
     def showMatAction(self, img1, kp1, img2, kp2, matches):
-        '''
-        print("Calculating...")
-        orb = cv2.ORB_create()
-        kp1, des1 = orb.detectAndCompute(self.grayImageLoad, None)
-        kp2, des2 = orb.detectAndCompute(self.grayImageLoad2, None)
-
-        bf = cv2.BFMatcher()
-
-        matches = bf.knnMatch(des1, des2, k = 2)
-        good = []
-        for m, n in matches:
-            if m.distance < 0.95*n.distance:
-                good.append([m])
-        '''
-
-        #print("len matches: " + str(matches))
         
         # BGR (142, 255, 132) light blue
         # (255, 102, 51) light green
@@ -358,10 +366,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.renameObject.hide()
 
     def removeAction(self):
-        del self.imageList[self.objectList.currentIndex()]
+        if self.objectList.currentIndex() is not -1:
+            del self.imageList[self.objectList.currentIndex()]
         self.objectList.removeItem(self.objectList.currentIndex())
         for i in range(self.objectList.currentIndex(),self.objectList.currentIndex()+2,1):
-            del self.imageKeypointList[i]
+            if i is not None:
+                del self.imageKeypointList[i]
         #TODO: Regenerar bien listas de descriptores y keypoints
         self.bf.clear()
         for i in self.imageList:
@@ -396,20 +406,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 pEnd.setY(239)
             self.imageWindow.setWidth(pEnd.x()-self.imageWindow.x())
             self.imageWindow.setHeight(pEnd.y()-self.imageWindow.y())
-
-            '''            
-            window_pos_x = self.imageWindow.x()
-            window_pos_y = self.imageWindow.y()
-            window_width = self.imageWindow.width()
-            window_height = self.imageWindow.height()
-
-            self.colorImageM = self.grayImage[window_pos_y:window_pos_y+window_height,window_pos_x:window_pos_x+window_width].copy()
-            self.colorImageM = cv2.resize(self.colorImageM, (700, 240))
-            self.colorImageM = cv2.cvtColor(self.colorImageM, cv2.COLOR_GRAY2RGB)
-            self.visorM.set_open_cv_imageColor(self.colorImageM)
-            self.visorM.update()
-            '''
-
             self.winSelected = True
 
     def deSelectWindow(self):
