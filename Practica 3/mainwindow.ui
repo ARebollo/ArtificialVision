@@ -137,25 +137,6 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="removeButton_2">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>230</y>
-     <width>181</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Change Image</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QFrame" name="imageFrameS_2">
    <property name="geometry">
     <rect>
@@ -176,13 +157,13 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>550</y>
-     <width>67</width>
+     <y>530</y>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Matches</string>
+    <string>Real time matches</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -195,10 +176,9 @@
     </rect>
    </property>
    <property name="text">
-    <string> Showing the original
- image keypoints and
- the matching with
- the second image</string>
+    <string> It draws the matches in real
+ time, if its black then its not
+ locating the object yet.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -208,7 +188,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>270</y>
+     <y>230</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -223,23 +203,30 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="showMat">
+  <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>440</y>
-     <width>181</width>
-     <height>31</height>
+     <x>20</x>
+     <y>260</y>
+     <width>81</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>ShowMatches</string>
+    <string>Video input</string>
    </property>
-   <property name="checkable">
-    <bool>false</bool>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>260</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
    </property>
-   <property name="checked">
-    <bool>false</bool>
+   <property name="text">
+    <string>Real time keypoints</string>
    </property>
   </widget>
   <widget class="QPushButton" name="loadButton_Video">
