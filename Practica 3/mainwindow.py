@@ -164,6 +164,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             message = QtWidgets.QMessageBox()
             message.about(None, 'Error', 'Error loading image: Maximum number of objects reached.')
 
+    def loadVideoAction(self):
+        imgPath, _ = QFileDialog.getOpenFileName()
+        if imgPath != "":
+            self.captureState = True
+            self.capture = VideoCapture(imgPath)
+            self.timer.stop()
+            fps = self.capture.get(cv2.CAP_PROP_FPS)
+            self.timer.start(1000/fps)
+
+
     #Calculates the matches between the image captured by the webcam/video and the objects stored. Stores them in obtainedMatches().
     #Returns a list containing, for each of the three (or two, or however many there are), the scale with the most matches.
     def calculateMatches(self):
