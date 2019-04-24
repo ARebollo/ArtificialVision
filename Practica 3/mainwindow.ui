@@ -241,11 +241,18 @@
    <property name="text">
     <string>Load Video</string>
    </property>
-   <property name="checkable">
-    <bool>false</bool>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>260</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
    </property>
-   <property name="checked">
-    <bool>false</bool>
+   <property name="text">
+    <string>Real time keypoints</string>
    </property>
   </widget>
  </widget>
