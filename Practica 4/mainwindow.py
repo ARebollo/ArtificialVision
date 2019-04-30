@@ -17,8 +17,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -91,40 +91,62 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     to avoid having different regions with the same value.  
     '''
     def fillImgRegions(self):
+
+        #print("principio" + str(self.imgRegions))
+
+        np.set_printoptions(threshold = np.inf)
+
         regionID = 0
+        #print("imagen: " + str(self.grayImage.shape))
         self.edges = cv2.Canny(self.grayImage,100,200)
+        #print("---")
+        #print("bordes: " + str(self.edges))
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+
+        #print("borders shape: " + str(self.mask.shape))
+        #print("---")
+        #print(self.mask)
+
         print("Edge size:" + str(self.edges.shape))
         print("Image shape" + str(self.grayImage.shape))
         print("Regions shape" + str(self.imgRegions.shape))
         print("We got here")
+
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
-                print("i = " + str(i) + " j =  " + str(j))
+                #print("i = " + str(i) + " j =  " + str(j))
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
                     retval, _, self.mask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 10)
-                    print(rect)
+                    #print(rect)
                     for k in range (rect[0], rect[0] + rect[2], 1):
                         for l in range(rect[1], rect[1] + rect[3], 1):
+                            #print("mask l, k: " + str(self.mask[l+1][k+1]))
                             if self.mask[l+1][k+1] == 10:
                                 self.imgRegions[l][k] = regionID
                                 regionID += 1
                                 if regionID == 255:
                                     regionID = 0
-                                self.grayImageDest = self.imgRegions
+
+                                '''
+                                #self.grayImageDest = self.imgRegions
+                                self.grayImageDest = self.grayImage
                                 self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-        #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+                                #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
                                 self.visorD.set_open_cv_image(self.grayImageDest)
                                 self.visorD.update()
+
                                 self.edges = cv2.Canny(self.grayImage,100,200)
                                 self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-    '''
+                                '''
+    
+        print(self.imgRegions)
+
         self.grayImageDest = self.imgRegions
         self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-        #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+        self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
-    '''
+    
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
@@ -168,10 +190,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: astype is needed to convert the cv type to the qt expected one
         self.visorS.set_open_cv_image(self.grayImage)
         # FIXED: astype is needed to convert the cv type to the qt expected one
-
-        self.visorD.set_open_cv_image(self.grayImageDest)
-        self.visorS.update()
-        self.visorD.update()        
+        self.visorS.update()   
     
 if __name__ == '__main__':
     import sys
