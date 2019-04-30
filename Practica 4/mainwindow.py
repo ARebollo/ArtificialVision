@@ -18,7 +18,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##################      UI loading      ##################
 
         #uic.loadUi('/Users/dakolas/Documents/GitHub/ArtificialVision/Practica 3/mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
 
         ##########################################################
 
@@ -65,8 +65,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##############################################################
 
-        self.edges = np.zeros((320, 240), np.int8)
-        self.imgRegions = np.full((320, 240),-1, dtype = np.float32)
+        self.edges = np.zeros((240, 320), np.int8)
+        self.imgRegions = np.full((240, 320),-1, dtype = np.int32)
         self.listRegions = []
         
         ##############################################################
@@ -94,24 +94,37 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         regionID = 0
         self.edges = cv2.Canny(self.grayImage,100,200)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        for i in range (0, 320, 1):
-            for j in range(0, 240, 1):
+        print("Edge size:" + str(self.edges.shape))
+        print("Image shape" + str(self.grayImage.shape))
+        print("Regions shape" + str(self.imgRegions.shape))
+        print("We got here")
+        for i in range(0, 240, 1):
+            for j in range(0, 320, 1):
+                print("i = " + str(i) + " j =  " + str(j))
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
-                    retval, _, _, rect = cv2.floodFill(self.grayImage, self.mask, (i,j), 10)
-                    for i in range (1, 240, 1):
-                        for j in range(1, 320, 1):
-                            if self.mask[i][j] == 10:
-                                self.imgRegions[i][j] = regionID
+                    retval, _, self.mask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 10)
+                    print(rect)
+                    for k in range (rect[0], rect[0] + rect[2], 1):
+                        for l in range(rect[1], rect[1] + rect[3], 1):
+                            if self.mask[l+1][k+1] == 10:
+                                self.imgRegions[l][k] = regionID
                                 regionID += 1
+                                if regionID == 255:
+                                    regionID = 0
+                                self.grayImageDest = self.imgRegions
+                                self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+        #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+                                self.visorD.set_open_cv_image(self.grayImageDest)
+                                self.visorD.update()
                                 self.edges = cv2.Canny(self.grayImage,100,200)
                                 self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-
+    '''
         self.grayImageDest = self.imgRegions
         self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
-    
+    '''
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
@@ -119,8 +132,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImage = cv2.imread(imgPath)
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-        
-        self.test()
+            self.visorS.update()
+        #self.test()
         self.fillImgRegions()
         
     def captureButtonAction(self):
