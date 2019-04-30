@@ -95,17 +95,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.edges = cv2.Canny(self.grayImage,100,200)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         for i in range (0, 320, 1):
-            for j in range(0, 240, 1)
+            for j in range(0, 240, 1):
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
-                    retval, rect = cv2.floodfill(self.grayImage, self.mask, cv2.Point(i,j), 10)
-                    for i in range (1, 320, 1):
-                        for j in range(1, 240, 1):
-                            if mask[i][j] == 10:
-                                imgRegions[i][j] = regionID
+                    retval, _, _, rect = cv2.floodFill(self.grayImage, self.mask, (i,j), 10)
+                    for i in range (1, 240, 1):
+                        for j in range(1, 320, 1):
+                            if self.mask[i][j] == 10:
+                                self.imgRegions[i][j] = regionID
                                 regionID += 1
                                 self.edges = cv2.Canny(self.grayImage,100,200)
                                 self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
 
+        self.grayImageDest = self.imgRegions
+        self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+        #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+        self.visorD.set_open_cv_image(self.grayImageDest)
+        self.visorD.update()
+    
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
@@ -115,6 +121,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         
         self.test()
+        self.fillImgRegions()
         
     def captureButtonAction(self):
         if self.captureState is False:
@@ -141,7 +148,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 return
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-  
+
         if self.winSelected:
             self.visorS.drawSquare(self.imageWindow, Qt.green)
 
