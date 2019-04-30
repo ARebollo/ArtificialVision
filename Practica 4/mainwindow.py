@@ -91,10 +91,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     to avoid having different regions with the same value.  
     '''
     def fillImgRegions(self):
+        regionID = 0
+        self.edges = cv2.Canny(self.grayImage,100,200)
+        self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         for i in range (0, 320, 1):
             for j in range(0, 240, 1)
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
-                    retval, rect = cv2.floodfill(self.grayImage, self.mask, cv2.Point(i,j), )
+                    retval, rect = cv2.floodfill(self.grayImage, self.mask, cv2.Point(i,j), 10)
+                    for i in range (1, 320, 1):
+                        for j in range(1, 240, 1):
+                            if mask[i][j] == 10:
+                                imgRegions[i][j] = regionID
+                                regionID += 1
+                                self.edges = cv2.Canny(self.grayImage,100,200)
+                                self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
 
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
