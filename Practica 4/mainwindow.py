@@ -17,8 +17,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -82,6 +82,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
         plt.show()
 
+
+    def printNumpyArray(self, array):
+        for i in range(array.shape[0]):
+            for j in range(array.shape[1]):
+                print(array[i][j], end = ' ')
+                if j == array.shape[1]:
+                    print()
+
+
     '''
     What we have to do is fill each region with a value.
     Iterate over the whole image. If we find a point that doesn't have a region we call floodfill
@@ -98,11 +107,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         regionID = 0
         #print("imagen: " + str(self.grayImage.shape))
+        #self.printNumpyArray(self.grayImage)
         self.edges = cv2.Canny(self.grayImage,100,200)
+        
         #print("---")
         #print("bordes: " + str(self.edges))
+        print("Stop1")
+        #self.printNumpyArray(self.edges)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-
+        print(self.mask.shape)
+        print("Stop")
+        #self.printNumpyArray(self.mask)
+        image = np.zeros((240,320), dtype = np.int32)
         #print("borders shape: " + str(self.mask.shape))
         #print("---")
         #print(self.mask)
@@ -111,17 +127,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print("Image shape" + str(self.grayImage.shape))
         print("Regions shape" + str(self.imgRegions.shape))
         print("We got here")
-
+        plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
+        plt.show()
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
-                #print("i = " + str(i) + " j =  " + str(j))
+                
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
-                    retval, _, self.mask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 10)
+                    #print("i = " + str(i) + " j =  " + str(j))
+                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 128, flags = cv2.FLOODFILL_MASK_ONLY)
+                    
+                    #print(self.imgRegions)
                     #print(rect)
                     for k in range (rect[0], rect[0] + rect[2], 1):
                         for l in range(rect[1], rect[1] + rect[3], 1):
                             #print("mask l, k: " + str(self.mask[l+1][k+1]))
-                            if self.mask[l+1][k+1] == 10:
+                            if newMask[l+1][k+1] == 128:
                                 self.imgRegions[l][k] = regionID
                                 regionID += 1
                                 if regionID == 255:
@@ -134,18 +154,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
                                 self.visorD.set_open_cv_image(self.grayImageDest)
                                 self.visorD.update()
-
-                                self.edges = cv2.Canny(self.grayImage,100,200)
-                                self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
                                 '''
+                                
     
-        print(self.imgRegions)
+        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        plt.show()
 
+        cv2.imwrite("result.jpg", self.imgRegions)
         self.grayImageDest = self.imgRegions
-        self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-        self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+        #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+        #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
+    
     
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
