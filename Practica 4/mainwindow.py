@@ -17,8 +17,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -134,39 +134,42 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
                     #print("i = " + str(i) + " j =  " + str(j))
-                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 128, flags = cv2.FLOODFILL_MASK_ONLY)
+                    # TODO coger el valor del dialogo
+                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 30, 30, flags = cv2.FLOODFILL_MASK_ONLY)
                     
                     #print(self.imgRegions)
                     #print(rect)
+
                     for k in range (rect[0], rect[0] + rect[2], 1):
                         for l in range(rect[1], rect[1] + rect[3], 1):
                             #print("mask l, k: " + str(self.mask[l+1][k+1]))
-                            if newMask[l+1][k+1] == 128:
+                            if newMask[l+1][k+1] == 1:
                                 self.imgRegions[l][k] = regionID
-                                regionID += 1
-                                if regionID == 255:
-                                    regionID = 0
+                    
+                    regionID = regionID + 1
 
-                                '''
-                                #self.grayImageDest = self.imgRegions
-                                self.grayImageDest = self.grayImage
-                                self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-                                #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
-                                self.visorD.set_open_cv_image(self.grayImageDest)
-                                self.visorD.update()
-                                '''
+                    '''
+                    #self.grayImageDest = self.imgRegions
+                    self.grayImageDest = self.grayImage
+                    self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+                    #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+                    self.visorD.set_open_cv_image(self.grayImageDest)
+                    self.visorD.update()
+                    '''
                                 
+        print("Resultado: " + str(self.imgRegions))
     
-        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
-        plt.show()
+        #plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        #plt.show()
 
+        '''
         cv2.imwrite("result.jpg", self.imgRegions)
         self.grayImageDest = self.imgRegions
         #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
-    
+        '''
     
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
