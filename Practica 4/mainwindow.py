@@ -18,8 +18,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -60,6 +60,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadAction)
+        self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
 
@@ -109,7 +110,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         regionID = 1
         #print("imagen: " + str(self.grayImage.shape))
         #self.printNumpyArray(self.grayImage)
-        self.edges = cv2.Canny(self.grayImage,100,200)
+        self.edges = cv2.Canny(self.grayImage,40,120)
         
         #print("---")
         #print("bordes: " + str(self.edges))
@@ -128,24 +129,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print("Image shape" + str(self.grayImage.shape))
         print("Regions shape" + str(self.imgRegions.shape))
         print("We got here")
-        plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
-        plt.show()
+        #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
+        #plt.show()
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
                 #We found a new region:
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
                     
                     #print("i = " + str(i) + " j =  " + str(j))
-                    # TODO coger el valor del dialogo
-                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 30, 30, flags = cv2.FLOODFILL_MASK_ONLY)
+                    dialogValue = self.spinBoxDifference.value()
+                    
+                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
+                    upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8)
+                    
                     newRegion = region(regionID, rect)
                     #print(self.imgRegions)
                     #print(rect)
-                    listRegions.append(newRegion)
+                    self.listRegions.append(newRegion)
                     for k in range (rect[0], rect[0] + rect[2], 1):
                         for l in range(rect[1], rect[1] + rect[3], 1):
                             #print("mask l, k: " + str(self.mask[l+1][k+1]))
-                            if newMask[l+1][k+1] == 1:
+                            if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
                                 self.imgRegions[l][k] = regionID
                                 newRegion.addPoint(self.grayImage[l][k])
 
@@ -156,8 +160,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             if self.imgRegions[l][k] == regionID:
                                 self.grayImageDest[l][k] = avgGrey
 
-                    print(regionID)
+                    #print(regionID)
                     regionID = regionID + 1
+                    #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
                     '''
                     #self.grayImageDest = self.imgRegions
                     self.grayImageDest = self.grayImage
@@ -171,19 +176,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #After we're done, we iterate through the list of regions, using the rectangle to be more efficient, and we set each pixel in grayImageDest that is inside that region
         #to the average value of the region. It should give us a nice image. The only thing left to do is to do *something* with the borders.
 
-
-
-
+        '''
         #Set borders to black.
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
                 if self.imgRegions[i][j] == -1:
-                    self.imgRegions[i][j] = 0                        
+                    self.imgRegions[i][j] = 0       
+        '''                 
         #print("Resultado: " + str(self.imgRegions))
         #print(self.imgRegions.shape)
-        print(np.unique(self.imgRegions))
-        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
-        plt.show()
+        #print(np.unique(self.imgRegions))
+        
+        #plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        #plt.show()
 
         
         cv2.imwrite("result.png", self.imgRegions)
@@ -191,6 +196,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
+        self.imgRegions = np.full((240, 320),-1, dtype = np.int32)
         
     
     def loadAction(self):
