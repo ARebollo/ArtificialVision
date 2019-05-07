@@ -18,8 +18,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -105,7 +105,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         #print("principio" + str(self.imgRegions))
 
-        np.set_printoptions(threshold = np.inf)
+        #np.set_printoptions(threshold = np.inf)
 
         regionID = 1
         #print("imagen: " + str(self.grayImage.shape))
@@ -114,66 +114,59 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         #print("---")
         #print("bordes: " + str(self.edges))
-        print("Stop1")
+        #print("Stop1")
         #self.printNumpyArray(self.edges)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        print(self.mask.shape)
-        print("Stop")
+        #print(self.mask.shape)
+        #print("Stop")
         #self.printNumpyArray(self.mask)
-        image = np.zeros((240,320), dtype = np.int32)
         #print("borders shape: " + str(self.mask.shape))
         #print("---")
         #print(self.mask)
-
+        '''
         print("Edge size:" + str(self.edges.shape))
         print("Image shape" + str(self.grayImage.shape))
         print("Regions shape" + str(self.imgRegions.shape))
         print("We got here")
         #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
         #plt.show()
+        '''
+        dialogValue = self.spinBoxDifference.value()
+        if self.checkBoxRange.isChecked() is True:
+            floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
+        else:
+            floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
+
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
                 #We found a new region:
-                if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
+                
+                if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
+                    if self.edges[i][j] == 0:
                     
-                    #print("i = " + str(i) + " j =  " + str(j))
-                    dialogValue = self.spinBoxDifference.value()
-                    if self.checkBoxRange.checked() is True:
-                        _, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
-                        upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8)
-                    else:
-                        _, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
-                        upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8)
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
+                        upDiff = dialogValue, flags = floodFlags)
                     
-                    newRegion = region(regionID, rect)
-                    #print(self.imgRegions)
-                    #print(rect)
-                    self.listRegions.append(newRegion)
-                    for k in range (rect[0], rect[0] + rect[2], 1):
-                        for l in range(rect[1], rect[1] + rect[3], 1):
-                            #print("mask l, k: " + str(self.mask[l+1][k+1]))
-                            if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
-                                self.imgRegions[l][k] = regionID
-                                newRegion.addPoint(self.grayImage[l][k])
+                        newRegion = region(regionID, rect)
+                    
+                        for k in range (rect[0], rect[0] + rect[2], 1):
+                            for l in range(rect[1], rect[1] + rect[3], 1):
+                                if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
+                                    self.imgRegions[l][k] = regionID
+                                    newRegion.addPoint(self.grayImage[l][k])
 
-                    #This should set the piece of grayImageDest to the correct value
-                    _, avgGrey = newRegion.returnAverage()
-                    for k in range (rect[0], rect[0] + rect[2], 1):
-                        for l in range(rect[1], rect[1] + rect[3], 1):
-                            if self.imgRegions[l][k] == regionID:
-                                self.grayImageDest[l][k] = avgGrey
+                    #This should set the piece of grayImageDest to the correct value. Maybe move outside to increase efficiency
+                        _, avgGrey = newRegion.returnAverage()
+                        for k in range (rect[0], rect[0] + rect[2], 1):
+                            for l in range(rect[1], rect[1] + rect[3], 1):
+                                if self.imgRegions[l][k] == regionID:
+                                    self.grayImageDest[l][k] = avgGrey
 
                     #print(regionID)
-                    regionID = regionID + 1
+                    regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-                    '''
-                    #self.grayImageDest = self.imgRegions
-                    self.grayImageDest = self.grayImage
-                    self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-                    #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
-                    self.visorD.set_open_cv_image(self.grayImageDest)
-                    self.visorD.update()
-                    '''
+                                        
+
         #TODO: When it finds a new region, add it to a list as a region object, with the rectangle for efficiency. When it iterates over the region to set the imgRegions,
         #it adds the value of the respective point in grayImage (or colorImage, whatever) to the region object. When it finishes adding the region, it returns the average value.
         #After we're done, we iterate through the list of regions, using the rectangle to be more efficient, and we set each pixel in grayImageDest that is inside that region
@@ -194,7 +187,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #plt.show()
 
         
-        cv2.imwrite("result.png", self.imgRegions)
+        #cv2.imwrite("result.png", self.imgRegions)
         #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
@@ -238,6 +231,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 return
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
+            self.fillImgRegions()
 
         if self.winSelected:
             self.visorS.drawSquare(self.imageWindow, Qt.green)
