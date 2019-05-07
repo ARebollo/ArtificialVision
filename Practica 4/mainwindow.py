@@ -9,6 +9,7 @@ import numpy as np
 #from ImgViewer import ImgViewer
 import copy
 from ImgViewer import ImgViewer
+from region import region
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
@@ -131,20 +132,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         plt.show()
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
-                
+                #We found a new region:
                 if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0:
+                    
                     #print("i = " + str(i) + " j =  " + str(j))
                     # TODO coger el valor del dialogo
                     retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 30, 30, flags = cv2.FLOODFILL_MASK_ONLY)
-                    
+                    newRegion = region(regionID, rect)
                     #print(self.imgRegions)
                     #print(rect)
-
+                    listRegions.append(newRegion)
                     for k in range (rect[0], rect[0] + rect[2], 1):
                         for l in range(rect[1], rect[1] + rect[3], 1):
                             #print("mask l, k: " + str(self.mask[l+1][k+1]))
                             if newMask[l+1][k+1] == 1:
                                 self.imgRegions[l][k] = regionID
+                                newRegion.addPoint(self.grayImage[l][k])
+
+                    #This should set the piece of grayImageDest to the correct value
+                    _, avgGrey = newRegion.returnAverage()
+                    for k in range (rect[0], rect[0] + rect[2], 1):
+                        for l in range(rect[1], rect[1] + rect[3], 1):
+                            if self.imgRegions[l][k] == regionID:
+                                self.grayImageDest[l][k] = avgGrey
+
                     print(regionID)
                     regionID = regionID + 1
                     '''
@@ -176,7 +187,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         
         cv2.imwrite("result.png", self.imgRegions)
-        self.grayImageDest = self.imgRegions.astype(np.uint8)
         #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
