@@ -138,9 +138,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     
                     #print("i = " + str(i) + " j =  " + str(j))
                     dialogValue = self.spinBoxDifference.value()
-                    
-                    retval, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
-                    upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8)
+                    if self.checkBoxRange.checked() is True:
+                        _, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
+                        upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8)
+                    else:
+                        _, image, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
+                        upDiff = dialogValue, flags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8)
                     
                     newRegion = region(regionID, rect)
                     #print(self.imgRegions)
