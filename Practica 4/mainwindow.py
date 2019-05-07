@@ -17,8 +17,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -105,7 +105,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         np.set_printoptions(threshold = np.inf)
 
-        regionID = 0
+        regionID = 1
         #print("imagen: " + str(self.grayImage.shape))
         #self.printNumpyArray(self.grayImage)
         self.edges = cv2.Canny(self.grayImage,100,200)
@@ -145,9 +145,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             #print("mask l, k: " + str(self.mask[l+1][k+1]))
                             if newMask[l+1][k+1] == 1:
                                 self.imgRegions[l][k] = regionID
-                    
+                    print(regionID)
                     regionID = regionID + 1
-
                     '''
                     #self.grayImageDest = self.imgRegions
                     self.grayImageDest = self.grayImage
@@ -156,20 +155,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.visorD.set_open_cv_image(self.grayImageDest)
                     self.visorD.update()
                     '''
-                                
-        print("Resultado: " + str(self.imgRegions))
-    
-        #plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
-        #plt.show()
+        #TODO: When it finds a new region, add it to a list as a region object, with the rectangle for efficiency. When it iterates over the region to set the imgRegions,
+        #it adds the value of the respective point in grayImage (or colorImage, whatever) to the region object. When it finishes adding the region, it returns the average value.
+        #After we're done, we iterate through the list of regions, using the rectangle to be more efficient, and we set each pixel in grayImageDest that is inside that region
+        #to the average value of the region. It should give us a nice image. The only thing left to do is to do *something* with the borders.
 
-        '''
-        cv2.imwrite("result.jpg", self.imgRegions)
-        self.grayImageDest = self.imgRegions
+
+
+
+        #Set borders to black.
+        for i in range(0, 240, 1):
+            for j in range(0, 320, 1):
+                if self.imgRegions[i][j] == -1:
+                    self.imgRegions[i][j] = 0                        
+        #print("Resultado: " + str(self.imgRegions))
+        #print(self.imgRegions.shape)
+        print(np.unique(self.imgRegions))
+        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        plt.show()
+
+        
+        cv2.imwrite("result.png", self.imgRegions)
+        self.grayImageDest = self.imgRegions.astype(np.uint8)
         #self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
         #self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
         self.visorD.set_open_cv_image(self.grayImageDest)
         self.visorD.update()
-        '''
+        
     
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
