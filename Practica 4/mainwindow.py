@@ -18,8 +18,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -148,19 +148,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         upDiff = dialogValue, flags = floodFlags)
                     
                         newRegion = region(regionID, rect)
-                    
+                        cont = 0
+                        average = 0
+
                         for k in range (rect[0], rect[0] + rect[2], 1):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
                                     self.imgRegions[l][k] = regionID
-                                    newRegion.addPoint(self.grayImage[l][k])
+                                    #newRegion.addPoint(self.grayImage[l][k])
+                                    cont = cont + 1
+                                    average = average + self.grayImage[l][k]
+                                    self.grayImageDest[l][k] = average/cont
 
+                    '''
                     #This should set the piece of grayImageDest to the correct value. Maybe move outside to increase efficiency
                         _, avgGrey = newRegion.returnAverage()
                         for k in range (rect[0], rect[0] + rect[2], 1):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if self.imgRegions[l][k] == regionID:
                                     self.grayImageDest[l][k] = avgGrey
+                    '''
 
                     #print(regionID)
                     regionID += 1
