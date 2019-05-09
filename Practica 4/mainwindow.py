@@ -165,7 +165,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     #print(regionID)
                     regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-                                        
+        checkBreak = False
+        if self.checkBoxBorders.isChecked() is True:
+            #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
+            for i in range(1, 240, 1):
+                for j in range(1, 320, 1):
+                    checkBreak = False
+                    for k in range(1, -2, -1):
+                        if checkBreak is True:
+                            break
+                        for l in range(1, -2, -1):
+                            if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
+                                self.grayImageDest[i][j] = 255
+                                checkBreak = True
+                                break
+
+
 
         #TODO: When it finds a new region, add it to a list as a region object, with the rectangle for efficiency. When it iterates over the region to set the imgRegions,
         #it adds the value of the respective point in grayImage (or colorImage, whatever) to the region object. When it finishes adding the region, it returns the average value.
