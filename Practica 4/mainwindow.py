@@ -44,7 +44,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         self.grayImage = np.zeros((240, 320), np.uint8)
-        self.colorImage = np.zeros((240,320,3))
+        self.colorImage = np.zeros((240,320,3), np.uint8)
         # self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         self.imgS = QImage(320, 240, QImage.Format_RGB888)
         self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
@@ -52,7 +52,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
 
         self.grayImageDest = np.zeros((240,320), np.uint8)
-        self.colorImageDest = np.zeros((240,320,3))
+        self.colorImageDest = np.zeros((240,320,3), np.uint8)
         self.imgD = QImage(320, 240, QImage.Format_RGB888)
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
         
@@ -64,7 +64,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.colorButton.clicked.connect(self.colorButtonAction)
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadAction)
-        self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
+        #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
 
@@ -201,31 +201,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
     def fillImgRegionsColor(self):
 
-        #print("principio" + str(self.imgRegions))
-
-        #np.set_printoptions(threshold = np.inf)
-
         regionID = 1
-        #print("imagen: " + str(self.grayImage.shape))
-        #self.printNumpyArray(self.grayImage)
         self.edges = cv2.Canny(self.colorImage,40,120)
-        
-        #print("---")
-        #print("bordes: " + str(self.edges))
-        #print("Stop1")
-        #self.printNumpyArray(self.edges)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        #print(self.mask.shape)
-        #print("Stop")
-        #self.printNumpyArray(self.mask)
-        #print("borders shape: " + str(self.mask.shape))
-        #print("---")
-        #print(self.mask)
         '''
-        print("Edge size:" + str(self.edges.shape))
-        print("Image shape" + str(self.grayImage.shape))
-        print("Regions shape" + str(self.imgRegions.shape))
-        print("We got here")
         #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
         #plt.show()
         '''
@@ -251,7 +230,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
                                     self.imgRegions[l][k] = regionID
-                                    newRegion.addPoint(self.colorImage[l][k])
+                                    newRegion.addPoint(self.colorImage[l][k][0], self.colorImage[l][k][1], self.colorImage[l][k][2])
                                     
 
                     
@@ -279,7 +258,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             break
                         for l in range(1, -2, -1):
                             if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
-                                self.colorImageDest[i][j] = 255
+                                self.colorImageDest[i][j] = [255, 255, 255]
                                 checkBreak = True
                                 break
 
