@@ -9,18 +9,19 @@ class regionColor:
         self.currentCount = 0
         self.rect = rectangle
         
-    def addPoint(self, R, G, B):
+    def addPoint(self, values):
+        #print("currentCount: ", self.currentCount, "avgColor: ", self.avgColor, "regionID: ", self.id)
         self.currentCount += 1
-        self.avgColor[0] += R
-        self.avgColor[1] += G
-        self.avgColor[2] += B
+        self.avgColor[0] += values[0]
+        self.avgColor[1] += values[1]
+        self.avgColor[2] += values[2]
+        #print("values: " , values)
 
     def calcAverage(self):
         for i in range(3):
+            #print("color en calcAverage: " , int(self.avgColor[i]/self.currentCount))
             self.avgColor[i] = int(self.avgColor[i]/self.currentCount)
 
     def returnAverage(self):
-        #print(self.avgColor)
-        
-        #print(self.avgColor)
+        #print("color medio en returnAverage: ", self.avgColor)
         return self.avgColor
