@@ -143,26 +143,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         newRegion.calcAverage()
                         regionList.append(newRegion)
 
-                    
-                    #This should set the piece of grayImageDest to the correct value. Maybe move outside to increase efficiency.
-                    #Use imgRegions and the regionID to set each point to the correct value, that way it's only one big loop instead
-                    #of many smaller overlapping ones
-                        avgGrey = newRegion.returnAverage()
-                        for k in range (rect[0], rect[0] + rect[2], 1):
-                            for l in range(rect[1], rect[1] + rect[3], 1):
-                                if self.imgRegions[l][k] == regionID:
-                                    self.grayImageDest[l][k] = avgGrey
-                    
-
-                    #print(regionID)
-                    regionID += 1
+                        regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        '''
+        
         for i in range(240):
-            for i in range(320):
-                self.grayImageDest[i][j] = regionList[self.imgRegions[i][j]+1].avgGrey
+            for j in range(320):
+                if self.imgRegions[i][j] != -1:
+                    regionIndex = self.imgRegions[i][j] -1
+                    region2 = regionList[regionIndex]
+                    avgGrey = region2.returnAverage()
+                    self.grayImageDest[i][j] = avgGrey
 
-        '''
+        
         checkBreak = False
         if self.checkBoxBorders.isChecked() is True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
