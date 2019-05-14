@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QWidget" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1010</width>
+    <height>301</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Proyecto de Visión Artificial</string>
+  </property>
+  <widget class="QFrame" name="imageFrameS">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="imageFrameD">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>20</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="captureButton">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>20</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start Capture</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="colorButton">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>70</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>110</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>260</y>
+     <width>81</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Video input</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>260</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton_Video">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>150</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Video</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBoxDifference">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>190</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>255</number>
+   </property>
+   <property name="value">
+    <number>60</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>190</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Max Difference</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxRange">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>230</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Floating Range</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxBorders">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>250</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Draw borders</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxMerge">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>270</y>
+     <width>70</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Merge</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>captureButton</tabstop>
+  <tabstop>colorButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
