@@ -13,7 +13,9 @@ class region:
         self.currentCount += 1
         self.currentTotalGray += value
 
-    def returnAverage(self):
+    def calcAverage(self):
         if self.avgGrey == 0:
             self.avgGrey = self.currentTotalGray / self.currentCount
+
+    def returnAverage(self):
         return self.avgGrey

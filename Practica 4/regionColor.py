@@ -15,9 +15,12 @@ class regionColor:
         self.avgColor[1] += G
         self.avgColor[2] += B
 
-    def returnAverage(self):
-        #print(self.avgColor)
+    def calcAverage(self):
         for i in range(3):
             self.avgColor[i] = int(self.avgColor[i]/self.currentCount)
+
+    def returnAverage(self):
+        #print(self.avgColor)
+        
         #print(self.avgColor)
         return self.avgColor
