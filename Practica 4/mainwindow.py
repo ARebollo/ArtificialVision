@@ -64,7 +64,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.colorButton.clicked.connect(self.colorButtonAction)
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadAction)
-        #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
+        self.spinBoxDifference.valueChanged.connect(self.pickFill)
 
         ######################################################
 
@@ -77,6 +77,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##############################################################
 
+    def pickFill(self):
+        if self.colorState is True:
+            self.fillImgRegions()
+        else:
+            self.fillImgRegionsColor()
     
     '''
     What we have to do is fill each region with a value.
