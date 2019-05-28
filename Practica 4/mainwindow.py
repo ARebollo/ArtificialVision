@@ -19,12 +19,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
-        self.capture = VideoCapture(1)
+        self.capture = VideoCapture(0)
         self.captureState = True
         self.captureButtonAction()
         self.colorState = False
@@ -64,7 +64,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.colorButton.clicked.connect(self.colorButtonAction)
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadAction)
-        self.spinBoxDifference.valueChanged.connect(self.pickFill)
+        #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
 
@@ -77,11 +77,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##############################################################
 
-    def pickFill(self):
-        if self.colorState is True:
-            self.fillImgRegions()
-        else:
-            self.fillImgRegionsColor()
     
     '''
     What we have to do is fill each region with a value.
@@ -151,6 +146,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         
+        
         for i in range(240):
             for j in range(320):
                 if self.imgRegions[i][j] != -1:
@@ -163,8 +159,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         checkBreak = False
         if self.checkBoxBorders.isChecked() is True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
-            for i in range(1, 239, 1):
-                for j in range(1, 319, 1):
+            for i in range(1, 240, 1):
+                for j in range(1, 320, 1):
                     checkBreak = False
                     for k in range(1, -2, -1):
                         if checkBreak is True:
@@ -207,13 +203,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def fillImgRegionsColor(self):
 
         regionID = 1
-        regionList = []
         self.edges = cv2.Canny(self.colorImage,40,120)
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         '''
         #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
         #plt.show()
         '''
+        regionList = []
         dialogValue = self.spinBoxDifference.value()
         if self.checkBoxRange.isChecked() is True:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
@@ -235,16 +231,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         for k in range (rect[0], rect[0] + rect[2], 1):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
-                                    #self.imgRegions[l][k] = regionID
-                                    #newRegion.addPoint(self.colorImage[l][k][0], self.colorImage[l][k][1], self.colorImage[l][k][2])
                                     self.imgRegions[l][k] = regionID
-                                    newRegion.addPoint(self.colorImage[l][k]) 
-                        newRegion.calcAverage()
-                        regionList.append(newRegion)
+                                    newRegion.addPoint([self.colorImage[l][k][0], self.colorImage[l][k][1], self.colorImage[l][k][2]])
+                                    
+                        regionList.append(copy.deepcopy(newRegion))
+                    
+                    #This should set the piece of grayImageDest to the correct value. Maybe move outside to increase efficiency.
+                    #Use imgRegions and the regionID to set each point to the correct value, that way it's only one big loop instead
+                    #of many smaller overlapping ones
+                        avgColor = newRegion.returnAverage()
+                        for k in range (rect[0], rect[0] + rect[2], 1):
+                            for l in range(rect[1], rect[1] + rect[3], 1):
+                                if self.imgRegions[l][k] == regionID:
+                                    self.colorImageDest[l][k] = avgColor
+                    
 
                     #print(regionID)
-                        regionID += 1
- 
+                    regionID += 1
+                    #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+        checkBreak = False
         for i in range(240):
             for j in range(320):
                 if self.imgRegions[i][j] != -1:
@@ -252,11 +257,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     region2 = regionList[regionIndex]
                     avgColor = region2.returnAverage()
                     self.colorImageDest[i][j] = avgColor
-                    #print("color medio: ", avgColor)
 
-
-                    #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        checkBreak = False
         if self.checkBoxBorders.isChecked() is True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
             for i in range(1, 240, 1):
