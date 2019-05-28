@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1010</width>
-    <height>301</height>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,22 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
+   <widget class="QFrame" name="imageFrameS_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>320</width>
+      <height>240</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="imageFrameD">
    <property name="geometry">
@@ -45,30 +61,11 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="captureButton">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>20</y>
-     <width>181</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Start Capture</string>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="colorButton">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>70</y>
+     <y>100</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -83,17 +80,17 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="loadButton">
+  <widget class="QPushButton" name="loadButton_1">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>110</y>
+     <y>20</y>
      <width>181</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Load Image</string>
+    <string>Load Image 1</string>
    </property>
    <property name="checkable">
     <bool>false</bool>
@@ -112,7 +109,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Video input</string>
+    <string>Image 1</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
@@ -125,93 +122,101 @@
     </rect>
    </property>
    <property name="text">
-    <string>Output</string>
+    <string>Image 2</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="loadButton_Video">
+  <widget class="QPushButton" name="initDisparity_button">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>150</y>
+     <y>140</y>
      <width>181</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Load Video</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBoxDifference">
-   <property name="geometry">
-    <rect>
-     <x>740</x>
-     <y>190</y>
-     <width>51</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>255</number>
-   </property>
-   <property name="value">
-    <number>60</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>800</x>
-     <y>190</y>
-     <width>91</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Max Difference</string>
+    <string>Initialize Disparity</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBoxRange">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>230</y>
+     <y>220</y>
      <width>161</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Floating Range</string>
+    <string>Show Corners</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBoxBorders">
+  <widget class="QPushButton" name="propDisparity_button">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>250</y>
-     <width>141</width>
-     <height>21</height>
+     <y>180</y>
+     <width>181</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Draw borders</string>
+    <string>Propagate Disparity</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBoxMerge">
+  <widget class="QFrame" name="imageFrameS_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="imageFrameD_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>310</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton_2">
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>270</y>
-     <width>70</width>
-     <height>17</height>
+     <y>60</y>
+     <width>181</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Merge</string>
+    <string>Load Image 2</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
  <tabstops>
-  <tabstop>captureButton</tabstop>
   <tabstop>colorButton</tabstop>
  </tabstops>
  <resources/>
