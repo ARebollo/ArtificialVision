@@ -28,22 +28,6 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QFrame" name="imageFrameS_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>320</width>
-      <height>240</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-   </widget>
   </widget>
   <widget class="QFrame" name="imageFrameD">
    <property name="geometry">
@@ -164,7 +148,7 @@
     <string>Propagate Disparity</string>
    </property>
   </widget>
-  <widget class="QFrame" name="imageFrameS_3">
+  <widget class="QFrame" name="imageFrameS_2">
    <property name="geometry">
     <rect>
      <x>20</x>
