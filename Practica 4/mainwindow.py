@@ -118,6 +118,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #plt.show()
         '''
         dialogValue = self.spinBoxDifference.value()
+        print(dialogValue)
         if self.checkBoxRange.isChecked() is True:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
         else:
@@ -146,16 +147,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         
-        
         for i in range(240):
             for j in range(320):
-                if self.imgRegions[i][j] != -1:
-                    regionIndex = self.imgRegions[i][j] -1
-                    region2 = regionList[regionIndex]
-                    avgGrey = region2.returnAverage()
-                    self.grayImageDest[i][j] = avgGrey
+                if self.imgRegions[i][j] == -1:
+                    if i != 239:
+                        self.imgRegions[i][j] = self.imgRegions[i+1][j]
+                    else: 
+                        self.imgRegions[i][j] = self.imgRegions[i-1][j]
+                regionIndex = self.imgRegions[i][j] -1
+                region2 = regionList[regionIndex]
+                avgGrey = region2.returnAverage()
+                self.grayImageDest[i][j] = avgGrey
 
-        
+        print("Number of regions: ", len(regionList))
+
         checkBreak = False
         if self.checkBoxBorders.isChecked() is True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
@@ -232,31 +237,33 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
                                     self.imgRegions[l][k] = regionID
-                                    newRegion.addPoint([self.colorImage[l][k][0], self.colorImage[l][k][1], self.colorImage[l][k][2]])
+                                    newRegion.addPoint(self.colorImage[l][k])
                                     
-                        regionList.append(copy.deepcopy(newRegion))
+                        
                     
                     #This should set the piece of grayImageDest to the correct value. Maybe move outside to increase efficiency.
                     #Use imgRegions and the regionID to set each point to the correct value, that way it's only one big loop instead
                     #of many smaller overlapping ones
-                        avgColor = newRegion.returnAverage()
-                        for k in range (rect[0], rect[0] + rect[2], 1):
-                            for l in range(rect[1], rect[1] + rect[3], 1):
-                                if self.imgRegions[l][k] == regionID:
-                                    self.colorImageDest[l][k] = avgColor
-                    
-
+                        newRegion.calcAverage()
+                        regionList.append(copy.deepcopy(newRegion))
                     #print(regionID)
-                    regionID += 1
+                        regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         checkBreak = False
+        print("Number of regions: ", len(regionList))
+
         for i in range(240):
             for j in range(320):
-                if self.imgRegions[i][j] != -1:
-                    regionIndex = self.imgRegions[i][j] -1
-                    region2 = regionList[regionIndex]
-                    avgColor = region2.returnAverage()
-                    self.colorImageDest[i][j] = avgColor
+                if self.imgRegions[i][j] == -1:
+                    if i != 239:
+                        self.imgRegions[i][j] = self.imgRegions[i+1][j]
+                    else: 
+                        self.imgRegions[i][j] = self.imgRegions[i-1][j]
+                regionIndex = self.imgRegions[i][j] -1
+                region2 = regionList[regionIndex]
+                avgColor = region2.returnAverage()
+                self.colorImageDest[i][j] = avgColor
+        
 
         if self.checkBoxBorders.isChecked() is True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
@@ -318,6 +325,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         if imgPath != "":
             if self.colorState is True:
+                self.grayImage = np.zeros((240,320), np.uint8)
+                self.grayImageDest = np.zeros((240,320), np.uint8)
                 self.grayImage = cv2.imread(imgPath)
                 self.grayImage = cv2.resize(self.grayImage, (320, 240))
                 self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
@@ -326,6 +335,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
             else:
+                self.colorImage = np.zeros((240,320,3), np.uint8)
+                self.colorImageDest = np.zeros((240,320,3), np.uint8)
                 self.colorImage = cv2.imread(imgPath)
                 self.colorImage = cv2.resize(self.colorImage, (320, 240))
                 self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
