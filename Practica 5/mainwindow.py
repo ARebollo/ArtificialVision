@@ -91,9 +91,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     
     def calculateCorners(self):
         dst = cv2.cornerHarris(self.grayImage,2, 3, 0.04)
-        dst = cv2.dilate(dst,None)
-        ret, dst = cv2.threshold(dst,0.1*dst.max(),255,0)
-        plt.subplot(121),plt.imshow(dst,cmap = 'gray')
+        threshArr = (dst > 1e-5)
+        
+
+        for i in range(240):
+            for j in range(320):
+                if threshArr[i][j] == True:
+                    for k in range (-2, 3, 1):
+                        if(i+k >= 0 and i+k <240):
+                            for l in range(-2, 3, 1):
+                                if (j+l >= 0 and j+l < 320):
+                                    if(threshArr[i+k][j+l] == True):
+                                        threshArr[i+k][j+l] = False
+                    threshArr[i][j] = True
+
+        plt.subplot(121),plt.imshow(threshArr,cmap = 'gray')
         plt.show()
         return dst
 
