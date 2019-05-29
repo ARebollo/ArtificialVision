@@ -62,8 +62,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##################      Buttons     ##################
 
         self.colorButton.clicked.connect(self.colorButtonAction)
-        self.captureButton.clicked.connect(self.captureButtonAction)
-        self.loadButton.clicked.connect(self.loadAction)
+        self.loadButton_1.clicked.connect(self.loadAction)
         #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
@@ -78,6 +77,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ##############################################################
 
     
+
+
     '''
     What we have to do is fill each region with a value.
     Iterate over the whole image. If we find a point that doesn't have a region we call floodfill
@@ -86,6 +87,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     so we don't iterate multiple times over the same region. After we have done that, we regenerate the mask
     to avoid having different regions with the same value.  
     '''
+
+    
+    def calculateCorners(self):
+        dst = cv2.cornerHarris(self.grayImage,2, 3, 0.04)
+        dst = cv2.dilate(dst,None)
+        ret, dst = cv2.threshold(dst,0.1*dst.max(),255,0)
+        plt.subplot(121),plt.imshow(dst,cmap = 'gray')
+        plt.show()
+        return dst
+
     def fillImgRegions(self):
 
         #print("principio" + str(self.imgRegions))
@@ -311,7 +322,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.grayImage = cv2.imread(imgPath)
                 self.grayImage = cv2.resize(self.grayImage, (320, 240))
                 self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-                self.fillImgRegions()
+                self.calculateCorners()
+                #self.fillImgRegions()
                 self.visorS.set_open_cv_image(self.grayImage)
 
 
@@ -319,7 +331,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.colorImage = cv2.imread(imgPath)
                 self.colorImage = cv2.resize(self.colorImage, (320, 240))
                 self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2RGB)
-                self.fillImgRegionsColor()
+                self.calculateCorners()
+                #self.fillImgRegionsColor()
                 self.visorS.set_open_cv_imageColor(self.colorImage)
         self.visorS.update()
         #self.test()
@@ -334,8 +347,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             
         else:
             self.captureState = False
-            self.captureButton.setChecked(False)
-            self.captureButton.setText("Start Capture")
+           
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
