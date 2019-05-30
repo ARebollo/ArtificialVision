@@ -70,6 +70,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.propDisparity_button.clicked.connect(self.propDispAction)
         self.visorS_2.windowSelected.connect(self.dispClick)
         #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
+        self.checkBoxRange.stateChanged.connect(self.checkBoxAction)
+        self.goodCorners = []
+        self.notSoGoodCorners = []
 
         ######################################################
 
@@ -93,15 +96,25 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     to avoid having different regions with the same value.  
     '''
     
+    def checkBoxAction(self):
+        if self.checkBoxRange.isChecked():
+            self.showCorners()
 
+    def showCorners(self):
 
+        plt.subplot(121), plt.imshow(self.goodCorners, cmap='gray')
+        plt.show()
 
+        #plt.subplot(121), plt.imshow(self.notSoGoodCorners, cmap='gray')
+        #plt.show()
 
     def calculateCorners(self, w):
         
         
         dst = cv2.cornerHarris(self.grayImage, 2, 3, 0.04)
         
+        self.notSoGoodCorners = dst
+
         threshArr = (dst > 1e-5)
         
         for i in range(240):
@@ -114,6 +127,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                     if(threshArr[i+k][j+l] == True):
                                         threshArr[i+k][j+l] = False
                     threshArr[i][j] = True
+
+        self.goodCorners = threshArr
 
         self.calculateDisparityCorners(threshArr, w)
         
@@ -140,7 +155,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(240):
             for j in range(320):
                 if threshArr[i][j] == True:
-                    yl = i
+                    yl = i 
                     xl = j
                     for k in range (-w, w+1, 1):
                         if(i+k >= 0 and i+k <240):
@@ -277,7 +292,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.timer.stop()
             self.propDisparity_button.setChecked(False)
         else: 
-            self.timer.start(100)
+            self.timer.start(1000)
             self.propDisparity_button.setChecked(True)
         
 
