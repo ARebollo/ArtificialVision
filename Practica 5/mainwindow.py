@@ -142,23 +142,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if threshArr[i][j] == True:
                     yl = i
                     xl = j
-                    for k in range (-w, w, 1):
+                    for k in range (-w, w+1, 1):
                         if(i+k >= 0 and i+k <240):
-                            for l in range(-w, w, 1):
+                            for l in range(-w, w+1, 1):
                                 if (j+l >= 0 and j+l < 320):
                                     cornerSquare[k][l] = self.grayImage[i+k][j+l]
                     line, heightDiff = self.getEpipolarLine(w, yl)
                     #print("shapes: " , line.shape, cornerSquare.shape)
                     
                     if heightDiff < 0:
-                        
                         res = cv2.matchTemplate(line, cornerSquare[-heightDiff:], method)
                     else:
                         res = cv2.matchTemplate(line, cornerSquare, method)
                     #TODO: Check if max_val is good
                     min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
                     self.fixedPoints[i][j] = True
-                    self.disparity[i][j] = xl - maxLoc[1]
+                    self.disparity[i][j] = xl - maxLoc[0]
 
                     '''
                     print("Minimum value: ", str(min_val))
@@ -252,9 +251,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.visorD.set_open_cv_image(self.grayImageDest)
         #self.visorD.update()
         #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
-        self.visorD_2.set_open_cv_image(self.realDispImg)
-        self.visorD_2.update()
+
     def initializeDisparity(self):
+        
         self.fillImgRegions()
         
         for i in range(240):
@@ -308,7 +307,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def showDisparity(self):
         for i in range(240):
             for j in range(320):
-                value = 3*self.disparity[i][j]*self.origWidth/320
+                value = self.disparity[i][j]*self.origWidth/320
                 if value > 255:
                     value = 255
                 self.estimDispImg[i][j] = value
@@ -323,9 +322,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         Y = int(point.y()-posY/2)
         if Y < 0:
             Y = 0
-
+        print(self.disparity[Y][X])
+        print(self.estimDispImg[Y][X])
         self.estimatedDisp.display(self.disparity[Y][X])
         self.trueDisp.display(self.realDispImg[Y][X])
+
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
