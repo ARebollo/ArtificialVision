@@ -238,7 +238,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(240):
             for j in range(320):
                 found = False
-                if (self.imgRegions[i][j] == 1):
+                if (self.imgRegions[i][j] == -1):
                     for k in range(-1,2,1):
                         if found == True:
                             break
