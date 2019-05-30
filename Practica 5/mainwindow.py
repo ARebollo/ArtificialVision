@@ -33,7 +33,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.disparity = np.zeros((240, 320), np.uint8)
         self.timer = QTimer()
-        self.timer.timeout.connect(self.propagateDisparity)
+        self.timer.timeout.connect(self.timerExpired)
 
         ##################      Image arrays and viewer objects     ##################
 
@@ -68,6 +68,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.loadTruth_Button.clicked.connect(self.loadGroundTruth)
         self.initDisparity_button.clicked.connect(self.initializeDisparity)
         self.propDisparity_button.clicked.connect(self.propDispAction)
+        self.visorS_2.windowSelected.connect(self.dispClick)
         #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
@@ -79,6 +80,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imgRegions = np.full((240, 320),-1, dtype = np.int32)
         self.listRegions = []
         self.origWidth = 0
+        self.fixedPoints = np.zeros((240, 320), dtype = bool)
         
         ##############################################################
 
@@ -97,10 +99,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def calculateCorners(self, w):
         
-        if self.colorState == True:
-            dst = cv2.cornerHarris(self.grayImage, 2, 3, 0.04)
-        else:
-            dst = cv2.cornerHarris(self.colorImage, 2, 3, 0.04)
+        
+        dst = cv2.cornerHarris(self.grayImage, 2, 3, 0.04)
         
         threshArr = (dst > 1e-5)
         
@@ -134,9 +134,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         it calculates the disparity value for the most likely point
         and sets it in the disparity array.
         """
-        cornerSquare = np.full((240,320), np.bool_)
+        cornerSquare = np.zeros((2*w+1,2*w+1), dtype=np.uint8)
         method = cv2.TM_CCOEFF
-        self.fixedPoints = np.zeros((320, 240))
+        
         for i in range(240):
             for j in range(320):
                 if threshArr[i][j] == True:
@@ -151,13 +151,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     #print("shapes: " , line.shape, cornerSquare.shape)
                     
                     if heightDiff < 0:
+                        
                         res = cv2.matchTemplate(line, cornerSquare[-heightDiff:], method)
                     else:
                         res = cv2.matchTemplate(line, cornerSquare, method)
                     #TODO: Check if max_val is good
                     min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
                     self.fixedPoints[i][j] = True
-                    self.disparity[i][j] = xl - maxLoc[0]
+                    self.disparity[i][j] = xl - maxLoc[1]
 
                     '''
                     print("Minimum value: ", str(min_val))
@@ -165,8 +166,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     print("Minimum location: ", str(minLoc))
                     print("Maximum location: ", str(maxLoc))
                     '''
-        for x in self.disparity:
-            print(x, end='')
 
     def getEpipolarLine(self, w, yl):
         if yl-w < 0:
@@ -176,55 +175,104 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             return self.grayImageDest[yl-w:yl+w + 1], yl-w
 
-    def calculateRegions(self):
 
-        regionID = 0
-        self.listRegions.clear()
+    def fillImgRegions(self):
 
-        edges = cv2.Canny(self.grayImage,40,120)
-        mask = cv2.copyMakeBorder(edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+        #print("principio" + str(self.imgRegions))
 
+        #np.set_printoptions(threshold = np.inf)
+
+        regionID = 1
+        regionList = []
+        #print("imagen: " + str(self.grayImage.shape))
+        # self.printNumpyArray(self.grayImage)
+        self.edges = cv2.Canny(self.grayImage, 40, 120)
+
+        # print("---")
+        #print("bordes: " + str(self.edges))
+        # print("Stop1")
+        # self.printNumpyArray(self.edges)
+        self.mask = cv2.copyMakeBorder(
+            self.edges, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=255)
+        # print(self.mask.shape)
+        # print("Stop")
+        # self.printNumpyArray(self.mask)
+        #print("borders shape: " + str(self.mask.shape))
+        # print("---")
+        # print(self.mask)
+        '''
+        print("Edge size:" + str(self.edges.shape))
+        print("Image shape" + str(self.grayImage.shape))
+        print("Regions shape" + str(self.imgRegions.shape))
+        print("We got here")
+        #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
+        #plt.show()
+        '''        
         floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
 
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
-                #We found a new region:
-                
-                if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0: #Optimize this, it's the part that makes it stupid slow
-                    
-                    _, _, newMask, rect = cv2.floodFill(self.grayImage, mask, (j,i), 1, loDiff = 40, 
-                    upDiff = 40, flags = floodFlags)
-                    
-                    newRegion = region(regionID, rect)
+                # We found a new region:
 
-                    for k in range (rect[0], rect[0] + rect[2], 1):
-                        for l in range(rect[1], rect[1] + rect[3], 1):
-                            if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
-                                self.imgRegions[l][k] = regionID
-                                    
-                        
-                    self.listRegions.append(copy.deepcopy(newRegion))
+                # Optimize this, it's the part that makes it stupid slow
+                if self.imgRegions[i][j] == -1:
+                    if self.edges[i][j] == 0:
 
-                    regionID += 1
-                    #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j, i), 1, loDiff=30,
+                                                            upDiff=30, flags=floodFlags)
+                        #print(rect)
+                        newRegion = region(regionID, rect)
 
+                        for k in range(rect[0], rect[0] + rect[2], 1):
+                            for l in range(rect[1], rect[1] + rect[3], 1):
+                                if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
+                                    self.imgRegions[l][k] = regionID
+                                    self.realDispImg[l][k] = self.grayImage[l][k]
+                                    #newRegion.addPoint(self.grayImage[l][k])
+                        #newRegion.calcAverage()
+                        self.listRegions.append(copy.deepcopy(newRegion))
+
+                        regionID += 1
+                        self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+
+        for i in range(240):
+            for j in range(320):
+                found = False
+                if (self.imgRegions[i][j] == 1):
+                    for k in range(-1,2,1):
+                        if found == True:
+                            break
+                        if i+k >= 0 and i+k<240: 
+                            for l in range(-1,2,1):
+                                if j+l >= 0 and j+l < 320:
+                                    if (self.imgRegions[i+k][j+l] != -1):
+                                        self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
+                                        found = True
+                                        break 
+        #self.visorD.set_open_cv_image(self.grayImageDest)
+        #self.visorD.update()
+        #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
+        self.visorD_2.set_open_cv_image(self.realDispImg)
+        self.visorD_2.update()
     def initializeDisparity(self):
+        self.fillImgRegions()
+        
+        for i in range(240):
+            for j in range(320):
+                if(self.imgRegions[i][j] != -1 and self.disparity[i][j] != 0):
+                    self.listRegions[self.imgRegions[i][j]-1].addPoint(self.disparity[i][j])
+        
         for i in self.listRegions:
-            average = 0
-            count = 0
-            rect = i.rect
-            id = i.id
-            for j in range (rect[0], rect[0] + rect[2], 1):
-                for k in range(rect[1], rect[1] + rect[3], 1):
-                    if self.imgRegions[j][k] == id:  
-                        average += self.disparity[j][k]
-                        count += 1
-            averageRegion = int(average/count)
-            for j in range (rect[0], rect[0] + rect[2], 1):
-                for k in range(rect[1], rect[1] + rect[3], 1):
-                    if self.imgRegions[j][k] == id and self.disparity[j][k] == 0:
-                        self.disparity[j][k] = averageRegion
-                        
+            i.calcAverage()
+        print(np.amax(self.imgRegions))
+        for i in range(240):
+            for j in range(320):
+                if(self.disparity[i][j] == 0 and self.imgRegions[i][j] != -1):
+                    #print("max reg = ", len(self.listRegions), " index= ", self.imgRegions[i][j])
+                    self.disparity[i][j] = self.listRegions[self.imgRegions[i][j]-1].returnAverage()
+        
+        self.showDisparity()
+                      
     def propDispAction(self):
         if self.propDisparity_button.isChecked() is True:
             self.timer.stop()
@@ -232,6 +280,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else: 
             self.timer.start(100)
             self.propDisparity_button.setChecked(True)
+        
+
+    def timerExpired(self):
+        self.propagateDisparity(1)
 
     def propagateDisparity(self, envWidth):
         for i in range(240):
@@ -249,8 +301,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                         avgDisp += self.disparity[i+k][j+l]
                                         count += 1
                     self.disparity[i][j] = int(avgDisp/count)
+        self.showDisparity()
 
-        pass
+        
 
     def showDisparity(self):
         for i in range(240):
@@ -259,8 +312,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if value > 255:
                     value = 255
                 self.estimDispImg[i][j] = value
-        pass
+        
+        self.visorS_2.set_open_cv_image(self.estimDispImg)
+        self.visorS_2.update()
 
+    def dispClick(self, point, posX, posY):
+        X = int(point.x() - posX/2)
+        if X < 0: 
+            X = 0
+        Y = int(point.y()-posY/2)
+        if Y < 0:
+            Y = 0
+
+        self.estimatedDisp.display(self.disparity[Y][X])
+        self.trueDisp.display(self.realDispImg[Y][X])
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
@@ -291,7 +356,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.visorD.update()
     
     def loadGroundTruth(self):
-        pass
+        imgPath, _ = QFileDialog.getOpenFileName()
+        
+        if imgPath != "":
+            self.realDispImg = cv2.imread(imgPath)
+            self.realDispImg = cv2.resize(self.realDispImg, (320, 240))
+            self.realDispImg = cv2.cvtColor(self.realDispImg, cv2.COLOR_BGR2GRAY)
+            self.visorD_2.set_open_cv_image(self.realDispImg)
                
 if __name__ == '__main__':
     import sys
