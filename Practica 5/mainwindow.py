@@ -19,15 +19,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 5/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 5/mainwindow.ui', self)
 
         ##########################################################
 
-        self.capture = VideoCapture(0)
-        self.captureState = True
-        self.captureButtonAction()
-        self.colorState = False
         self.imageWindow = QRect()
 
         self.winSelected = False
@@ -36,13 +32,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.bothImg = False
 
         self.disparity = np.zeros((240, 320), np.uint8)
-       
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.propagateDisparity)
+
         ##################      Image arrays and viewer objects     ##################
 
         # FIXED: Opencv images where created with wrong width height values (switched) so the copy failed 
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
         self.grayImage = np.zeros((240, 320), np.uint8)
-        self.colorImage = np.zeros((240,320,3), np.uint8)
         # self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
         self.imgS = QImage(320, 240, QImage.Format_RGB888)
         self.visorS = ImgViewer(320, 240, self.imgS, self.imageFrameS)
@@ -50,22 +47,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # FIXED: original removed 2 of the 3 chanels with the np.zeros
 
         self.grayImageDest = np.zeros((240,320), np.uint8)
-        self.colorImageDest = np.zeros((240,320,3), np.uint8)
         self.imgD = QImage(320, 240, QImage.Format_RGB888)
         self.visorD = ImgViewer(320, 240, self.imgD, self.imageFrameD)
 
-        self.cornersImg = np.zeros((240, 320), np.uint8)
+        self.estimDispImg = np.zeros((240, 320), np.uint8)
         self.imgS_2 = QImage(320, 240, QImage.Format_RGB888)
         self.visorS_2 = ImgViewer(320, 240, self.imgS, self.imageFrameS_2)
         
+        self.realDispImg = np.zeros((240,320), np.uint8)
+        self.imgD_2 = QImage(320, 240, QImage.Format_RGB888)
+        self.visorD_2 = ImgViewer(320, 240, self.imgD, self.imageFrameD_2)
+
         ##############################################################################
 
 
         ##################      Buttons     ##################
 
-        self.colorButton.clicked.connect(self.colorButtonAction)
         self.loadButton_1.clicked.connect(self.loadAction)
         self.loadButton_2.clicked.connect(self.loadAction2)
+        self.loadTruth_Button.clicked.connect(self.loadGroundTruth)
+        self.initDisparity_button.clicked.connect(self.initializeDisparity)
+        self.propDisparity_button.clicked.connect(self.propDispAction)
         #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
 
         ######################################################
@@ -76,6 +78,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.edges = np.zeros((240, 320), np.int8)
         self.imgRegions = np.full((240, 320),-1, dtype = np.int32)
         self.listRegions = []
+        self.origWidth = 0
         
         ##############################################################
 
@@ -88,6 +91,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     to avoid having different regions with the same value.  
     '''
     
+
+
+
+
     def calculateCorners(self, w):
         
         if self.colorState == True:
@@ -107,46 +114,37 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                     if(threshArr[i+k][j+l] == True):
                                         threshArr[i+k][j+l] = False
                     threshArr[i][j] = True
-        self.calculateDisparity(threshArr, w)
-        
-        '''
-        auxMatrix = np.zeros((240,320), np.uint8)
 
-        for i in range(240):
-            for j in range(320):
-                if threshArr[i][j] == True:
-                    if(i+k >= 0 and i+k <240):
-                        if (j+l >= 0 and j+l < 320):
-                            auxMatrix[i][j] = True
-                            
-                            for k in range (1, 2, 1):
-                                auxMatrix[i-k][j-k] = True
-                                auxMatrix[i-k][j+k] = True
-                                auxMatrix[i+k][j-k] = True
-                                auxMatrix[i+k][j+k] = True
-        '''
+        self.calculateDisparityCorners(threshArr, w)
         
-        self.cornersImg = threshArr * np.full((240,320), 255 ,np.uint8)
-        self.visorS_2.set_open_cv_image(self.cornersImg)
-        self.visorS_2.update()
+        #Convert the boolean array into a black and white one
+        #self.cornersImg = threshArr * np.full((240,320), 255 ,np.uint8)
+        #self.visorS_2.set_open_cv_image(self.cornersImg)
+        #self.visorS_2.update()
 
         #plt.subplot(121),plt.imshow(auxMatrix,cmap = 'gray')
         #plt.show()
         return threshArr
 
-    def calculateDisparity(self, threshArr, w):
-
-        cornerSquare = np.zeros((w,w), np.uint8)
+    def calculateDisparityCorners(self, threshArr, w):
+        """
+        Calculates the disparity value for the fixed points.
+        For each of them, it tries to match a region of w points around the
+        corner with the horizontal line at that height. When it finds them,
+        it calculates the disparity value for the most likely point
+        and sets it in the disparity array.
+        """
+        cornerSquare = np.full((240,320), np.bool_)
         method = cv2.TM_CCOEFF
-
+        self.fixedPoints = np.zeros((320, 240))
         for i in range(240):
             for j in range(320):
                 if threshArr[i][j] == True:
                     yl = i
                     xl = j
-                    for k in range (int(-w/2), int(w/2), 1):
+                    for k in range (-w, w, 1):
                         if(i+k >= 0 and i+k <240):
-                            for l in range(int(-w/2), int(w/2), 1):
+                            for l in range(-w, w, 1):
                                 if (j+l >= 0 and j+l < 320):
                                     cornerSquare[k][l] = self.grayImage[i+k][j+l]
                     line, heightDiff = self.getEpipolarLine(w, yl)
@@ -156,9 +154,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         res = cv2.matchTemplate(line, cornerSquare[-heightDiff:], method)
                     else:
                         res = cv2.matchTemplate(line, cornerSquare, method)
-
+                    #TODO: Check if max_val is good
                     min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
-    
+                    self.fixedPoints[i][j] = True
                     self.disparity[i][j] = xl - maxLoc[0]
 
                     '''
@@ -171,139 +169,129 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             print(x, end='')
 
     def getEpipolarLine(self, w, yl):
-        if int(yl-w/2) < 0:
-            return self.grayImageDest[0:yl+int(w/2 + 1)], int(yl-w/2)
-        elif int(yl+w/2) >= 240:
-            return self.grayImageDest[yl-int(w/2):239], int(yl-w/2)
+        if yl-w < 0:
+            return self.grayImageDest[0:yl+w + 1], yl-w
+        elif yl+w >= 240:
+            return self.grayImageDest[yl-w:239], yl-w
         else:
-            return self.grayImageDest[yl-int(w/2):yl+int(w/2 + 1)], int(yl-w/2)
+            return self.grayImageDest[yl-w:yl+w + 1], yl-w
 
-    def fillImgRegions(self):
+    def calculateRegions(self):
 
-        regionID = 1
-        regionList = []
-  
-        self.edges = cv2.Canny(self.grayImage,40,120)
-        
-        self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+        regionID = 0
+        self.listRegions.clear()
 
-        dialogValue = self.spinBoxDifference.value()
-        if self.checkBoxRange.isChecked() is True:
-            floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
-        else:
-            floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
+        edges = cv2.Canny(self.grayImage,40,120)
+        mask = cv2.copyMakeBorder(edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+
+        floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
 
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
                 #We found a new region:
                 
-                if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
-                    if self.edges[i][j] == 0:
+                if self.imgRegions[i][j] == -1 and self.edges[i][j] == 0: #Optimize this, it's the part that makes it stupid slow
                     
-                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = dialogValue, 
-                        upDiff = dialogValue, flags = floodFlags)
+                    _, _, newMask, rect = cv2.floodFill(self.grayImage, mask, (j,i), 1, loDiff = 40, 
+                    upDiff = 40, flags = floodFlags)
                     
-                        newRegion = region(regionID, rect)
+                    newRegion = region(regionID, rect)
 
-                        for k in range (rect[0], rect[0] + rect[2], 1):
-                            for l in range(rect[1], rect[1] + rect[3], 1):
-                                if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
-                                    self.imgRegions[l][k] = regionID
-                                    newRegion.addPoint(self.grayImage[l][k])
-                        newRegion.calcAverage()
-                        regionList.append(newRegion)
+                    for k in range (rect[0], rect[0] + rect[2], 1):
+                        for l in range(rect[1], rect[1] + rect[3], 1):
+                            if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
+                                self.imgRegions[l][k] = regionID
+                                    
+                        
+                    self.listRegions.append(copy.deepcopy(newRegion))
 
-                        regionID += 1
+                    regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        
+
+    def initializeDisparity(self):
+        for i in self.listRegions:
+            average = 0
+            count = 0
+            rect = i.rect
+            id = i.id
+            for j in range (rect[0], rect[0] + rect[2], 1):
+                for k in range(rect[1], rect[1] + rect[3], 1):
+                    if self.imgRegions[j][k] == id:  
+                        average += self.disparity[j][k]
+                        count += 1
+            averageRegion = int(average/count)
+            for j in range (rect[0], rect[0] + rect[2], 1):
+                for k in range(rect[1], rect[1] + rect[3], 1):
+                    if self.imgRegions[j][k] == id and self.disparity[j][k] == 0:
+                        self.disparity[j][k] = averageRegion
+                        
+    def propDispAction(self):
+        if self.propDisparity_button.isChecked() is True:
+            self.timer.stop()
+            self.propDisparity_button.setChecked(False)
+        else: 
+            self.timer.start(100)
+            self.propDisparity_button.setChecked(True)
+
+    def propagateDisparity(self, envWidth):
         for i in range(240):
             for j in range(320):
-                if self.imgRegions[i][j] != -1:
-                    regionIndex = self.imgRegions[i][j] -1
-                    region2 = regionList[regionIndex]
-                    avgGrey = region2.returnAverage()
-                    self.grayImageDest[i][j] = avgGrey
+                if self.fixedPoints[i][j] == False: #To avoid changing fixed points
+                    avgDisp = 0
+                    count = 0
+                    origRegion = self.imgRegions[i][j]
+                    for k in range(-envWidth,envWidth+1,1):
+                        if (i+k >= 0 and i+k <240):
+                            for l in range(-envWidth,envWidth+1,1):
+                                if (j+l >= 0 and j+l <320):
+                                    #To avoid taking into account the point itself or adding points from other regions
+                                    if (k == 0 and l == 0) == False or self.imgRegions[i+k][j+l] != origRegion: 
+                                        avgDisp += self.disparity[i+k][j+l]
+                                        count += 1
+                    self.disparity[i][j] = int(avgDisp/count)
 
-        checkBreak = False
-        if self.checkBoxBorders.isChecked() is True:
-            #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
-            for i in range(1, 240, 1):
-                for j in range(1, 320, 1):
-                    checkBreak = False
-                    for k in range(1, -2, -1):
-                        if checkBreak is True:
-                            break
-                        for l in range(1, -2, -1):
-                            if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
-                                self.grayImageDest[i][j] = 255
-                                checkBreak = True
-                                break
+        pass
 
-        self.visorD.set_open_cv_image(self.grayImageDest)
-        self.visorD.update()
-        self.imgRegions = np.full((240, 320),-1, dtype = np.int32)
-        
-    def colorButtonAction(self):
-        if self.colorState == False:
-            self.colorButton.setText("Gray Image")
-            self.colorButton.setChecked(True)
-            print("Swapping to Gray")
-            self.colorState = True
-        else: 
-            self.colorButton.setText("Color Image")
-            self.colorButton.setChecked(False)
-            print("Swapping to color")
-            self.colorState = False
-    
+    def showDisparity(self):
+        for i in range(240):
+            for j in range(320):
+                value = 3*self.disparity[i][j]*self.origWidth/320
+                if value > 255:
+                    value = 255
+                self.estimDispImg[i][j] = value
+        pass
+
     def loadAction(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
         if imgPath != "":
-            if self.colorState is True:
-                self.grayImage = cv2.imread(imgPath)
-                self.grayImage = cv2.resize(self.grayImage, (320, 240))
-                self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-                if self.bothImg == True:
-                    self.calculateCorners(11)
-                self.visorS.set_open_cv_image(self.grayImage)
-
+            self.grayImage = cv2.imread(imgPath)
+            self.origWidth = self.grayImage.shape[1]
+            self.grayImage = cv2.resize(self.grayImage, (320, 240))
+            self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
+            if self.bothImg == True:
+                self.calculateCorners(5)
             else:
-                self.colorImage = cv2.imread(imgPath)
-                self.colorImage = cv2.resize(self.colorImage, (320, 240))
-                self.colorImage = cv2.cvtColor(self.colorImage, cv2.COLOR_BGR2GRAY)
-                if self.bothImg == True:
-                    self.calculateCorners(11)
-                self.visorS.set_open_cv_image(self.colorImage)
-        self.visorS.update()
+                self.bothImg = True
+            self.visorS.set_open_cv_image(self.grayImage)
+            self.visorS.update()
 
     def loadAction2(self):
         imgPath, _ = QFileDialog.getOpenFileName()
         
         if imgPath != "":
-            if self.colorState is True:
-                self.grayImageDest = cv2.imread(imgPath)
-                self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
-                self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
-                self.visorD.set_open_cv_image(self.grayImageDest)
-                self.bothImg = True
+            self.grayImageDest = cv2.imread(imgPath)
+            self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
+            self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
+            self.visorD.set_open_cv_image(self.grayImageDest)
+            if self.bothImg == True:
+                self.calculateCorners(5)
             else:
-                self.colorImageDest = cv2.imread(imgPath)
-                self.colorImageDest = cv2.resize(self.colorImageDest, (320, 240))
-                self.colorImageDest = cv2.cvtColor(self.colorImageDest, cv2.COLOR_BGR2GRAY)
-                self.visorD.set_open_cv_image(self.colorImageDest)
                 self.bothImg = True
-                
-        self.visorD.update()
-
-        
-    def captureButtonAction(self):
-        if self.captureState is False:
-            self.capture = VideoCapture(0)
-            self.captureButton.setChecked(True)
-            self.captureButton.setText("Stop Capture")
-            self.captureState = True
-        else:
-            self.captureState = False
+            self.visorD.update()
+    
+    def loadGroundTruth(self):
+        pass
                
 if __name__ == '__main__':
     import sys
