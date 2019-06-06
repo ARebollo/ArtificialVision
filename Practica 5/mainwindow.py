@@ -111,7 +111,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def calculateCorners(self, w):
         
         
-        dst = cv2.cornerHarris(self.grayImage, 2, 3, 0.04)
+        dst = cv2.cornerHarris(self.grayImage, 3, 3, 0.04)
         
         self.notSoGoodCorners = dst
 
@@ -150,7 +150,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         and sets it in the disparity array.
         """
         cornerSquare = np.zeros((2*w+1,2*w+1), dtype=np.uint8)
-        method = cv2.TM_CCOEFF
+        method = cv2.TM_CCOEFF_NORMED
         
         for i in range(240):
             for j in range(320):
@@ -322,7 +322,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def showDisparity(self):
         for i in range(240):
             for j in range(320):
-                value = self.disparity[i][j]*self.origWidth/320
+                value = 3*self.disparity[i][j]*self.origWidth/320
                 if value > 255:
                     value = 255
                 self.estimDispImg[i][j] = value
