@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 class regionColor:
-    def __init__(self, id, rectangle, frontierPointsList = [], avgColor = [0,0,0]):
+    def __init__(self, id, rectangle, frontierPointsList = [], avgColor = [int(0),int(0),int(0)]):
         self.id = id
         self.avgColor = avgColor
         self.frontierPointsList = frontierPointsList

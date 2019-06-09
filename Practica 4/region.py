@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 class region:
-    def __init__(self, id, rectangle, frontierPointsList = [], avgGrey = 0):
+    def __init__(self, id, rectangle, frontierPointsList = [], avgGrey = int(0)):
         self.id = id
         self.avgGrey = avgGrey
         self.frontierPointsList = frontierPointsList

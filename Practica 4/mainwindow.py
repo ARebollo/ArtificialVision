@@ -6,6 +6,8 @@ import cv2
 from cv2 import VideoCapture
 from matplotlib import pyplot as plt
 import numpy as np
+from distutils.core import setup 
+import py2exe
 #from ImgViewer import ImgViewer
 import copy
 from ImgViewer import ImgViewer
@@ -19,8 +21,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -157,7 +159,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 regionIndex = self.imgRegions[i][j] -1
                 region2 = regionList[regionIndex]
                 avgGrey = region2.returnAverage()
-                self.grayImageDest[i][j] = avgGrey
+                self.grayImageDest[i][j] = int(avgGrey)
 
         print("Number of regions: ", len(regionList))
 
@@ -228,8 +230,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
                     if self.edges[i][j] == 0:
                     
-                        _, _, newMask, rect = cv2.floodFill(self.colorImage, self.mask, (j,i), 1, loDiff = dialogValue, 
-                        upDiff = dialogValue, flags = floodFlags)
+
+                        dialogValueArray = [dialogValue, dialogValue, dialogValue]
+
+                        _, _, newMask, rect = cv2.floodFill(self.colorImage, self.mask, (j,i), 1, loDiff = dialogValueArray, 
+                        upDiff = dialogValueArray, flags = floodFlags)
                     
                         newRegion = regionColor(regionID, rect)
 
