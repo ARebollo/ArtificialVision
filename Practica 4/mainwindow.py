@@ -144,22 +144,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                     self.imgRegions[l][k] = regionID
                                     newRegion.addPoint(self.grayImage[l][k])
                         newRegion.calcAverage()
-                        regionList.append(newRegion)
+                        regionList.append(copy.deepcopy(newRegion))
 
                         regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         
-        for i in range(240):
-            for j in range(320):
+        for i in range(1,239,1):
+            for j in range(1,319,1):
                 if self.imgRegions[i][j] == -1:
-                    if i != 239:
-                        self.imgRegions[i][j] = self.imgRegions[i+1][j]
-                    else: 
-                        self.imgRegions[i][j] = self.imgRegions[i-1][j]
-                regionIndex = self.imgRegions[i][j] -1
-                region2 = regionList[regionIndex]
-                avgGrey = region2.returnAverage()
-                self.grayImageDest[i][j] = int(avgGrey)
+                    for k in range(-1,2,1):
+                        for l in range(-1,2,1):
+                            if self.imgRegions[i+j][k+l] != -1 and self.imgRegions[i][j] == -1:
+                                self.imgRegions[i][j] = self.imgRegions[i+j][k+l]    
+                                regionIndex = self.imgRegions[i][j] -1
+                                region2 = regionList[regionIndex]
+                                avgGrey = region2.returnAverage()
+                                self.grayImageDest[i][j] = int(avgGrey)
 
         print("Number of regions: ", len(regionList))
 
