@@ -11,6 +11,7 @@ import copy
 from ImgViewer import ImgViewer
 from region import region
 from regionColor import regionColor
+import math
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
 
@@ -116,20 +117,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.notSoGoodCorners = dst
 
         threshArr = (dst > 1e-5)
-        
+        #List of good corners. Contains HarrisValue, i, j, Deleted.
+        cornerList = [] 
         for i in range(240):
             for j in range(320):
                 if threshArr[i][j] == True:
-                    for k in range (-2, 3, 1):
-                        if(i+k >= 0 and i+k <240):
-                            for l in range(-2, 3, 1):
-                                if (j+l >= 0 and j+l < 320):
-                                    if(threshArr[i+k][j+l] == True):
-                                        threshArr[i+k][j+l] = False
-                    threshArr[i][j] = True
+                    cornerList.append([dst, i, j, False])
 
-        self.goodCorners = threshArr
+        cornerList = sorted(cornerList, reverse = True, key=lambda x: x[1])
+        for i in range(len(cornerList)): 
+            if cornerList[i][3] is False:
+                for j in range(i+1, len(cornerList), 1):
+                    if cornerList[j][3] is False:
+                        XdistSq = abs(cornerList[i][1]-cornerList[j][1]) ** 2
+                        YdistSq = abs(cornerList[i][2]-cornerList[j][2]) ** 2
+                        dist = math.sqrt(XdistSq+YdistSq)
+                        if dist < 3:
+                            cornerList[j][3] = True
 
+        for i in cornerList:
+            if threshArr[i[1]][i[2]] is True:
+                threshArr[i[1]][i[2]] = False
+        self.goodCorners = copy.deepcopy(dst)
         self.calculateDisparityCorners(threshArr, w)
         
         #Convert the boolean array into a black and white one
