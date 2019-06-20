@@ -231,7 +231,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
         #plt.show()
         '''        
-        floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
+        floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
 
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
@@ -241,8 +241,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if self.imgRegions[i][j] == -1:
                     if self.edges[i][j] == 0:
 
-                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j, i), 1, loDiff=30,
-                                                            upDiff=30, flags=floodFlags)
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j, i), 1, loDiff=10,
+                                                            upDiff=10, flags=floodFlags)
                         #print(rect)
                         newRegion = region(regionID, rect)
 
