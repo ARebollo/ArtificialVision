@@ -201,89 +201,58 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def fillImgRegions(self):
 
-        #print("principio" + str(self.imgRegions))
-
-        #np.set_printoptions(threshold = np.inf)
-
         regionID = 1
-        regionList = []
-        #print("imagen: " + str(self.grayImage.shape))
-        # self.printNumpyArray(self.grayImage)
-        self.edges = cv2.Canny(self.grayImage, 40, 120)
-
-        # print("---")
-        #print("bordes: " + str(self.edges))
-        # print("Stop1")
-        # self.printNumpyArray(self.edges)
-        self.mask = cv2.copyMakeBorder(
-            self.edges, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=255)
-        # print(self.mask.shape)
-        # print("Stop")
-        # self.printNumpyArray(self.mask)
-        #print("borders shape: " + str(self.mask.shape))
-        # print("---")
-        # print(self.mask)
-        '''
-        print("Edge size:" + str(self.edges.shape))
-        print("Image shape" + str(self.grayImage.shape))
-        print("Regions shape" + str(self.imgRegions.shape))
-        print("We got here")
-        #plt.subplot(121),plt.imshow(self.edges,cmap = 'gray')
-        #plt.show()
-        '''        
+        
+        self.edges = cv2.Canny(self.grayImage,40,120)
+        
+       
+        self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
-
+        
         for i in range(0, 240, 1):
             for j in range(0, 320, 1):
-                # We found a new region:
-
-                # Optimize this, it's the part that makes it stupid slow
-                if self.imgRegions[i][j] == -1:
+                #We found a new region:
+                
+                if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
                     if self.edges[i][j] == 0:
-
-                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j, i), 1, loDiff=10,
-                                                            upDiff=10, flags=floodFlags)
-                        #print(rect)
+                    
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = 10, 
+                        upDiff = 10, flags = floodFlags)
+                    
                         newRegion = region(regionID, rect)
 
-                        for k in range(rect[0], rect[0] + rect[2], 1):
+                        for k in range (rect[0], rect[0] + rect[2], 1):
                             for l in range(rect[1], rect[1] + rect[3], 1):
                                 if newMask[l+1][k+1] == 1 and self.imgRegions[l][k] == -1:
                                     self.imgRegions[l][k] = regionID
-                                    self.realDispImg[l][k] = self.grayImage[l][k]
-                                    #newRegion.addPoint(self.grayImage[l][k])
-                        #newRegion.calcAverage()
+                        
                         self.listRegions.append(copy.deepcopy(newRegion))
 
                         regionID += 1
-                        self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-
-        for i in range(240):
-            for j in range(320):
-                found = False
-                if (self.imgRegions[i][j] == -1):
+                    #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
+        
+        for i in range(1,239,1):
+            for j in range(1,319,1):
+                if self.imgRegions[i][j] == -1:
                     for k in range(-1,2,1):
-                        if found == True:
-                            break
-                        if i+k >= 0 and i+k<240: 
-                            for l in range(-1,2,1):
-                                if j+l >= 0 and j+l < 320:
-                                    if (self.imgRegions[i+k][j+l] != -1):
-                                        self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
-                                        found = True
-                                        break 
+                        for l in range(-1,2,1):
+                            if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
+                                self.imgRegions[i][j] = self.imgRegions[i+k][j+l]   
         #self.visorD.set_open_cv_image(self.grayImageDest)
         #self.visorD.update()
         #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
 
     def initializeDisparity(self):
         
-        self.fillImgRegions()
-        
+        self.fillImgRegions()   
+        print(len(self.listRegions))
         for i in range(240):
             for j in range(320):
                 if(self.imgRegions[i][j] != -1 and self.disparity[i][j] != 0):
-                    self.listRegions[self.imgRegions[i][j]-1].addPoint(self.disparity[i][j])
+                    print(self.imgRegions[i][j]-1)
+                    region = self.listRegions[self.imgRegions[i][j]-1]
+                    region.addPoint(self.disparity[i][j])
+                    #self.listRegions[self.imgRegions[i][j]-1].addPoint(self.disparity[i][j])
         
         for i in self.listRegions:
             i.calcAverage()
@@ -336,7 +305,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     value = 255
                 self.estimDispImg[i][j] = value
         
-        self.visorS_2.set_open_cv_image(self.estimDispImg)
+        self.visorS_2.set_open_cv_image(cv2.cvtColor(self.estimDispImg, cv2.COLOR_GRAY2RGB))
         self.visorS_2.update()
 
     def dispClick(self, point, posX, posY):
@@ -363,7 +332,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.calculateCorners(5)
             else:
                 self.bothImg = True
-            self.visorS.set_open_cv_image(self.grayImage)
+            self.visorS.set_open_cv_image(cv2.cvtColor(self.grayImage, cv2.COLOR_GRAY2RGB))
             self.visorS.update()
 
     def loadAction2(self):
@@ -373,7 +342,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImageDest = cv2.imread(imgPath)
             self.grayImageDest = cv2.resize(self.grayImageDest, (320, 240))
             self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
-            self.visorD.set_open_cv_image(self.grayImageDest)
+            
+            self.visorD.set_open_cv_image(cv2.cvtColor(self.grayImageDest, cv2.COLOR_GRAY2RGB))
             if self.bothImg == True:
                 self.calculateCorners(5)
             else:
@@ -387,7 +357,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.realDispImg = cv2.imread(imgPath)
             self.realDispImg = cv2.resize(self.realDispImg, (320, 240))
             self.realDispImg = cv2.cvtColor(self.realDispImg, cv2.COLOR_BGR2GRAY)
-            self.visorD_2.set_open_cv_image(self.realDispImg)
+            self.visorD_2.set_open_cv_image(cv2.cvtColor(self.realDispImg, cv2.COLOR_GRAY2RGB))
                
 if __name__ == '__main__':
     import sys
