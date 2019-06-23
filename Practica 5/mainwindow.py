@@ -122,9 +122,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(240):
             for j in range(320):
                 if threshArr[i][j] == True:
-                    cornerList.append([dst, i, j, False])
-
-        cornerList = sorted(cornerList, reverse = True, key=lambda x: x[1])
+                    cornerList.append([dst[i][j], i, j, False])
+        #cornerList.sort(key = lambda x: x[0], reverse = True)
+        cornerList = sorted(cornerList, reverse = True, key=lambda x: x[0])
         for i in range(len(cornerList)): 
             if cornerList[i][3] is False:
                 for j in range(i+1, len(cornerList), 1):
