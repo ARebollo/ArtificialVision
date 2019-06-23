@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 5/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 5/mainwindow.ui', self)
 
         ##########################################################
 
@@ -102,15 +102,35 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.showCorners()
 
     def showCorners(self):
+        auxImg = cv2.cvtColor(self.grayImage, cv2.COLOR_GRAY2RGB)
+        auxCorners = self.calculateCorners(5)
+        green = [20, 225, 39]
+        red = [207, 4, 44]
 
-        plt.subplot(121), plt.imshow(self.goodCorners, cmap='gray')
-        plt.show()
+        print(auxCorners)
 
-        #plt.subplot(121), plt.imshow(self.notSoGoodCorners, cmap='gray')
+        for i in range(1,239,1):
+            for j in range(1,319,1):
+                if auxCorners[i][j] == True:
+                    print("todo ok")
+                    auxImg[i][j] = green
+                    for k in range(0,2):
+                        auxImg[i-k][j-k] = green
+                        auxImg[i+k][j+k] = green
+                        auxImg[i-k][j+k] = green
+                        auxImg[i+k][j-k] = green
+
+        cv2.imshow('img', auxImg)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        
+        #plt.subplot(121),plt.imshow(auxCorners,cmap = 'gray')
         #plt.show()
 
-    def calculateCorners(self, w):
+        #self.visorS.set_open_cv_image(auxImg)
+        #self.visorS.update()
         
+    def calculateCorners(self, w):
         
         dst = cv2.cornerHarris(self.grayImage, 3, 3, 0.04)
         
@@ -126,19 +146,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #cornerList.sort(key = lambda x: x[0], reverse = True)
         cornerList = sorted(cornerList, reverse = True, key=lambda x: x[0])
         for i in range(len(cornerList)): 
-            if cornerList[i][3] is False:
+            if cornerList[i][3]==False:
                 for j in range(i+1, len(cornerList), 1):
-                    if cornerList[j][3] is False:
+                    if cornerList[j][3]==False:
                         XdistSq = abs(cornerList[i][1]-cornerList[j][1]) ** 2
                         YdistSq = abs(cornerList[i][2]-cornerList[j][2]) ** 2
                         dist = math.sqrt(XdistSq+YdistSq)
                         if dist < 3:
                             cornerList[j][3] = True
 
-        for i in cornerList:
-            if i[3] is False:
-                if threshArr[i[1]][i[2]] is True:
-                    threshArr[i[1]][i[2]] = False
+        for corner in cornerList:
+            if corner[3]==True:
+                if threshArr[corner[1]][corner[2]]==True:
+                    threshArr[corner[1]][corner[2]] = False
         #self.goodCorners = copy.deepcopy(dst)
         self.calculateDisparityCorners(threshArr, w)
         
@@ -246,18 +266,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def initializeDisparity(self):
         
         self.fillImgRegions()   
-        print(len(self.listRegions))
+        #print(len(self.listRegions))
         for i in range(240):
             for j in range(320):
                 if(self.imgRegions[i][j] != -1 and self.disparity[i][j] != 0):
-                    print(self.imgRegions[i][j]-1)
+                    #print(self.imgRegions[i][j]-1)
                     region = self.listRegions[self.imgRegions[i][j]-1]
                     region.addPoint(self.disparity[i][j])
                     #self.listRegions[self.imgRegions[i][j]-1].addPoint(self.disparity[i][j])
         
         for i in self.listRegions:
             i.calcAverage()
-        print(np.amax(self.imgRegions))
+        #print(np.amax(self.imgRegions))
         for i in range(240):
             for j in range(320):
                 if(self.disparity[i][j] == 0 and self.imgRegions[i][j] != -1):
@@ -267,7 +287,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.showDisparity()
                       
     def propDispAction(self):
-        if self.propDisparity_button.isChecked() is True:
+        if self.propDisparity_button.isChecked()==True:
             self.timer.stop()
             self.propDisparity_button.setChecked(False)
         else: 
@@ -316,8 +336,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         Y = int(point.y()-posY/2)
         if Y < 0:
             Y = 0
-        print(self.disparity[Y][X])
-        print(self.estimDispImg[Y][X])
+        #print(self.disparity[Y][X])
+        #print(self.estimDispImg[Y][X])
         self.estimatedDisp.display(self.disparity[Y][X])
         self.trueDisp.display(self.realDispImg[Y][X])
 
@@ -353,7 +373,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     
     def loadGroundTruth(self):
         imgPath, _ = QFileDialog.getOpenFileName()
-        
+    
         if imgPath != "":
             self.realDispImg = cv2.imread(imgPath)
             self.realDispImg = cv2.resize(self.realDispImg, (320, 240))
