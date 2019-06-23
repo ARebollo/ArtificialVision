@@ -136,9 +136,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             cornerList[j][3] = True
 
         for i in cornerList:
-            if threshArr[i[1]][i[2]] is True:
-                threshArr[i[1]][i[2]] = False
-        self.goodCorners = copy.deepcopy(dst)
+            if i[3] is False:
+                if threshArr[i[1]][i[2]] is True:
+                    threshArr[i[1]][i[2]] = False
+        #self.goodCorners = copy.deepcopy(dst)
         self.calculateDisparityCorners(threshArr, w)
         
         #Convert the boolean array into a black and white one
