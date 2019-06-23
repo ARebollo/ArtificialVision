@@ -16,6 +16,8 @@ class regionColor:
         self.avgColor[1] += values[1]
         self.avgColor[2] += values[2]
         
+    def addFrontierPoint(self, value):
+        self.frontierPointsList.append(value)
 
     def calcAverage(self):
         for i in range(3):

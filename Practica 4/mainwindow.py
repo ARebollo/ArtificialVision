@@ -7,7 +7,6 @@ from cv2 import VideoCapture
 from matplotlib import pyplot as plt
 import numpy as np
 from distutils.core import setup 
-import py2exe
 #from ImgViewer import ImgViewer
 import copy
 from ImgViewer import ImgViewer
@@ -21,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -121,7 +120,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         dialogValue = self.spinBoxDifference.value()
         print(dialogValue)
-        if self.checkBoxRange.isChecked() is True:
+        if self.checkBoxRange.isChecked() == True:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
         else:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
@@ -148,29 +147,53 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
                         regionID += 1
                     #self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
-        
+
         for i in range(1,239,1):
             for j in range(1,319,1):
                 if self.imgRegions[i][j] == -1:
                     for k in range(-1,2,1):
                         for l in range(-1,2,1):
-                            if self.imgRegions[i+j][k+l] != -1 and self.imgRegions[i][j] == -1:
-                                self.imgRegions[i][j] = self.imgRegions[i+j][k+l]    
-                                regionIndex = self.imgRegions[i][j] -1
-                                region2 = regionList[regionIndex]
-                                avgGrey = region2.returnAverage()
-                                self.grayImageDest[i][j] = int(avgGrey)
+                            if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
+                                self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
+        '''
+        if self.checkBoxMerge.isChecked() is True:
+            for i in range (1, 239, 1):
+                for j in range(1, 319, 1):
+                    found = False
+                    for k in range(-1,2,1):
+                        if found is True:
+                            break
+                        for l in range(-1,2,1) :
+                            if found is True:
+                                break
+                            if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
+                                regionList[self.imgRegions[i][j]-1].addFrontierPoint([i,j, self.imgRegions[i+k][j+l]-1])
+         
+            Lo que tengo que hacer:
+            Para cada región, mirar su frontera. Para cada valor distinto que haya, mirar cual de las dos es más pequeña.
+            Para la más pequeña, mirar si el número de puntos de ese valor es mayor de un porcentaje y si no muchos de esos puntos
+            pertenecen a un borde de canny. Si es así, recorrer el rectángulo de esa región y poner todos los puntos al otro valor.
+        '''
+
+
+
+        for i in range(1,239,1):
+            for j in range(1,319,1):    
+                regionIndex = self.imgRegions[i][j] -1
+                region2 = regionList[regionIndex]
+                avgGrey = region2.returnAverage()
+                self.grayImageDest[i][j] = int(avgGrey)
 
         print("Number of regions: ", len(regionList))
 
         checkBreak = False
-        if self.checkBoxBorders.isChecked() is True:
+        if self.checkBoxBorders.isChecked() == True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
-            for i in range(1, 240, 1):
-                for j in range(1, 320, 1):
+            for i in range(1, 239, 1):
+                for j in range(1, 319, 1):
                     checkBreak = False
                     for k in range(1, -2, -1):
-                        if checkBreak is True:
+                        if checkBreak == True:
                             break
                         for l in range(1, -2, -1):
                             if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
@@ -178,6 +201,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 checkBreak = True
                                 break
 
+        
 
 
         #TODO: When it finds a new region, add it to a list as a region object, with the rectangle for efficiency. When it iterates over the region to set the imgRegions,
@@ -218,7 +242,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         '''
         regionList = []
         dialogValue = self.spinBoxDifference.value()
-        if self.checkBoxRange.isChecked() is True:
+        if self.checkBoxRange.isChecked() == True:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
         else:
             floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | cv2.FLOODFILL_FIXED_RANGE | 1 << 8
@@ -270,13 +294,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.colorImageDest[i][j] = avgColor
         
 
-        if self.checkBoxBorders.isChecked() is True:
+        if self.checkBoxBorders.isChecked() == True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
             for i in range(1, 240, 1):
                 for j in range(1, 320, 1):
                     checkBreak = False
                     for k in range(1, -2, -1):
-                        if checkBreak is True:
+                        if checkBreak == True:
                             break
                         for l in range(1, -2, -1):
                             if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
@@ -329,7 +353,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         imgPath, _ = QFileDialog.getOpenFileName()
         
         if imgPath != "":
-            if self.colorState is True:
+            if self.colorState == True:
                 self.grayImage = np.zeros((240,320), np.uint8)
                 self.grayImageDest = np.zeros((240,320), np.uint8)
                 self.grayImage = cv2.imread(imgPath)
@@ -352,7 +376,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         
     def captureButtonAction(self):
-        if self.captureState is False:
+        if self.captureState == False:
             self.capture = VideoCapture(0)
             self.captureButton.setChecked(True)
             self.captureButton.setText("Stop Capture")
@@ -365,9 +389,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def timerLoop(self):
         if (self.captureState == True and self.capture.isOpened() == True):
-            if self.colorState is True:
+            if self.colorState == True:
                 ret, self.grayImage = self.capture.read()
-                if ret is False:
+                if ret == False:
                     self.capture.release()
                     self.captureState = False
                     self.grayImage = np.zeros((240, 320), np.uint8)
@@ -382,7 +406,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             else:
                 print("Should be here")
                 ret, self.colorImage = self.capture.read()
-                if ret is False:
+                if ret == False:
                     self.capture.release()
                     self.captureState = False
                     self.colorImage = np.zeros((240,320,3))
