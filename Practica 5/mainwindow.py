@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 5/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 5/mainwindow.ui', self)
 
         ##########################################################
 
@@ -149,16 +149,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if cornerList[i][3]==False:
                 for j in range(i+1, len(cornerList), 1):
                     if cornerList[j][3]==False:
-                        XdistSq = abs(cornerList[i][1]-cornerList[j][1]) ** 2
-                        YdistSq = abs(cornerList[i][2]-cornerList[j][2]) ** 2
+                        XdistSq = (cornerList[i][1]-cornerList[j][1]) ** 2
+                        YdistSq = (cornerList[i][2]-cornerList[j][2]) ** 2
                         dist = math.sqrt(XdistSq+YdistSq)
                         if dist < 3:
                             cornerList[j][3] = True
 
         for corner in cornerList:
             if corner[3]==True:
-                if threshArr[corner[1]][corner[2]]==True:
-                    threshArr[corner[1]][corner[2]] = False
+                threshArr[corner[1]][corner[2]] = False
         #self.goodCorners = copy.deepcopy(dst)
         self.calculateDisparityCorners(threshArr, w)
         
@@ -191,18 +190,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         if(i+k >= 0 and i+k <240):
                             for l in range(-w, w+1, 1):
                                 if (j+l >= 0 and j+l < 320):
-                                    cornerSquare[k][l] = self.grayImage[i+k][j+l]
+                                    cornerSquare[w+k][w+l] = self.grayImage[i+k][j+l]
                     line, heightDiff = self.getEpipolarLine(w, yl)
                     #print("shapes: " , line.shape, cornerSquare.shape)
-                    
-                    if heightDiff < 0:
-                        res = cv2.matchTemplate(line, cornerSquare[-heightDiff:], method)
-                    else:
+                    if heightDiff >= 0:
                         res = cv2.matchTemplate(line, cornerSquare, method)
-                    #TODO: Check if max_val is good
-                    min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
-                    self.fixedPoints[i][j] = True
-                    self.disparity[i][j] = xl - maxLoc[0]
+                        
+                        #TODO: Check if max_val is good
+                        min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
+                        print("TEST", maxLoc)
+                        if (max_val > 0.95):
+                            self.fixedPoints[i][j] = True
+                            self.disparity[i][j] = xl - (maxLoc[0] + w)
 
                     '''
                     print("Minimum value: ", str(min_val))
@@ -237,8 +236,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
                     if self.edges[i][j] == 0:
                     
-                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = 10, 
-                        upDiff = 10, flags = floodFlags)
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = 14, 
+                        upDiff = 14, flags = floodFlags)
                     
                         newRegion = region(regionID, rect)
 
@@ -258,7 +257,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     for k in range(-1,2,1):
                         for l in range(-1,2,1):
                             if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
-                                self.imgRegions[i][j] = self.imgRegions[i+k][j+l]   
+                                self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
+        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        plt.show()   
         #self.visorD.set_open_cv_image(self.grayImageDest)
         #self.visorD.update()
         #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
@@ -269,7 +270,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #print(len(self.listRegions))
         for i in range(240):
             for j in range(320):
-                if(self.imgRegions[i][j] != -1 and self.disparity[i][j] != 0):
+                if self.disparity[i][j] != 0:
                     #print(self.imgRegions[i][j]-1)
                     region = self.listRegions[self.imgRegions[i][j]-1]
                     region.addPoint(self.disparity[i][j])
@@ -280,7 +281,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #print(np.amax(self.imgRegions))
         for i in range(240):
             for j in range(320):
-                if(self.disparity[i][j] == 0 and self.imgRegions[i][j] != -1):
+                if self.disparity[i][j] == 0:
                     #print("max reg = ", len(self.listRegions), " index= ", self.imgRegions[i][j])
                     self.disparity[i][j] = self.listRegions[self.imgRegions[i][j]-1].returnAverage()
         
@@ -338,7 +339,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             Y = 0
         #print(self.disparity[Y][X])
         #print(self.estimDispImg[Y][X])
-        self.estimatedDisp.display(self.disparity[Y][X])
+        self.estimatedDisp.display(self.estimDispImg[Y][X])
         self.trueDisp.display(self.realDispImg[Y][X])
 
     def loadAction(self):

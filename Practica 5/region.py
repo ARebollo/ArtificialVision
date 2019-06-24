@@ -9,6 +9,7 @@ class region:
         self.currentTotalGray = 0
         self.currentCount = 0
         self.rect = rectangle
+        
     def addPoint(self, value):
         self.currentCount += 1
         self.currentTotalGray += value
