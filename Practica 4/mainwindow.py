@@ -155,8 +155,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         for l in range(-1,2,1):
                             if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
                                 self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
-        '''
+        
+        print("Number of regions before: ", len(regionList))
+
         if self.checkBoxMerge.isChecked() is True:
+            print("Merging")
             for i in range (1, 239, 1):
                 for j in range(1, 319, 1):
                     found = False
@@ -167,8 +170,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             if found is True:
                                 break
                             if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
-                                regionList[self.imgRegions[i][j]-1].addFrontierPoint([i,j, self.imgRegions[i+k][j+l]-1])
-         
+                                regionList[self.imgRegions[i][j]-1].addFrontierPoint([i,j, self.imgRegions[i+k][j+l]])
+            for i in regionList:
+                borderRegions = i.regionsInBorder()
+                for j in borderRegions:
+                    otherRegion = regionList[j-1]
+                    if i.regionSize() < otherRegion.regionSize():
+                        smallestRegion = i.id
+                        biggest = j
+                    else:
+                        smallestRegion = j
+                        biggest = i.id
+                    percentageOfBorder = regionList[smallestRegion-1].percentageOfBorder(self.edges, biggest)
+                    percentageOfFrontier = regionList[smallestRegion-1].percentageOfFrontier(biggest)
+                    if percentageOfBorder > 0.25 and percentageOfFrontier > 0.25:
+                        for k in range(240):
+                            for l in range(320):
+                                if self.imgRegions[k][l] == smallestRegion:
+                                    self.imgRegions[k][l] = biggest
+                        regionList[biggest-1].mergeRegion(regionList[smallestRegion-1])
+                        regionList.pop(smallestRegion-1)
+
+        ''' 
             Lo que tengo que hacer:
             Para cada región, mirar su frontera. Para cada valor distinto que haya, mirar cual de las dos es más pequeña.
             Para la más pequeña, mirar si el número de puntos de ese valor es mayor de un porcentaje y si no muchos de esos puntos
@@ -184,7 +207,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 avgGrey = region2.returnAverage()
                 self.grayImageDest[i][j] = int(avgGrey)
 
-        print("Number of regions: ", len(regionList))
+        print("Number of regions after: ", len(regionList))
 
         checkBreak = False
         if self.checkBoxBorders.isChecked() == True:
