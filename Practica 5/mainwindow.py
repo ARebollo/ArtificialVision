@@ -336,22 +336,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         for i in range(240):
             for j in range(320):
                 if self.fixedPoints[i][j] == False: #To avoid changing fixed points
-                    avgDisp = 0
+                    avgDisp = 0.0
                     count = 0
                     origRegion = self.imgRegions[i][j]
+                    #todo cambiar
                     for k in range(-envWidth,envWidth+1,1):
                         if (i+k >= 0 and i+k <240):
+                            #todo cambiar
                             for l in range(-envWidth,envWidth+1,1):
                                 if (j+l >= 0 and j+l <320):
                                     #To avoid taking into account the point itself or adding points from other regions
-                                    if (k == 0 and l == 0) == False: 
-                                        #print("k==0 and l==0 == False")
-                                        if self.imgRegions[i+k][j+l] == origRegion: 
-                                            #print("origRegion")
-                                            avgDisp += self.disparity[i+k][j+l]
-                                            count += 1
+                                    if self.imgRegions[i+k][j+l] == origRegion: 
+                                        #print("origRegion")
+                                        avgDisp += self.disparity[i+k][j+l]
+                                        count += 1
                     if count != 0:
-                        self.disparity[i][j] = int(avgDisp/count)
+                        self.disparity[i][j] = avgDisp/count
         self.showDisparity()
 
     def showDisparity(self):
