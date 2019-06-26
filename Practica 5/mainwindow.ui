@@ -125,8 +125,8 @@
   <widget class="QCheckBox" name="checkBoxRange">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>220</y>
+     <x>750</x>
+     <y>270</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -256,6 +256,52 @@
    </property>
    <property name="text">
     <string>True Disparity</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="kernelSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="iterationSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>220</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kernel size</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>220</y>
+     <width>59</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Iterations</string>
    </property>
   </widget>
  </widget>

@@ -32,7 +32,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.openVideo = False
         self.bothImg = False
 
-        self.disparity = np.zeros((240, 320), np.uint8)
+        self.disparity = np.zeros((240, 320), np.float32)
         #self.timer = QTimer()
         #self.timer.timeout.connect(self.timerExpired)
 
@@ -71,6 +71,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.visorS_2.windowSelected.connect(self.dispClick)
         #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
         self.checkBoxRange.stateChanged.connect(self.checkBoxAction)
+        self.kernelSpinBox.valueChanged.connect(self.kernelAction)
+        self.iterationSpinBox.valueChanged.connect(self.iterationAction)
+        self.kernel = 0
+        self.iterations = 0
         self.goodCorners = []
         self.notSoGoodCorners = []
 
@@ -96,6 +100,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     to avoid having different regions with the same value.  
     '''
     
+    def kernelAction(self):
+        self.kernel = self.kernelSpinBox.value()
+        print("kernel: " , self.kernel)
+    def iterationAction(self):
+        self.iterations = self.iterationSpinBox.value()
+        print("iterations: " , self.iterations)
+
     def checkBoxAction(self):
         if self.checkBoxRange.isChecked():
             self.showCorners()
@@ -238,7 +249,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             for j in range(1,319,1):
                 if self.fixedPoints[i][j] == True:
                     shift = self.disparity[i][j]
-                    self.shiftedPoints[i][j-shift] = self.fixedPoints[i][j]
+                    self.shiftedPoints[i][j-int(shift)] = self.fixedPoints[i][j]
                         
 
                     '''
@@ -295,8 +306,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         for l in range(-1,2,1):
                             if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
                                 self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
-        plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
-        plt.show()   
+        
+        #plt.subplot(121),plt.imshow(self.imgRegions,cmap = 'gray')
+        #plt.show()   
         #self.visorD.set_open_cv_image(self.grayImageDest)
         #self.visorD.update()
         #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
@@ -325,7 +337,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.showDisparity()
                       
     def propDispAction(self):
-        self.propagateDisparity(1)
+        i = 0
+        while i < self.iterations:
+            self.propagateDisparity(self.kernel)
+            i += 1
         
     '''
     def timerExpired(self):
@@ -333,25 +348,40 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     '''
 
     def propagateDisparity(self, envWidth):
-        for i in range(240):
-            for j in range(320):
+        
+        '''
+        contTrue = 0
+        contFalse = 0
+
+        for i in range(1,240,1):
+            for j in range(1,320,1):
+                if self.fixedPoints[i][j] == True:
+                    contTrue += 1
+                else:
+                    contFalse += 1
+
+        print("contTrue: " , contTrue)
+        print("contFalse: " , contFalse)
+        '''
+        
+        for i in range(envWidth, 240-envWidth):
+            for j in range(envWidth, 320-envWidth):
                 if self.fixedPoints[i][j] == False: #To avoid changing fixed points
                     avgDisp = 0.0
                     count = 0
                     origRegion = self.imgRegions[i][j]
                     #todo cambiar
                     for k in range(-envWidth,envWidth+1,1):
-                        if (i+k >= 0 and i+k <240):
-                            #todo cambiar
-                            for l in range(-envWidth,envWidth+1,1):
-                                if (j+l >= 0 and j+l <320):
-                                    #To avoid taking into account the point itself or adding points from other regions
-                                    if self.imgRegions[i+k][j+l] == origRegion: 
-                                        #print("origRegion")
-                                        avgDisp += self.disparity[i+k][j+l]
-                                        count += 1
+                        #todo cambiar
+                        for l in range(-envWidth,envWidth+1,1):
+                            #To avoid taking into account the point itself or adding points from other regions
+                            if self.imgRegions[i+k][j+l] == origRegion: 
+                                #print("origRegion")
+                                avgDisp += self.disparity[i+k][j+l]
+                                count += 1
                     if count != 0:
-                        self.disparity[i][j] = avgDisp/count
+                        self.disparity[i][j] = float(avgDisp/count)
+                        #print("disparity i,j: " , i , j , self.disparity[i][j])
         self.showDisparity()
 
     def showDisparity(self):
