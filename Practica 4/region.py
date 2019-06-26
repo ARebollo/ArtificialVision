@@ -9,7 +9,7 @@ class region:
         self.currentTotalGray = 0
         self.currentCount = 0
         self.rect = rectangle
-        
+        self.deleted = False
     def addPoint(self, value):
         self.currentCount += 1
         self.currentTotalGray += value
@@ -19,11 +19,16 @@ class region:
 
     def percentageOfFrontier(self, regionID):
         count = 0
+        '''
         print("length of frontier = ", len(self.frontierPointsList))
         print("Size of region: ", self.currentCount)
+        print("Id of region = ", self.id)
+        '''
         for i in self.frontierPointsList:
             if i[2] == regionID:
                 count += 1
+        if len(self.frontierPointsList) == 0:
+            return 0
         return count/len(self.frontierPointsList)
 
     def percentageOfBorder(self, cannyBorder, regionID):

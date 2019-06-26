@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 4/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -160,7 +160,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
         
         print("Number of regions before: ", len(regionList))
-
+        if -1 in self.imgRegions:
+            print("ERROR")
         if self.checkBoxMerge.isChecked() is True:
             print("Merging")
             for i in range (1, 239, 1):
@@ -174,25 +175,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 break
                             if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
                                 regionList[self.imgRegions[i][j]-1].addFrontierPoint([i,j, self.imgRegions[i+k][j+l]])
+                                #print("Point coords: ", i, " ", j, " Region ID: ", self.imgRegions[i][j])
             for i in regionList:
-                borderRegions = i.regionsInBorder()
-                for j in borderRegions:
-                    otherRegion = regionList[j-1]
-                    if i.regionSize() < otherRegion.regionSize():
-                        smallestRegion = i.id
-                        biggest = j
-                    else:
-                        smallestRegion = j
-                        biggest = i.id
-                    percentageOfBorder = regionList[smallestRegion-1].percentageOfBorder(self.edges, biggest)
-                    percentageOfFrontier = regionList[smallestRegion-1].percentageOfFrontier(biggest)
-                    if percentageOfBorder > 0.25 and percentageOfFrontier > 0.25:
-                        for k in range(240):
-                            for l in range(320):
-                                if self.imgRegions[k][l] == smallestRegion:
-                                    self.imgRegions[k][l] = biggest
-                        regionList[biggest-1].mergeRegion(regionList[smallestRegion-1])
-                        regionList.pop(smallestRegion-1)
+                if i.deleted == False:
+                    borderRegions = i.regionsInBorder()
+                    for j in borderRegions:
+                        otherRegion = regionList[j-1]
+                        if i.regionSize() < otherRegion.regionSize():
+                            smallestRegion = i.id
+                            biggest = j
+                        else:
+                            smallestRegion = j
+                            biggest = i.id
+                        percentageOfBorder = regionList[smallestRegion-1].percentageOfBorder(self.edges, biggest)
+                        percentageOfFrontier = regionList[smallestRegion-1].percentageOfFrontier(biggest)
+                        if percentageOfBorder > 0.25 and percentageOfFrontier > 0.25:
+                            for k in range(240):
+                                for l in range(320):
+                                    if self.imgRegions[k][l] == smallestRegion:
+                                        self.imgRegions[k][l] = biggest
+                            regionList[biggest-1].mergeRegion(regionList[smallestRegion-1])
+                            regionList[smallestRegion-1].deleted = True
+                        #regionList.pop(smallestRegion-1)
 
         ''' 
             Lo que tengo que hacer:
@@ -203,8 +207,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 
-        for i in range(1,239,1):
-            for j in range(1,319,1):    
+        for i in range(240):
+            for j in range(320):    
                 regionIndex = self.imgRegions[i][j] -1
                 region2 = regionList[regionIndex]
                 avgGrey = region2.returnAverage()
