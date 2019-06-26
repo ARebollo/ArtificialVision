@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        #uic.loadUi('mainwindow.ui', self)
-        uic.loadUi('Practica 5/mainwindow.ui', self)
+        uic.loadUi('mainwindow.ui', self)
+        #uic.loadUi('Practica 5/mainwindow.ui', self)
 
         ##########################################################
 
@@ -212,6 +212,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #plt.show()
         return threshArr
 
+
     def calculateDisparityCorners(self, threshArr, w):
         """
         Calculates the disparity value for the fixed points.
@@ -244,14 +245,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         if (max_val > 0.95):
                             self.fixedPoints[i][j] = True
                             self.disparity[i][j] = xl - (maxLoc[0] + w)
-        
+
         for i in range(1,239,1):
             for j in range(1,319,1):
                 if self.fixedPoints[i][j] == True:
                     shift = self.disparity[i][j]
                     self.shiftedPoints[i][j-int(shift)] = self.fixedPoints[i][j]
                         
-
                     '''
                     print("Minimum value: ", str(min_val))
                     print("Maximum value: ", str(max_val))
@@ -260,6 +260,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     '''
         return threshArr
 
+
     def getEpipolarLine(self, w, yl):
         if yl-w < 0:
             return self.grayImageDest[0:yl+w + 1], yl-w
@@ -267,6 +268,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             return self.grayImageDest[yl-w:239], yl-w
         else:
             return self.grayImageDest[yl-w:yl+w + 1], yl-w
+
+    def calculateDiff(self):
+
+        count = 0
+        percentDiff = 0.0
+        for i in range(240):
+            for j in range(320):
+                if self.estimDispImg[i][j] != 0:
+                      count += 1
+                      percentDiff += abs(self.realDispImg[i][j]-self.estimDispImg[i][j])/255.0
+
+        self.dispPerc.display(percentDiff/count)
 
     def fillImgRegions(self):
 
@@ -314,6 +327,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.imgRegions = np.full((240, 320), -1, dtype=np.int32)
 
     def initializeDisparity(self):
+
+        self.calculateCorners(5)
         
         self.fillImgRegions()   
         #print(len(self.listRegions))
@@ -335,7 +350,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.disparity[i][j] = self.listRegions[self.imgRegions[i][j]-1].returnAverage()
         
         self.showDisparity()
-                      
+        self.calculateDiff()
+
     def propDispAction(self):
         i = 0
         while i < self.iterations:
@@ -383,6 +399,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         self.disparity[i][j] = float(avgDisp/count)
                         #print("disparity i,j: " , i , j , self.disparity[i][j])
         self.showDisparity()
+        self.calculateDiff()
 
     def showDisparity(self):
         for i in range(240):
@@ -415,10 +432,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.origWidth = self.grayImage.shape[1]
             self.grayImage = cv2.resize(self.grayImage, (320, 240))
             self.grayImage = cv2.cvtColor(self.grayImage, cv2.COLOR_BGR2GRAY)
-            if self.bothImg == True:
-                self.calculateCorners(5)
-            else:
-                self.bothImg = True
+            
+                
+            
             self.visorS.set_open_cv_image(cv2.cvtColor(self.grayImage, cv2.COLOR_GRAY2RGB))
             self.visorS.update()
 
@@ -431,10 +447,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.grayImageDest = cv2.cvtColor(self.grayImageDest, cv2.COLOR_BGR2GRAY)
             
             self.visorD.set_open_cv_image(cv2.cvtColor(self.grayImageDest, cv2.COLOR_GRAY2RGB))
-            if self.bothImg == True:
-                self.calculateCorners(5)
-            else:
-                self.bothImg = True
+            
             self.visorD.update()
     
     def loadGroundTruth(self):

@@ -304,6 +304,29 @@
     <string>Iterations</string>
    </property>
   </widget>
+  <widget class="QLCDNumber" name="dispPerc">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>440</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>440</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Difference</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>colorButton</tabstop>
