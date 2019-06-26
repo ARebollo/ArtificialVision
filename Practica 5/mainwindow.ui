@@ -327,6 +327,19 @@
     <string>Difference</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBoxCorners">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>250</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Two-Way Corners</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>colorButton</tabstop>

@@ -258,8 +258,74 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     print("Minimum location: ", str(minLoc))
                     print("Maximum location: ", str(maxLoc))
                     '''
+        if self.checkBoxCorners.isChecked() == True:
+            rightCorners = self.calculateGoodCornersRight(w)
+            self.shiftedPoints = np.logical_and(self.shiftedPoints, rightCorners)
+            
+                    
+        
         return threshArr
 
+    def calculateGoodCornersRight(self, w):
+
+        dst = cv2.cornerHarris(self.grayImageDest, 3, 3, 0.04)
+
+
+        threshArr = (dst > 1e-6)
+        #threshArr = (dst > 1e-6)
+        
+        #List of good corners. Contains HarrisValue, i, j, Deleted.
+        cornerList = [] 
+        for i in range(240):
+            for j in range(320):
+                if threshArr[i][j] == True:
+                    cornerList.append([dst[i][j], i, j, False])
+        #cornerList.sort(key = lambda x: x[0], reverse = True)
+        cornerList = sorted(cornerList, reverse = True, key=lambda x: x[0])
+        for i in range(len(cornerList)): 
+            if cornerList[i][3]==False:
+                for j in range(i+1, len(cornerList), 1):
+                    if cornerList[j][3]==False:
+                        XdistSq = (cornerList[i][1]-cornerList[j][1]) ** 2
+                        YdistSq = (cornerList[i][2]-cornerList[j][2]) ** 2
+                        dist = math.sqrt(XdistSq+YdistSq)
+                        if dist < 3:
+                            cornerList[j][3] = True
+
+        for corner in cornerList:
+            if corner[3]==True:
+                threshArr[corner[1]][corner[2]] = False
+        #self.goodCorners = copy.deepcopy(dst)
+
+        cornerSquare = np.zeros((2*w+1,2*w+1), dtype=np.uint8)
+        method = cv2.TM_CCOEFF_NORMED
+        rightCorners = np.full((240,320), False, dtype = bool)
+        rightDisp = np.full((240, 320), 0.0, dtype = np.float32)
+        for i in range(5,235,1):
+            for j in range(5,315,1):
+                if threshArr[i][j] == True:
+                    yl = i 
+                    xl = j
+                    for k in range (-w, w+1, 1):
+                        if(i+k >= 0 and i+k <240):
+                            for l in range(-w, w+1, 1):
+                                if (j+l >= 0 and j+l < 320):
+                                    cornerSquare[w+k][w+l] = self.grayImageDest[i+k][j+l]
+                    line, heightDiff = self.getEpipolarLine(w, yl)
+                    #print("shapes: " , line.shape, cornerSquare.shape)
+                    if heightDiff >= 0:
+                        res = cv2.matchTemplate(line, cornerSquare, method)
+                        
+                        #TODO: Check if max_val is good
+                        min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
+                        #print("TEST", maxLoc)
+                        if (max_val > 0.95):
+                            rightCorners[i][j] = True
+                            rightDisp[i][j] = xl - (maxLoc[0] + w)
+        
+
+        return rightCorners
+        
 
     def getEpipolarLine(self, w, yl):
         if yl-w < 0:
@@ -353,11 +419,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.calculateDiff()
 
     def propDispAction(self):
-        i = 0
-        while i < self.iterations:
+
+        for i in range(self.iterations):
             self.propagateDisparity(self.kernel)
-            i += 1
-        
+
+
+        self.showDisparity()
+        self.calculateDiff()
     '''
     def timerExpired(self):
         self.propagateDisparity(1)
@@ -398,8 +466,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     if count != 0:
                         self.disparity[i][j] = float(avgDisp/count)
                         #print("disparity i,j: " , i , j , self.disparity[i][j])
-        self.showDisparity()
-        self.calculateDiff()
+        
 
     def showDisparity(self):
         for i in range(240):
