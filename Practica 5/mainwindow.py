@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 5/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 5/mainwindow.ui', self)
 
         ##########################################################
 
@@ -33,8 +33,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.bothImg = False
 
         self.disparity = np.zeros((240, 320), np.uint8)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.timerExpired)
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.timerExpired)
 
         ##################      Image arrays and viewer objects     ##################
 
@@ -61,7 +61,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##############################################################################
 
-
         ##################      Buttons     ##################
 
         self.loadButton_1.clicked.connect(self.loadAction)
@@ -76,7 +75,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.notSoGoodCorners = []
 
         ######################################################
-
         
         ##############################################################
 
@@ -85,7 +83,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.listRegions = []
         self.origWidth = 0
         self.fixedPoints = np.zeros((240, 320), dtype = bool)
-        
+        self.shiftedPoints = np.zeros((240, 320), dtype = bool)
+
         ##############################################################
 
     '''
@@ -103,40 +102,72 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def showCorners(self):
         auxImg = cv2.cvtColor(self.grayImage, cv2.COLOR_GRAY2RGB)
+        auxImg2 = cv2.cvtColor(self.grayImageDest, cv2.COLOR_GRAY2RGB)
+        
         auxCorners = self.calculateCorners(5)
-        green = [20, 225, 39]
+        unMatchedCorners = np.zeros((240, 320), np.uint8)
+
+        green = [39, 225, 20]
         red = [207, 4, 44]
 
-        print(auxCorners)
+        print("shape"+ str(auxCorners.shape))
 
         for i in range(1,239,1):
             for j in range(1,319,1):
-                if auxCorners[i][j] == True:
-                    print("todo ok")
+                if auxCorners[i][j] == True and self.fixedPoints[i][j] == False:
+                    unMatchedCorners[i][j] = True
+                else:
+                    unMatchedCorners[i][j] = False
+
+        for i in range(1,237,1):
+            for j in range(1,317,1):
+                if self.fixedPoints[i][j] == True:
                     auxImg[i][j] = green
-                    for k in range(0,2):
+                    for k in range(0,4):
                         auxImg[i-k][j-k] = green
                         auxImg[i+k][j+k] = green
                         auxImg[i-k][j+k] = green
                         auxImg[i+k][j-k] = green
+                if unMatchedCorners[i][j] == True:
+                    auxImg[i][j] = red
+                    for k in range(0,4):
+                        auxImg[i-k][j-k] = red
+                        auxImg[i+k][j+k] = red
+                        auxImg[i-k][j+k] = red
+                        auxImg[i+k][j-k] = red
 
-        cv2.imshow('img', auxImg)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        
+        for i in range(1,237,1):
+            for j in range(1,317,1):
+                if self.shiftedPoints[i][j] == True:
+                    auxImg2[i][j] = green
+                    for k in range(0,4):
+                        auxImg2[i-k][j-k] = green
+                        auxImg2[i+k][j+k] = green
+                        auxImg2[i-k][j+k] = green
+                        auxImg2[i+k][j-k] = green
+                        
+        #cv2.imshow('img', auxImg)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
+
         #plt.subplot(121),plt.imshow(auxCorners,cmap = 'gray')
         #plt.show()
 
-        #self.visorS.set_open_cv_image(auxImg)
-        #self.visorS.update()
-        
+        self.visorS.set_open_cv_image(auxImg)
+        self.visorS.update()
+        self.visorD.set_open_cv_image(auxImg2)
+        self.visorD.update()
+
+
     def calculateCorners(self, w):
         
         dst = cv2.cornerHarris(self.grayImage, 3, 3, 0.04)
         
         self.notSoGoodCorners = dst
 
-        threshArr = (dst > 1e-5)
+        threshArr = (dst > 1e-6)
+        #threshArr = (dst > 1e-6)
+        
         #List of good corners. Contains HarrisValue, i, j, Deleted.
         cornerList = [] 
         for i in range(240):
@@ -181,8 +212,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         cornerSquare = np.zeros((2*w+1,2*w+1), dtype=np.uint8)
         method = cv2.TM_CCOEFF_NORMED
         
-        for i in range(240):
-            for j in range(320):
+        for i in range(5,235,1):
+            for j in range(5,315,1):
                 if threshArr[i][j] == True:
                     yl = i 
                     xl = j
@@ -198,10 +229,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         
                         #TODO: Check if max_val is good
                         min_val, max_val, minLoc , maxLoc = cv2.minMaxLoc(res)
-                        print("TEST", maxLoc)
+                        #print("TEST", maxLoc)
                         if (max_val > 0.95):
                             self.fixedPoints[i][j] = True
                             self.disparity[i][j] = xl - (maxLoc[0] + w)
+        
+        for i in range(1,239,1):
+            for j in range(1,319,1):
+                if self.fixedPoints[i][j] == True:
+                    shift = self.disparity[i][j]
+                    self.shiftedPoints[i][j-shift] = self.fixedPoints[i][j]
+                        
 
                     '''
                     print("Minimum value: ", str(min_val))
@@ -209,6 +247,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     print("Minimum location: ", str(minLoc))
                     print("Maximum location: ", str(maxLoc))
                     '''
+        return threshArr
 
     def getEpipolarLine(self, w, yl):
         if yl-w < 0:
@@ -218,14 +257,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             return self.grayImageDest[yl-w:yl+w + 1], yl-w
 
-
     def fillImgRegions(self):
 
         regionID = 1
         
         self.edges = cv2.Canny(self.grayImage,40,120)
         
-       
         self.mask = cv2.copyMakeBorder(self.edges, 1,1,1,1, cv2.BORDER_CONSTANT, value = 255)
         floodFlags = cv2.FLOODFILL_MASK_ONLY | 4 | 1 << 8
         
@@ -236,8 +273,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if self.imgRegions[i][j] == -1: #Optimize this, it's the part that makes it stupid slow
                     if self.edges[i][j] == 0:
                     
-                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = 14, 
-                        upDiff = 14, flags = floodFlags)
+                        _, _, newMask, rect = cv2.floodFill(self.grayImage, self.mask, (j,i), 1, loDiff = 10, 
+                        upDiff = 10, flags = floodFlags)
                     
                         newRegion = region(regionID, rect)
 
@@ -288,16 +325,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.showDisparity()
                       
     def propDispAction(self):
-        if self.propDisparity_button.isChecked()==True:
-            self.timer.stop()
-            self.propDisparity_button.setChecked(False)
-        else: 
-            self.timer.start(1000)
-            self.propDisparity_button.setChecked(True)
+        self.propagateDisparity(1)
         
-
+    '''
     def timerExpired(self):
         self.propagateDisparity(1)
+    '''
 
     def propagateDisparity(self, envWidth):
         for i in range(240):
@@ -311,13 +344,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             for l in range(-envWidth,envWidth+1,1):
                                 if (j+l >= 0 and j+l <320):
                                     #To avoid taking into account the point itself or adding points from other regions
-                                    if (k == 0 and l == 0) == False or self.imgRegions[i+k][j+l] != origRegion: 
-                                        avgDisp += self.disparity[i+k][j+l]
-                                        count += 1
-                    self.disparity[i][j] = int(avgDisp/count)
+                                    if (k == 0 and l == 0) == False: 
+                                        #print("k==0 and l==0 == False")
+                                        if self.imgRegions[i+k][j+l] == origRegion: 
+                                            #print("origRegion")
+                                            avgDisp += self.disparity[i+k][j+l]
+                                            count += 1
+                    if count != 0:
+                        self.disparity[i][j] = int(avgDisp/count)
         self.showDisparity()
-
-        
 
     def showDisparity(self):
         for i in range(240):

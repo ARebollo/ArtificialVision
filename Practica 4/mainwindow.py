@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
