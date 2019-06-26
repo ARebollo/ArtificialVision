@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -159,9 +159,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
                                 self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
         
-        print("Number of regions before: ", len(regionList))
-        if -1 in self.imgRegions:
-            print("ERROR")
         if self.checkBoxMerge.isChecked() is True:
             print("Merging")
             for i in range (1, 239, 1):
@@ -189,7 +186,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                             biggest = i.id
                         percentageOfBorder = regionList[smallestRegion-1].percentageOfBorder(self.edges, biggest)
                         percentageOfFrontier = regionList[smallestRegion-1].percentageOfFrontier(biggest)
-                        if percentageOfBorder > 0.25 and percentageOfFrontier > 0.25:
+                        if percentageOfBorder > 0.4 and percentageOfFrontier > 0.4:
                             for k in range(240):
                                 for l in range(320):
                                     if self.imgRegions[k][l] == smallestRegion:
@@ -311,18 +308,57 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         checkBreak = False
         print("Number of regions: ", len(regionList))
 
+        for i in range(1,239,1):
+            for j in range(1,319,1):
+                if self.imgRegions[i][j] == -1:
+                    for k in range(-1,2,1):
+                        for l in range(-1,2,1):
+                            if self.imgRegions[i+k][j+l] != -1 and self.imgRegions[i][j] == -1:
+                                self.imgRegions[i][j] = self.imgRegions[i+k][j+l]
+
+        
+        
+        if self.checkBoxMerge.isChecked() is True:
+            print("Merging")
+            for i in range (1, 239, 1):
+                for j in range(1, 319, 1):
+                    found = False
+                    for k in range(-1,2,1):
+                        if found is True:
+                            break
+                        for l in range(-1,2,1) :
+                            if found is True:
+                                break
+                            if self.imgRegions[i][j] != self.imgRegions[i+k][j+l]:
+                                regionList[self.imgRegions[i][j]-1].addFrontierPoint([i,j, self.imgRegions[i+k][j+l]])
+                                #print("Point coords: ", i, " ", j, " Region ID: ", self.imgRegions[i][j])
+            for i in regionList:
+                if i.deleted == False:
+                    borderRegions = i.regionsInBorder()
+                    for j in borderRegions:
+                        otherRegion = regionList[j-1]
+                        if i.regionSize() < otherRegion.regionSize():
+                            smallestRegion = i.id
+                            biggest = j
+                        else:
+                            smallestRegion = j
+                            biggest = i.id
+                        percentageOfBorder = regionList[smallestRegion-1].percentageOfBorder(self.edges, biggest)
+                        percentageOfFrontier = regionList[smallestRegion-1].percentageOfFrontier(biggest)
+                        if percentageOfBorder > 0.4 and percentageOfFrontier > 0.4:
+                            for k in range(240):
+                                for l in range(320):
+                                    if self.imgRegions[k][l] == smallestRegion:
+                                        self.imgRegions[k][l] = biggest
+                            regionList[biggest-1].mergeRegion(regionList[smallestRegion-1])
+                            regionList[smallestRegion-1].deleted = True
+
         for i in range(240):
             for j in range(320):
-                if self.imgRegions[i][j] == -1:
-                    if i != 239:
-                        self.imgRegions[i][j] = self.imgRegions[i+1][j]
-                    else: 
-                        self.imgRegions[i][j] = self.imgRegions[i-1][j]
                 regionIndex = self.imgRegions[i][j] -1
                 region2 = regionList[regionIndex]
                 avgColor = region2.returnAverage()
                 self.colorImageDest[i][j] = avgColor
-        
 
         if self.checkBoxBorders.isChecked() == True:
             #We skip the first to avoid out of bounds. Can be done manually, or adding an if check that makes everything slow as fuck.
