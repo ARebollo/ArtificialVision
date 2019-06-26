@@ -20,8 +20,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         ##################      UI loading      ##################
 
-        uic.loadUi('mainwindow.ui', self)
-        #uic.loadUi('Practica 4/mainwindow.ui', self)
+        #uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('Practica 4/mainwindow.ui', self)
 
         ##########################################################
 
@@ -59,16 +59,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##############################################################################
 
-
         ##################      Buttons     ##################
 
         self.colorButton.clicked.connect(self.colorButtonAction)
         self.captureButton.clicked.connect(self.captureButtonAction)
         self.loadButton.clicked.connect(self.loadAction)
-        #self.spinBoxDifference.valueChanged.connect(self.fillImgRegions)
+        self.spinBoxDifference.valueChanged.connect(self.spinBoxAction)
 
         ######################################################
-
         
         ##############################################################
 
@@ -78,7 +76,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         ##############################################################
 
-    
+    def spinBoxAction(self):
+        if self.colorState is True:
+            self.fillImgRegions()
+        else: 
+            self.fillImgRegionsColor()
+
     '''
     What we have to do is fill each region with a value.
     Iterate over the whole image. If we find a point that doesn't have a region we call floodfill
