@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QWidget" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1010</width>
+    <height>642</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Proyecto de Visión Artificial</string>
+  </property>
+  <widget class="QFrame" name="imageFrameS">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="imageFrameD">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>20</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="colorButton">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>100</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color Image</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton_1">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>20</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Image 1</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>260</y>
+     <width>81</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Image 1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>260</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Image 2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="initDisparity_button">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>140</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Initialize Disparity</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxRange">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>270</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show Corners</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="propDisparity_button">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>180</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Propagate Disparity</string>
+   </property>
+  </widget>
+  <widget class="QFrame" name="imageFrameS_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="imageFrameD_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>310</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton_2">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>60</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Image 2</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadTruth_Button">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>300</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Ground Truth</string>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="estimatedDisp">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>340</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="trueDisp">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>390</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>345</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Estimated Disparity</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>390</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>True Disparity</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="kernelSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="iterationSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>220</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>220</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kernel size</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>220</y>
+     <width>59</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Iterations</string>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="dispPerc">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>440</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>440</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Difference</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxCorners">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>250</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Two-Way Corners</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>colorButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
